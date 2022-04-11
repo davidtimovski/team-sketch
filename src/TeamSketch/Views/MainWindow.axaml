@@ -1,0 +1,63 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:TeamSketch.ViewModels"
+        x:Class="TeamSketch.Views.MainWindow"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="Team Sketch">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+	<Grid RowDefinitions="1*,50">
+		<Grid Grid.Row="0" ColumnDefinitions="1*,200">
+			
+			<Canvas Grid.Column="0" Name="canvas" PointerPressed="Canvas_PointerPressed" PointerReleased="Canvas_PointerReleased" >
+				<Canvas.Background>
+					<SolidColorBrush Color="White" Opacity="0" />
+				</Canvas.Background>
+			</Canvas>
+
+			<Border Grid.Column="1">
+				<Grid RowDefinitions="200,1*">
+					<Border Grid.Row="0" Background="#eee" Padding="10 10 10 30">
+						<DockPanel VerticalAlignment="Top">
+							<Button Name="defaultColorButton">Default</Button>
+							<Button Name="redColorButton">Red</Button>
+						</DockPanel>
+					</Border>
+
+					<Border Grid.Row="1" Background="#ddd" Padding="10" VerticalAlignment="Stretch">
+						<StackPanel>
+							<Border Margin="0 0 0 10">
+								<TextBlock>Users</TextBlock>
+							</Border>
+
+							<ItemsControl Items="{Binding Users}">
+								<ItemsControl.ItemTemplate>
+									<DataTemplate DataType="vm:UserViewModel">
+										<Border Padding="15 10" Margin="0 0 0 7" Background="#eee">
+											<TextBlock Text="{Binding Nickname}" />
+										</Border>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</StackPanel>
+					</Border>
+				</Grid>
+
+			</Border>
+		</Grid>
+		
+		<Border Grid.Row="1" Height="50" Padding="15 0 0 0" Background="#eee">
+
+			<DockPanel VerticalAlignment="Center">
+				<TextBlock Text="Connected. Ping: " />
+				<TextBlock Text="{Binding Latency}" />
+				<TextBlock Text=" ms" />
+			</DockPanel>
+			
+		</Border>
+	</Grid>
+
+</Window>
