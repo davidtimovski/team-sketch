@@ -10,8 +10,9 @@ namespace TeamSketch.Services;
 public interface IRenderer
 {
     ColorsEnum BrushColor { get; }
-    double BrushThickness { get; set; }
-    void SetBrushColor(ColorsEnum brushColor);
+    double BrushThickness { get; }
+    void SetBrush(double thickness, ColorsEnum color);
+    void SetEraser();
     void Draw(PointDto point, bool remote = false);
     void Draw(LineDto line, bool remote = false);
 }
@@ -20,7 +21,6 @@ public class Renderer : IRenderer
 {
     private readonly Canvas _canvas;
     private readonly ISignalRService _signalRService;
-    private ISolidColorBrush _brush = new SolidColorBrush(Color.FromRgb(0, 0, 0));
 
     public Renderer(Canvas canvas, ISignalRService signalRService)
     {
@@ -29,37 +29,28 @@ public class Renderer : IRenderer
     }
 
     public ColorsEnum BrushColor { get; private set; }
-    public double BrushThickness { get; set; } = 2;
+    public double BrushThickness { get; private set; } = 2;
 
-    public void SetBrushColor(ColorsEnum color)
+    public void SetBrush(double thickness, ColorsEnum color)
     {
-        switch (color)
-        {
-            case ColorsEnum.Default:
-                _brush = new SolidColorBrush(Color.FromRgb(0, 0, 0));
-                break;
-            case ColorsEnum.Red:
-                _brush = new SolidColorBrush(Color.FromRgb(255, 0, 0));
-                break;
-            case ColorsEnum.Blue:
-                _brush = new SolidColorBrush(Color.FromRgb(0, 0, 255));
-                break;
-            case ColorsEnum.Green:
-                _brush = new SolidColorBrush(Color.FromRgb(0, 255, 0));
-                break;
-        }
-
+        BrushThickness = thickness;
         BrushColor = color;
+    }
+
+    public void SetEraser()
+    {
+        BrushThickness = 50;
+        BrushColor = ColorsEnum.Eraser;
     }
 
     public void Draw(PointDto point, bool remote = false)
     {
         var ellipse = new Ellipse
         {
-            Margin = new Thickness(point.X - (BrushThickness / 2), point.Y - (BrushThickness / 2), 0, 0),
-            Fill = new SolidColorBrush(Color.FromRgb(0, 0, 0)),
-            Width = BrushThickness,
-            Height = BrushThickness
+            Margin = new Thickness(point.X - (point.Size / 2), point.Y - (point.Size / 2), 0, 0),
+            Fill = GetBrush(point.Color),
+            Width = point.Size,
+            Height = point.Size
         };
         _canvas.Children.Add(ellipse);
 
@@ -81,8 +72,8 @@ public class Renderer : IRenderer
     public void Draw(LineDto line, bool remote = false)
     {
         Line lineShape = new();
-        lineShape.StrokeThickness = BrushThickness;
-        lineShape.Stroke = _brush;
+        lineShape.StrokeThickness = line.Thickness;
+        lineShape.Stroke = GetBrush(line.Color);
         lineShape.StartPoint = new Point(line.X1, line.Y1);
         lineShape.EndPoint = new Point(line.X2, line.Y2);
         _canvas.Children.Add(lineShape);
@@ -100,5 +91,18 @@ public class Renderer : IRenderer
         {
             System.Diagnostics.Debug.WriteLine(ex.Message);
         }
+    }
+
+    private static SolidColorBrush GetBrush(ColorsEnum color)
+    {
+        return color switch
+        {
+            ColorsEnum.Default => new SolidColorBrush(Color.FromRgb(0, 0, 0)),
+            ColorsEnum.Eraser => new SolidColorBrush(Color.FromRgb(255, 255, 255)),
+            ColorsEnum.Red => new SolidColorBrush(Color.FromRgb(255, 0, 0)),
+            ColorsEnum.Blue => new SolidColorBrush(Color.FromRgb(0, 0, 255)),
+            ColorsEnum.Green => new SolidColorBrush(Color.FromRgb(0, 255, 0)),
+            _ => throw new ArgumentException(null, nameof(color))
+        };
     }
 }

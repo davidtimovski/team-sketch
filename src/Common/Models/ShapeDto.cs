@@ -1,4 +1,4 @@
 ﻿namespace Common
 {
-    public abstract record ShapeDto(ColorsEnum color);
+    public abstract record ShapeDto(ColorsEnum Color);
 }

@@ -3,13 +3,12 @@
         xmlns:vm="using:TeamSketch.ViewModels"
         x:Class="TeamSketch.Views.EnterWindow"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Enter">
+        Title="Team Sketch">
 
 	<Window.Styles>
 		<Style Selector="Window">
 			<!--<Setter Property="Icon" Value="/Assets/logo.ico" />-->
 			<Setter Property="SizeToContent" Value="WidthAndHeight" />
-			<!--<Setter Property="Background" Value="{DynamicResource WindowBackground}" />-->
 			<Setter Property="Padding" Value="15 10" />
 		</Style>
 	</Window.Styles>
@@ -19,10 +18,29 @@
     </Design.DataContext>
 
 	<StackPanel>
-		<TextBox Text="{Binding Nickname}" Watermark="Nickname" />
-		<TextBox Text="{Binding Room}" Watermark="Room" />
+		<Border>
+			<DockPanel>
+				<Button Command="{Binding OnToggleTabCommand}" IsEnabled="{Binding JoinTabVisible}">Create</Button>
+				<Button Command="{Binding OnToggleTabCommand}" IsEnabled="{Binding !JoinTabVisible}">Join</Button>
+			</DockPanel>
+		</Border>
 
-		<Button Name="connectButton" HotKey="Enter">Connect</Button>
+		<Border>
+			<Panel>
+				<StackPanel IsVisible="{Binding !JoinTabVisible}">
+					<TextBox Text="{Binding Nickname}" Watermark="Nickname" />
+
+					<Button Name="createButton" HotKey="Enter">Create</Button>
+				</StackPanel>
+
+				<StackPanel IsVisible="{Binding JoinTabVisible}">
+					<TextBox Text="{Binding Nickname}" Watermark="Nickname" />
+					<TextBox Text="{Binding Room}" Watermark="Room" />
+
+					<Button Name="joinButton" HotKey="Enter">Join</Button>
+				</StackPanel>
+			</Panel>
+		</Border>
 	</StackPanel>
 
 </Window>

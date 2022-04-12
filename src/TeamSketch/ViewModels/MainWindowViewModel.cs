@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive;
 using System.Threading.Tasks;
+using Avalonia;
 using ReactiveUI;
 using Splat;
 using TeamSketch.DependencyInjection;
@@ -12,10 +14,12 @@ namespace TeamSketch.ViewModels;
 public class MainWindowViewModel : ViewModelBase
 {
     private readonly ISignalRService _signalRService;
+    private ReactiveCommand<Unit, Unit> OnCopyRoomCommand { get; }
 
     public MainWindowViewModel()
     {
         _signalRService = Locator.Current.GetRequiredService<ISignalRService>();
+        OnCopyRoomCommand = ReactiveCommand.Create(CopyRoom);
 
         _signalRService.Waved += SignalRService_Waved;
         _signalRService.Joined += SignalRService_Joined;
@@ -23,6 +27,15 @@ public class MainWindowViewModel : ViewModelBase
         _signalRService.Pong += SignalRService_Pong;
 
         Users.Add(new UserViewModel { Nickname = _signalRService.Nickname });
+
+        Room = _signalRService.Room;
+    }
+
+    public string Room { get; }
+
+    private async void CopyRoom()
+    {
+        await Application.Current.Clipboard.SetTextAsync(Room);
     }
 
     private void SignalRService_Waved(object sender, UserEventArgs e)
@@ -69,7 +82,7 @@ public class MainWindowViewModel : ViewModelBase
     {
         await _signalRService.LeaveAsync();
     }
-
+    
     private ObservableCollection<UserViewModel> Users { get; } = new ObservableCollection<UserViewModel>();
 
     private int latency;

@@ -5,10 +5,17 @@ namespace TeamSketch.Web.Hubs;
 
 public class ActionHub : Hub
 {
-    public async Task Join(string user, string room)
+    public async Task CreateRoom()
+    {
+        string room = Guid.NewGuid().ToString();
+        await Groups.AddToGroupAsync(Context.ConnectionId, room);
+        await Clients.Caller.SendAsync("RoomCreated", room);
+    }
+
+    public async Task JoinRoom(string user, string room)
     {
         await Groups.AddToGroupAsync(Context.ConnectionId, room);
-        await Clients.OthersInGroup(room).SendAsync("Joined", user);
+        await Clients.OthersInGroup(room).SendAsync("JoinedRoom", user);
     }
 
     public Task Wave(string user, string room)
@@ -16,25 +23,20 @@ public class ActionHub : Hub
         return Clients.OthersInGroup(room).SendAsync("Waved", user);
     }
 
-    public async Task Leave(string user, string room)
+    public async Task LeaveRoom(string user, string room)
     {
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, room);
-        await Clients.OthersInGroup(room).SendAsync("Left", user);
+        await Clients.OthersInGroup(room).SendAsync("LeftRoom", user);
     }
 
-    public async Task Draw(string user, string room, object shape)
+    public async Task DrawPoint(string user, string room, PointDto point)
     {
-        await Clients.OthersInGroup(room).SendAsync("Drew", user, shape);
+        await Clients.OthersInGroup(room).SendAsync("DrewPoint", user, point);
     }
 
-    public async Task DrawPoint(string user, string room, PointDto shape)
+    public async Task DrawLine(string user, string room, LineDto line)
     {
-        await Clients.OthersInGroup(room).SendAsync("DrewPoint", user, shape);
-    }
-
-    public async Task DrawLine(string user, string room, LineDto shape)
-    {
-        await Clients.OthersInGroup(room).SendAsync("DrewLine", user, shape);
+        await Clients.OthersInGroup(room).SendAsync("DrewLine", user, line);
     }
 
     public Task Ping()

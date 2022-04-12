@@ -11,7 +11,8 @@ public interface ISignalRService
     HubConnection Connection { get; }
     string Nickname { get; }
     string Room { get; }
-    Task ConnectAsync(string userNickname, string joinedRoom);
+    Task CreateRoomAsync(string userNickname);
+    Task JoinRoomAsync(string userNickname, string joinedRoom);
     Task WaveAsync();
     Task LeaveAsync();
     Task DrawAsync(ShapeDto shape);
@@ -46,13 +47,66 @@ public class SignalRService : ISignalRService
     public string Nickname { get; private set; }
     public string Room { get; private set; }
 
-    public async Task ConnectAsync(string userNickname, string joinedRoom)
+    public async Task CreateRoomAsync(string nickname)
     {
         await Connection.StartAsync();
 
-        Nickname = userNickname.Trim();
-        Room = joinedRoom.Trim().ToLower();
+        Nickname = nickname.Trim();
 
+        InitializeHandlersAndPingTimer();
+
+        Connection.On<string>("RoomCreated", (room) =>
+        {
+            Room = room;
+        });
+
+        await Connection.InvokeAsync("CreateRoom");
+    }
+
+    public async Task JoinRoomAsync(string nickname, string room)
+    {
+        await Connection.StartAsync();
+
+        Nickname = nickname.Trim();
+        Room = room;
+
+        InitializeHandlersAndPingTimer();
+
+        await Connection.InvokeAsync("JoinRoom", Nickname, Room);
+    }
+
+    public async Task WaveAsync()
+    {
+        await Connection.InvokeAsync("Wave", Nickname, Room);
+    }
+
+    public async Task LeaveAsync()
+    {
+        await Connection.InvokeAsync("LeaveRoom", Nickname, Room);
+    }
+
+    public async Task DrawAsync(ShapeDto shape)
+    {
+        switch (shape)
+        {
+            case PointDto point:
+                await Connection.InvokeAsync("DrawPoint", Nickname, Room, point);
+                break;
+            case LineDto line:
+                await Connection.InvokeAsync("DrawLine", Nickname, Room, line);
+                break;
+        }
+    }
+
+    public event EventHandler<UserEventArgs> Waved;
+    public event EventHandler<UserEventArgs> Joined;
+    public event EventHandler<UserEventArgs> Left;
+    public event EventHandler<DrewPointEventArgs> DrewPoint;
+    public event EventHandler<DrewLineEventArgs> DrewLine;
+    public event EventHandler<PongEventArgs> Pong;
+
+    private void InitializeHandlersAndPingTimer()
+    {
         Connection.On<string>("Waved", (user) =>
         {
             Waved.Invoke(this, new UserEventArgs
@@ -61,7 +115,7 @@ public class SignalRService : ISignalRService
             });
         });
 
-        Connection.On<string>("Joined", async (user) =>
+        Connection.On<string>("JoinedRoom", async (user) =>
         {
             await WaveAsync();
 
@@ -71,7 +125,7 @@ public class SignalRService : ISignalRService
             });
         });
 
-        Connection.On<string>("Left", (user) =>
+        Connection.On<string>("LeftRoom", (user) =>
         {
             Left.Invoke(this, new UserEventArgs
             {
@@ -110,39 +164,7 @@ public class SignalRService : ISignalRService
         _pingTimer.Tick += PingTimer_Tick;
         _pingTimer.Interval = TimeSpan.FromSeconds(5);
         _pingTimer.Start();
-
-        await Connection.InvokeAsync("Join", Nickname, Room);
     }
-
-    public async Task WaveAsync()
-    {
-        await Connection.InvokeAsync("Wave", Nickname, Room);
-    }
-
-    public async Task LeaveAsync()
-    {
-        await Connection.InvokeAsync("Leave", Nickname, Room);
-    }
-
-    public async Task DrawAsync(ShapeDto shape)
-    {
-        switch (shape)
-        {
-            case PointDto point:
-                await Connection.InvokeAsync("DrawPoint", Nickname, Room, point);
-                break;
-            case LineDto line:
-                await Connection.InvokeAsync("DrawLine", Nickname, Room, line);
-                break;
-        }
-    }
-
-    public event EventHandler<UserEventArgs> Waved;
-    public event EventHandler<UserEventArgs> Joined;
-    public event EventHandler<UserEventArgs> Left;
-    public event EventHandler<DrewPointEventArgs> DrewPoint;
-    public event EventHandler<DrewLineEventArgs> DrewLine;
-    public event EventHandler<PongEventArgs> Pong;
 }
 
 public class UserEventArgs : EventArgs

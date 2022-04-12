@@ -12,17 +12,35 @@ public partial class EnterWindow : Window
     {
         InitializeComponent();
 
-        var connectButton = this.FindControl<Button>("connectButton");
-        connectButton.Command = ReactiveCommand.Create(ConnectButtonClicked);
+        var createButton = this.FindControl<Button>("createButton");
+        createButton.Command = ReactiveCommand.Create(CreateButtonClicked);
+
+        var joinButton = this.FindControl<Button>("joinButton");
+        joinButton.Command = ReactiveCommand.Create(JoinButtonClicked);
     }
 
     public event EventHandler<EventArgs> Entered;
 
-    private async Task ConnectButtonClicked()
+    private async Task CreateButtonClicked()
     {
         var vm = (EnterViewModel)DataContext;
 
-        var result = await vm.ConnectAsync();
+        var result = await vm.CreateRoomAsync();
+        if (result != null)
+        {
+            // TODO: error message
+            return;
+        }
+
+        Entered.Invoke(this, null);
+        Close();
+    }
+
+    private async Task JoinButtonClicked()
+    {
+        var vm = (EnterViewModel)DataContext;
+
+        var result = await vm.JoinRoomAsync();
         if (result != null)
         {
             // TODO: error message

@@ -38,6 +38,9 @@ public partial class MainWindow : Window
 
         var redColorButton = this.FindControl<Button>("redColorButton");
         redColorButton.Command = ReactiveCommand.Create(SetRedColor);
+
+        var eraserButton = this.FindControl<Button>("eraserButton");
+        eraserButton.Command = ReactiveCommand.Create(SetEraser);
     }
 
     private void SignalRService_DrewPoint(object sender, DrewPointEventArgs e)
@@ -65,7 +68,7 @@ public partial class MainWindow : Window
     private void Canvas_PointerReleased(object sender, PointerReleasedEventArgs e)
     {
         pressed = false;
-        var point = new PointDto(currentPoint.X, currentPoint.Y, _renderer.BrushThickness, ColorsEnum.Default);
+        var point = new PointDto(currentPoint.X, currentPoint.Y, _renderer.BrushThickness, _renderer.BrushColor);
         _renderer.Draw(point);
     }
 
@@ -78,7 +81,7 @@ public partial class MainWindow : Window
 
         Point newPosition = e.GetPosition(this);
 
-        var line = new LineDto(currentPoint.X, currentPoint.Y, newPosition.X, newPosition.Y, _renderer.BrushThickness, ColorsEnum.Default);
+        var line = new LineDto(currentPoint.X, currentPoint.Y, newPosition.X, newPosition.Y, _renderer.BrushThickness, _renderer.BrushColor);
         _renderer.Draw(line);
 
         currentPoint = newPosition;
@@ -86,12 +89,17 @@ public partial class MainWindow : Window
 
     private void SetDefaultColor()
     {
-        _renderer.SetBrushColor(ColorsEnum.Default);
+        _renderer.SetBrush(2, ColorsEnum.Default);
     }
 
     private void SetRedColor()
     {
-        _renderer.SetBrushColor(ColorsEnum.Red);
+        _renderer.SetBrush(2, ColorsEnum.Red);
+    }
+
+    private void SetEraser()
+    {
+        _renderer.SetEraser();
     }
 
     protected override void OnClosing(CancelEventArgs e)
