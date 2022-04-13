@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Common\Common.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="6.0.4" />
   </ItemGroup>
 
 </Project>

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Avalonia.Threading;
-using Common;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.DependencyInjection;
+using TeamSketch.Models;
 
 namespace TeamSketch.Services;
 
@@ -15,13 +16,14 @@ public interface ISignalRService
     Task JoinRoomAsync(string userNickname, string joinedRoom);
     Task WaveAsync();
     Task LeaveAsync();
-    Task DrawAsync(ShapeDto shape);
+    Task DrawPointAsync(double x, double y, short size, ColorsEnum color);
+    Task DrawLineAsync(double x1, double y1, double x2, double y2, short thickness, ColorsEnum color);
 
     event EventHandler<UserEventArgs> Waved;
     event EventHandler<UserEventArgs> Joined;
     event EventHandler<UserEventArgs> Left;
-    event EventHandler<DrewPointEventArgs> DrewPoint;
-    event EventHandler<DrewLineEventArgs> DrewLine;
+    event EventHandler<DrewEventArgs> DrewPoint;
+    event EventHandler<DrewEventArgs> DrewLine;
     event EventHandler<PongEventArgs> Pong;
 }
 
@@ -34,6 +36,7 @@ public class SignalRService : ISignalRService
     {
         Connection = new HubConnectionBuilder()
            .WithUrl("http://localhost:5206/ActionHub")
+           .AddMessagePackProtocol()
            .Build();
     }
 
@@ -85,24 +88,23 @@ public class SignalRService : ISignalRService
         await Connection.InvokeAsync("LeaveRoom", Nickname, Room);
     }
 
-    public async Task DrawAsync(ShapeDto shape)
+    public async Task DrawPointAsync(double x, double y, short size, ColorsEnum color)
     {
-        switch (shape)
-        {
-            case PointDto point:
-                await Connection.InvokeAsync("DrawPoint", Nickname, Room, point);
-                break;
-            case LineDto line:
-                await Connection.InvokeAsync("DrawLine", Nickname, Room, line);
-                break;
-        }
+        var data = PayloadConverter.PointToBytes(x, y, size, color);
+        await Connection.InvokeAsync("DrawPoint", Nickname, Room, data);
+    }
+
+    public async Task DrawLineAsync(double x1, double y1, double x2, double y2, short thickness, ColorsEnum color)
+    {
+        var data = PayloadConverter.LineToBytes(x1, y1, x2, y2, thickness, color);
+        await Connection.InvokeAsync("DrawLine", Nickname, Room, data);
     }
 
     public event EventHandler<UserEventArgs> Waved;
     public event EventHandler<UserEventArgs> Joined;
     public event EventHandler<UserEventArgs> Left;
-    public event EventHandler<DrewPointEventArgs> DrewPoint;
-    public event EventHandler<DrewLineEventArgs> DrewLine;
+    public event EventHandler<DrewEventArgs> DrewPoint;
+    public event EventHandler<DrewEventArgs> DrewLine;
     public event EventHandler<PongEventArgs> Pong;
 
     private void InitializeHandlersAndPingTimer()
@@ -133,21 +135,21 @@ public class SignalRService : ISignalRService
             });
         });
 
-        Connection.On<string, PointDto>("DrewPoint", (user, point) =>
+        Connection.On<string, byte[]>("DrewPoint", (user, data) =>
         {
-            DrewPoint.Invoke(this, new DrewPointEventArgs
+            DrewPoint.Invoke(this, new DrewEventArgs
             {
                 User = user,
-                Point = point
+                Data = data
             });
         });
 
-        Connection.On<string, LineDto>("DrewLine", (user, line) =>
+        Connection.On<string, byte[]>("DrewLine", (user, data) =>
         {
-            DrewLine.Invoke(this, new DrewLineEventArgs
+            DrewLine.Invoke(this, new DrewEventArgs
             {
                 User = user,
-                Line = line
+                Data = data
             });
         });
 
@@ -172,16 +174,10 @@ public class UserEventArgs : EventArgs
     public string User { get; init; }
 }
 
-public class DrewPointEventArgs : EventArgs
+public class DrewEventArgs : EventArgs
 {
     public string User { get; init; }
-    public PointDto Point { get; init; }
-}
-
-public class DrewLineEventArgs : EventArgs
-{
-    public string User { get; init; }
-    public LineDto Line { get; init; }
+    public byte[] Data { get; init; }
 }
 
 public class PongEventArgs : EventArgs

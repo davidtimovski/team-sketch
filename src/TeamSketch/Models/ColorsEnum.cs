@@ -1,4 +1,4 @@
-﻿namespace Common
+﻿namespace TeamSketch.Models
 {
     public enum ColorsEnum
     {

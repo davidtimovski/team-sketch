@@ -3,18 +3,20 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Media;
-using Common;
+using TeamSketch.Models;
 
 namespace TeamSketch.Services;
 
 public interface IRenderer
 {
     ColorsEnum BrushColor { get; }
-    double BrushThickness { get; }
-    void SetBrush(double thickness, ColorsEnum color);
+    short BrushThickness { get; }
+    void SetBrush(short thickness, ColorsEnum color);
     void SetEraser();
-    void Draw(PointDto point, bool remote = false);
-    void Draw(LineDto line, bool remote = false);
+    void DrawPoint(double x, double y);
+    void DrawPointRemote(byte[] data);
+    void DrawLine(double x1, double y1, double x2, double y2);
+    void DrawLineRemote(byte[] data);
 }
 
 public class Renderer : IRenderer
@@ -29,9 +31,9 @@ public class Renderer : IRenderer
     }
 
     public ColorsEnum BrushColor { get; private set; }
-    public double BrushThickness { get; private set; } = 2;
+    public short BrushThickness { get; private set; } = 2;
 
-    public void SetBrush(double thickness, ColorsEnum color)
+    public void SetBrush(short thickness, ColorsEnum color)
     {
         BrushThickness = thickness;
         BrushColor = color;
@@ -43,25 +45,20 @@ public class Renderer : IRenderer
         BrushColor = ColorsEnum.Eraser;
     }
 
-    public void Draw(PointDto point, bool remote = false)
+    public void DrawPoint(double x, double y)
     {
         var ellipse = new Ellipse
         {
-            Margin = new Thickness(point.X - (point.Size / 2), point.Y - (point.Size / 2), 0, 0),
-            Fill = GetBrush(point.Color),
-            Width = point.Size,
-            Height = point.Size
+            Margin = new Thickness(x - (BrushThickness / 2), y - (BrushThickness / 2), 0, 0),
+            Fill = GetBrush(BrushColor),
+            Width = BrushThickness,
+            Height = BrushThickness
         };
         _canvas.Children.Add(ellipse);
 
-        if (remote)
-        {
-            return;
-        }
-
         try
         {
-            _ = _signalRService.DrawAsync(point);
+            _ = _signalRService.DrawPointAsync(x, y, BrushThickness, BrushColor);
         }
         catch (Exception ex)
         {
@@ -69,28 +66,36 @@ public class Renderer : IRenderer
         }
     }
 
-    public void Draw(LineDto line, bool remote = false)
+    public void DrawPointRemote(byte[] data)
     {
-        Line lineShape = new();
-        lineShape.StrokeThickness = line.Thickness;
-        lineShape.Stroke = GetBrush(line.Color);
-        lineShape.StartPoint = new Point(line.X1, line.Y1);
-        lineShape.EndPoint = new Point(line.X2, line.Y2);
-        _canvas.Children.Add(lineShape);
+        var point = PayloadConverter.BytesToPoint(data);
+        _canvas.Children.Add(point);
+    }
 
-        if (remote)
-        {
-            return;
-        }
+    public void DrawLine(double x1, double y1, double x2, double y2)
+    {
+        Line line = new();
+        line.StrokeThickness = BrushThickness;
+        line.Stroke = GetBrush(BrushColor);
+        line.StartPoint = new Point(x1, y1);
+        line.EndPoint = new Point(x2, y2);
+
+        _canvas.Children.Add(line);
 
         try
         {
-            _ = _signalRService.DrawAsync(line);
+            _ = _signalRService.DrawLineAsync(x1, y1, x2, y2, BrushThickness, BrushColor);
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine(ex.Message);
         }
+    }
+
+    public void DrawLineRemote(byte[] data)
+    {
+        var line = PayloadConverter.BytesToLine(data);
+        _canvas.Children.Add(line);
     }
 
     private static SolidColorBrush GetBrush(ColorsEnum color)

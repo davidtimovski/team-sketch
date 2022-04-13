@@ -1,5 +1,4 @@
-﻿using Common;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 
 namespace TeamSketch.Web.Hubs;
 
@@ -29,14 +28,14 @@ public class ActionHub : Hub
         await Clients.OthersInGroup(room).SendAsync("LeftRoom", user);
     }
 
-    public async Task DrawPoint(string user, string room, PointDto point)
+    public async Task DrawPoint(string user, string room, byte[] data)
     {
-        await Clients.OthersInGroup(room).SendAsync("DrewPoint", user, point);
+        await Clients.OthersInGroup(room).SendAsync("DrewPoint", user, data);
     }
 
-    public async Task DrawLine(string user, string room, LineDto line)
+    public async Task DrawLine(string user, string room, byte[] data)
     {
-        await Clients.OthersInGroup(room).SendAsync("DrewLine", user, line);
+        await Clients.OthersInGroup(room).SendAsync("DrewLine", user, data);
     }
 
     public Task Ping()

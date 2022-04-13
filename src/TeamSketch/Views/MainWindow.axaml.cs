@@ -4,10 +4,10 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
-using Common;
 using ReactiveUI;
 using Splat;
 using TeamSketch.DependencyInjection;
+using TeamSketch.Models;
 using TeamSketch.Services;
 using TeamSketch.Utils;
 using TeamSketch.ViewModels;
@@ -43,19 +43,19 @@ public partial class MainWindow : Window
         eraserButton.Command = ReactiveCommand.Create(SetEraser);
     }
 
-    private void SignalRService_DrewPoint(object sender, DrewPointEventArgs e)
+    private void SignalRService_DrewPoint(object sender, DrewEventArgs e)
     {
         Dispatcher.UIThread.InvokeAsync(() =>
         {
-            _renderer.Draw(e.Point, true);
+            _renderer.DrawPointRemote(e.Data);
         });
     }
 
-    private void SignalRService_DrewLine(object sender, DrewLineEventArgs e)
+    private void SignalRService_DrewLine(object sender, DrewEventArgs e)
     {
         Dispatcher.UIThread.InvokeAsync(() =>
         {
-            _renderer.Draw(e.Line, true);
+            _renderer.DrawLineRemote(e.Data);
         });
     }
 
@@ -68,8 +68,7 @@ public partial class MainWindow : Window
     private void Canvas_PointerReleased(object sender, PointerReleasedEventArgs e)
     {
         pressed = false;
-        var point = new PointDto(currentPoint.X, currentPoint.Y, _renderer.BrushThickness, _renderer.BrushColor);
-        _renderer.Draw(point);
+        _renderer.DrawPoint(currentPoint.X, currentPoint.Y);
     }
 
     private void Canvas_PointerMoved(object sender, PointerEventArgs e)
@@ -81,8 +80,7 @@ public partial class MainWindow : Window
 
         Point newPosition = e.GetPosition(this);
 
-        var line = new LineDto(currentPoint.X, currentPoint.Y, newPosition.X, newPosition.Y, _renderer.BrushThickness, _renderer.BrushColor);
-        _renderer.Draw(line);
+        _renderer.DrawLine(currentPoint.X, currentPoint.Y, newPosition.X, newPosition.Y);
 
         currentPoint = newPosition;
     }
