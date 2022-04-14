@@ -17,6 +17,7 @@ namespace TeamSketch.Views;
 public partial class MainWindow : Window
 {
     private readonly IRenderer _renderer;
+    private readonly ISignalRService _signalRService;
 
     private Point currentPoint = new();
     private bool pressed;
@@ -25,11 +26,11 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        var signalRService = Locator.Current.GetRequiredService<ISignalRService>();
-        _renderer = new Renderer(canvas, signalRService);
+        _renderer = new Renderer(canvas);
 
-        signalRService.DrewPoint += SignalRService_DrewPoint;
-        signalRService.DrewLine += SignalRService_DrewLine;
+        _signalRService = Locator.Current.GetRequiredService<ISignalRService>();
+        _signalRService.DrewPoint += SignalRService_DrewPoint;
+        _signalRService.DrewLine += SignalRService_DrewLine;
 
         canvas.PointerMoved += ThrottleHelper.CreateThrottledEventHandler(Canvas_PointerMoved, TimeSpan.FromMilliseconds(8));
 
@@ -47,7 +48,8 @@ public partial class MainWindow : Window
     {
         Dispatcher.UIThread.InvokeAsync(() =>
         {
-            _renderer.DrawPointRemote(e.Data);
+            var point = PayloadConverter.BytesToPoint(e.Data);
+            canvas.Children.Add(point);
         });
     }
 
@@ -55,7 +57,8 @@ public partial class MainWindow : Window
     {
         Dispatcher.UIThread.InvokeAsync(() =>
         {
-            _renderer.DrawLineRemote(e.Data);
+            var point = PayloadConverter.BytesToLine(e.Data);
+            canvas.Children.Add(point);
         });
     }
 
@@ -69,6 +72,15 @@ public partial class MainWindow : Window
     {
         pressed = false;
         _renderer.DrawPoint(currentPoint.X, currentPoint.Y);
+
+        try
+        {
+            _ = _signalRService.DrawPointAsync(currentPoint.X, currentPoint.Y, _renderer.BrushThickness, _renderer.BrushColor);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine(ex.Message);
+        }
     }
 
     private void Canvas_PointerMoved(object sender, PointerEventArgs e)
@@ -83,6 +95,15 @@ public partial class MainWindow : Window
         _renderer.DrawLine(currentPoint.X, currentPoint.Y, newPosition.X, newPosition.Y);
 
         currentPoint = newPosition;
+
+        try
+        {
+            _ = _signalRService.DrawLineAsync(currentPoint.X, currentPoint.Y, newPosition.X, newPosition.Y, _renderer.BrushThickness, _renderer.BrushColor);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine(ex.Message);
+        }
     }
 
     private void SetDefaultColor()
@@ -103,6 +124,15 @@ public partial class MainWindow : Window
     protected override void OnClosing(CancelEventArgs e)
     {
         var vm = DataContext as MainWindowViewModel;
-        _ = vm.LeaveAsync();
+        _ = vm.Disconnect();
+
+        var window = new EnterWindow
+        {
+            DataContext = new EnterViewModel(),
+            Topmost = true,
+            CanResize = false
+        };
+        window.Show();
+        window.Activate();
     }
 }

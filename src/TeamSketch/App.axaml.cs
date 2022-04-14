@@ -1,4 +1,3 @@
-using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
@@ -28,20 +27,10 @@ public class App : Application
                 Topmost = true,
                 CanResize = false
             };
-            window.Entered += Entered;
             window.Show();
             window.Activate();
         }
 
         base.OnFrameworkInitializationCompleted();
-    }
-
-    private void Entered(object sender, EventArgs e)
-    {
-        _desktop.MainWindow = new MainWindow()
-        {
-            DataContext = new MainWindowViewModel()
-        };
-        _desktop.MainWindow.Show();
     }
 }

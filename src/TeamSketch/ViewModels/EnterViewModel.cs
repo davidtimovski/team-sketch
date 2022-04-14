@@ -18,37 +18,73 @@ public class EnterViewModel : ViewModelBase
         _signalRService = Locator.Current.GetRequiredService<ISignalRService>();
 
         OnToggleTabCommand = ReactiveCommand.Create(ToggleTab);
+
+        if (_signalRService.Nickname != null)
+        {
+            nickname = _signalRService.Nickname;
+        }
+    }
+
+    public async Task<bool> CreateRoomAsync()
+    {
+        if (!FormIsValid())
+        {
+            return false;
+        }
+
+        try
+        {
+            await _signalRService.CreateRoomAsync(nickname);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            // TODO
+            Console.WriteLine(ex.Message);
+            return false;
+        }
+    }
+
+    public async Task<bool> JoinRoomAsync()
+    {
+        if (!FormIsValid())
+        {
+            return false;
+        }
+
+        try
+        {
+            await _signalRService.JoinRoomAsync(nickname, room);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            // TODO
+            Console.WriteLine(ex.Message);
+            return false;
+        }
+    }
+
+    private bool FormIsValid()
+    {
+        var valid = true;
+
+        if (nickname.Trim().Length == 0)
+        {
+            valid = false;
+        }
+
+        if (room.Trim().Length == 0)
+        {
+            valid = false;
+        }
+
+        return valid;
     }
 
     private void ToggleTab()
     {
         JoinTabVisible = !JoinTabVisible;
-    }
-
-    public async Task<string> CreateRoomAsync()
-    {
-        try
-        {
-            await _signalRService.CreateRoomAsync(nickname);
-            return null;
-        }
-        catch (Exception ex)
-        {
-            return ex.Message;
-        }
-    }
-
-    public async Task<string> JoinRoomAsync()
-    {
-        try
-        {
-            await _signalRService.JoinRoomAsync(nickname, room);
-            return null;
-        }
-        catch (Exception ex)
-        {
-            return ex.Message;
-        }
     }
 
     private bool joinTabVisible;
@@ -58,14 +94,14 @@ public class EnterViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref joinTabVisible, value);
     }
 
-    private string nickname;
+    private string nickname = string.Empty;
     private string Nickname
     {
         get => nickname;
         set => this.RaiseAndSetIfChanged(ref nickname, value);
     }
 
-    private string room;
+    private string room = string.Empty;
     private string Room
     {
         get => room;

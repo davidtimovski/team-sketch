@@ -15,7 +15,7 @@ public interface ISignalRService
     Task CreateRoomAsync(string userNickname);
     Task JoinRoomAsync(string userNickname, string joinedRoom);
     Task WaveAsync();
-    Task LeaveAsync();
+    Task DisconnectAsync();
     Task DrawPointAsync(double x, double y, short size, ColorsEnum color);
     Task DrawLineAsync(double x1, double y1, double x2, double y2, short thickness, ColorsEnum color);
 
@@ -35,15 +35,10 @@ public class SignalRService : ISignalRService
     public SignalRService()
     {
         Connection = new HubConnectionBuilder()
-           .WithUrl("http://localhost:5206/ActionHub")
+           //.WithUrl("http://localhost:5206/actionHub")
+           .WithUrl("https://team-sketch.davidtimovski.com/actionHub")
            .AddMessagePackProtocol()
            .Build();
-    }
-
-    private async void PingTimer_Tick(object sender, EventArgs e)
-    {
-        lastPing = DateTime.Now;
-        await Connection.InvokeAsync("Ping");
     }
 
     public HubConnection Connection { get; }
@@ -83,9 +78,11 @@ public class SignalRService : ISignalRService
         await Connection.InvokeAsync("Wave", Nickname, Room);
     }
 
-    public async Task LeaveAsync()
+    public async Task DisconnectAsync()
     {
+        _pingTimer.Stop();
         await Connection.InvokeAsync("LeaveRoom", Nickname, Room);
+        await Connection.StopAsync();
     }
 
     public async Task DrawPointAsync(double x, double y, short size, ColorsEnum color)
@@ -111,76 +108,77 @@ public class SignalRService : ISignalRService
     {
         Connection.On<string>("Waved", (user) =>
         {
-            Waved.Invoke(this, new UserEventArgs
-            {
-                User = user
-            });
+            Waved.Invoke(this, new UserEventArgs(user));
         });
 
         Connection.On<string>("JoinedRoom", async (user) =>
         {
             await WaveAsync();
 
-            Joined.Invoke(this, new UserEventArgs
-            {
-                User = user
-            });
+            Joined.Invoke(this, new UserEventArgs(user));
         });
 
         Connection.On<string>("LeftRoom", (user) =>
         {
-            Left.Invoke(this, new UserEventArgs
-            {
-                User = user
-            });
+            Left.Invoke(this, new UserEventArgs(user));
         });
 
         Connection.On<string, byte[]>("DrewPoint", (user, data) =>
         {
-            DrewPoint.Invoke(this, new DrewEventArgs
-            {
-                User = user,
-                Data = data
-            });
+            DrewPoint.Invoke(this, new DrewEventArgs(user, data));
         });
 
         Connection.On<string, byte[]>("DrewLine", (user, data) =>
         {
-            DrewLine.Invoke(this, new DrewEventArgs
-            {
-                User = user,
-                Data = data
-            });
+            DrewLine.Invoke(this, new DrewEventArgs(user, data));
         });
 
         Connection.On("Pong", () =>
         {
             TimeSpan diff = DateTime.Now - lastPing;
-
-            Pong.Invoke(this, new PongEventArgs
-            {
-                Latency = diff.Milliseconds
-            });
+            Pong.Invoke(this, new PongEventArgs(diff.Milliseconds));
         });
 
         _pingTimer.Tick += PingTimer_Tick;
-        _pingTimer.Interval = TimeSpan.FromSeconds(5);
+        _pingTimer.Interval = TimeSpan.FromSeconds(3);
         _pingTimer.Start();
+    }
+
+    private async void PingTimer_Tick(object sender, EventArgs e)
+    {
+        lastPing = DateTime.Now;
+        await Connection.InvokeAsync("Ping");
     }
 }
 
 public class UserEventArgs : EventArgs
 {
-    public string User { get; init; }
+    public UserEventArgs(string user)
+    {
+        User = user;
+    }
+
+    public string User { get; private set; }
 }
 
 public class DrewEventArgs : EventArgs
 {
-    public string User { get; init; }
-    public byte[] Data { get; init; }
+    public DrewEventArgs(string user, byte[] data)
+    {
+        User = user;
+        Data = data;
+    }
+
+    public string User { get; private set; }
+    public byte[] Data { get; private set; }
 }
 
 public class PongEventArgs : EventArgs
 {
-    public int Latency { get; init; }
+    public PongEventArgs(int latency)
+    {
+        Latency = latency;
+    }
+
+    public int Latency { get; private set; }
 }

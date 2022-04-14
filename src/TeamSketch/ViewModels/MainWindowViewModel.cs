@@ -78,9 +78,9 @@ public class MainWindowViewModel : ViewModelBase
         Users.Remove(user);
     }
 
-    public async Task LeaveAsync()
+    public async Task Disconnect()
     {
-        await _signalRService.LeaveAsync();
+        await _signalRService.DisconnectAsync();
     }
     
     private ObservableCollection<UserViewModel> Users { get; } = new ObservableCollection<UserViewModel>();

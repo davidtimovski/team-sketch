@@ -14,20 +14,16 @@ public interface IRenderer
     void SetBrush(short thickness, ColorsEnum color);
     void SetEraser();
     void DrawPoint(double x, double y);
-    void DrawPointRemote(byte[] data);
     void DrawLine(double x1, double y1, double x2, double y2);
-    void DrawLineRemote(byte[] data);
 }
 
 public class Renderer : IRenderer
 {
     private readonly Canvas _canvas;
-    private readonly ISignalRService _signalRService;
 
-    public Renderer(Canvas canvas, ISignalRService signalRService)
+    public Renderer(Canvas canvas)
     {
         _canvas = canvas;
-        _signalRService = signalRService;
     }
 
     public ColorsEnum BrushColor { get; private set; }
@@ -55,21 +51,6 @@ public class Renderer : IRenderer
             Height = BrushThickness
         };
         _canvas.Children.Add(ellipse);
-
-        try
-        {
-            _ = _signalRService.DrawPointAsync(x, y, BrushThickness, BrushColor);
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine(ex.Message);
-        }
-    }
-
-    public void DrawPointRemote(byte[] data)
-    {
-        var point = PayloadConverter.BytesToPoint(data);
-        _canvas.Children.Add(point);
     }
 
     public void DrawLine(double x1, double y1, double x2, double y2)
@@ -79,22 +60,6 @@ public class Renderer : IRenderer
         line.Stroke = GetBrush(BrushColor);
         line.StartPoint = new Point(x1, y1);
         line.EndPoint = new Point(x2, y2);
-
-        _canvas.Children.Add(line);
-
-        try
-        {
-            _ = _signalRService.DrawLineAsync(x1, y1, x2, y2, BrushThickness, BrushColor);
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine(ex.Message);
-        }
-    }
-
-    public void DrawLineRemote(byte[] data)
-    {
-        var line = PayloadConverter.BytesToLine(data);
         _canvas.Children.Add(line);
     }
 

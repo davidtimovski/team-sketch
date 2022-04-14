@@ -19,35 +19,39 @@ public partial class EnterWindow : Window
         joinButton.Command = ReactiveCommand.Create(JoinButtonClicked);
     }
 
-    public event EventHandler<EventArgs> Entered;
-
     private async Task CreateButtonClicked()
     {
         var vm = (EnterViewModel)DataContext;
-
-        var result = await vm.CreateRoomAsync();
-        if (result != null)
+        var success = await vm.CreateRoomAsync();
+        if (!success)
         {
-            // TODO: error message
             return;
         }
 
-        Entered.Invoke(this, null);
+        var mainWindow = new MainWindow()
+        {
+            DataContext = new MainWindowViewModel()
+        };
+        mainWindow.Show();
+
         Close();
     }
 
     private async Task JoinButtonClicked()
     {
         var vm = (EnterViewModel)DataContext;
-
-        var result = await vm.JoinRoomAsync();
-        if (result != null)
+        var success = await vm.JoinRoomAsync();
+        if (!success)
         {
-            // TODO: error message
             return;
         }
 
-        Entered.Invoke(this, null);
+        var mainWindow = new MainWindow()
+        {
+            DataContext = new MainWindowViewModel()
+        };
+        mainWindow.Show();
+
         Close();
     }
 }
