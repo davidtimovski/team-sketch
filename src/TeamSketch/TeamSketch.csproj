@@ -34,4 +34,8 @@
 		  <DependentUpon>EnterWindow.axaml</DependentUpon>
 	  </Compile>
   </ItemGroup>
+  <ItemGroup>
+	<EmbeddedResource Include="Assets\Fonts\OpenSans-Regular.ttf" />
+	<EmbeddedResource Include="Assets\Fonts\OpenSans-Medium.ttf" />
+  </ItemGroup>
 </Project>

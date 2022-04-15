@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ReactiveUI;
 using Splat;
@@ -27,8 +28,11 @@ public class EnterViewModel : ViewModelBase
 
     public async Task<bool> CreateRoomAsync()
     {
-        if (!FormIsValid())
+        Entering = true;
+
+        if (!ValidateNickname())
         {
+            Entering = false;
             return false;
         }
 
@@ -41,14 +45,27 @@ public class EnterViewModel : ViewModelBase
         {
             // TODO
             Console.WriteLine(ex.Message);
+            Entering = false;
             return false;
         }
     }
 
     public async Task<bool> JoinRoomAsync()
     {
-        if (!FormIsValid())
+        Entering = true;
+        NicknameIsInvalid = RoomIsInvalid = false;
+
+        bool valid = ValidateNickname();
+
+        if (room.Trim().Length == 0 || !Guid.TryParse(room.Trim(), out _))
         {
+            RoomIsInvalid = true;
+            valid = false;
+        }
+
+        if (!valid)
+        {
+            Entering = false;
             return false;
         }
 
@@ -61,29 +78,37 @@ public class EnterViewModel : ViewModelBase
         {
             // TODO
             Console.WriteLine(ex.Message);
+            Entering = false;
             return false;
         }
     }
 
-    private bool FormIsValid()
+    private bool ValidateNickname()
     {
-        var valid = true;
+        var trimmed = nickname.Trim();
 
-        if (nickname.Trim().Length == 0)
+        if (trimmed.Length == 0)
         {
-            valid = false;
+            NicknameIsInvalid = true;
+            return false;
         }
 
-        if (room.Trim().Length == 0)
+        if (!Regex.IsMatch(trimmed, "^\\w+$"))
         {
-            valid = false;
+            NicknameIsInvalid = true;
+            return false;
         }
 
-        return valid;
+        return true;
     }
 
     private void ToggleTab()
     {
+        if (Entering)
+        {
+            return;
+        }
+
         JoinTabVisible = !JoinTabVisible;
     }
 
@@ -101,10 +126,31 @@ public class EnterViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref nickname, value);
     }
 
+    private bool nicknameIsInvalid;
+    private bool NicknameIsInvalid
+    {
+        get => nicknameIsInvalid;
+        set => this.RaiseAndSetIfChanged(ref nicknameIsInvalid, value);
+    }
+
     private string room = string.Empty;
     private string Room
     {
         get => room;
         set => this.RaiseAndSetIfChanged(ref room, value);
+    }
+
+    private bool roomIsInvalid;
+    private bool RoomIsInvalid
+    {
+        get => roomIsInvalid;
+        set => this.RaiseAndSetIfChanged(ref roomIsInvalid, value);
+    }
+
+    private bool entering;
+    private bool Entering
+    {
+        get => entering;
+        set => this.RaiseAndSetIfChanged(ref entering, value);
     }
 }

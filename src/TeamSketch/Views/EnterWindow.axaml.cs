@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using ReactiveUI;
@@ -22,6 +21,7 @@ public partial class EnterWindow : Window
     private async Task CreateButtonClicked()
     {
         var vm = (EnterViewModel)DataContext;
+
         var success = await vm.CreateRoomAsync();
         if (!success)
         {
