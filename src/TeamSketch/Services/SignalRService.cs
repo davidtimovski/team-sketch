@@ -35,8 +35,11 @@ public class SignalRService : ISignalRService
     public SignalRService()
     {
         Connection = new HubConnectionBuilder()
-           //.WithUrl("http://localhost:5206/actionHub")
+#if DEBUG
+           .WithUrl("http://localhost:5206/actionHub")
+#else
            .WithUrl("https://team-sketch.davidtimovski.com/actionHub")
+#endif
            .AddMessagePackProtocol()
            .Build();
     }

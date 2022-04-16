@@ -7,7 +7,7 @@
     </Application.DataTemplates>
 
 	<Application.Resources>
-		<FontFamily x:Key="MainFontFamily">resm:TeamSketch.Assets.Fonts?assembly=TeamSketch#Open Sans</FontFamily>
+		<FontFamily x:Key="MainFontFamily">resm:TeamSketch.Assets.Fonts?assembly=TeamSketch#Red Hat Display</FontFamily>
 		<SolidColorBrush x:Key="PrimaryColor">#2181ff</SolidColorBrush>
 		<SolidColorBrush x:Key="PrimaryColorLight">#3191ff</SolidColorBrush>
 	</Application.Resources>

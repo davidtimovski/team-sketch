@@ -35,7 +35,7 @@
 	  </Compile>
   </ItemGroup>
   <ItemGroup>
-	<EmbeddedResource Include="Assets\Fonts\OpenSans-Regular.ttf" />
-	<EmbeddedResource Include="Assets\Fonts\OpenSans-Medium.ttf" />
+	<EmbeddedResource Include="Assets\Fonts\RedHatDisplay-Regular.ttf" />
+	<EmbeddedResource Include="Assets\Fonts\RedHatDisplay-Medium.ttf" />
   </ItemGroup>
 </Project>

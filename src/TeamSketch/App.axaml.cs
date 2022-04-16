@@ -13,14 +13,10 @@ public class App : Application
         AvaloniaXamlLoader.Load(this);
     }
 
-    private IClassicDesktopStyleApplicationLifetime _desktop;
-
     public override void OnFrameworkInitializationCompleted()
     {
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime)
         {
-            _desktop = desktop;
-
             var window = new EnterWindow
             {
                 DataContext = new EnterViewModel(),
