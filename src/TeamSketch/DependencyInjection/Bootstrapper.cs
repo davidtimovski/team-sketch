@@ -13,6 +13,7 @@ namespace TeamSketch.DependencyInjection
         private static void RegisterServices(IMutableDependencyResolver services)
         {
             services.RegisterLazySingleton<ISignalRService>(() => new SignalRService());
+            services.RegisterLazySingleton<IBrushService>(() => new BrushService());
         }
     }
 }

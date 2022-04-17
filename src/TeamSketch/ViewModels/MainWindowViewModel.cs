@@ -7,6 +7,7 @@ using Avalonia;
 using ReactiveUI;
 using Splat;
 using TeamSketch.DependencyInjection;
+using TeamSketch.Models;
 using TeamSketch.Services;
 
 namespace TeamSketch.ViewModels;
@@ -14,11 +15,15 @@ namespace TeamSketch.ViewModels;
 public class MainWindowViewModel : ViewModelBase
 {
     private readonly ISignalRService _signalRService;
+    private readonly IBrushService _brushService;
+
     private ReactiveCommand<Unit, Unit> OnCopyRoomCommand { get; }
 
     public MainWindowViewModel()
     {
         _signalRService = Locator.Current.GetRequiredService<ISignalRService>();
+        _brushService = Locator.Current.GetRequiredService<IBrushService>();
+
         OnCopyRoomCommand = ReactiveCommand.Create(CopyRoom);
 
         _signalRService.Waved += SignalRService_Waved;
@@ -82,8 +87,44 @@ public class MainWindowViewModel : ViewModelBase
     {
         await _signalRService.DisconnectAsync();
     }
-    
+
     private ObservableCollection<UserViewModel> Users { get; } = new ObservableCollection<UserViewModel>();
+
+    private ColorsEnum brushColor = ColorsEnum.Default;
+    private ColorsEnum BrushColor
+    {
+        get => brushColor;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref brushColor, value);
+            _brushService.Color = value;
+
+            if (value == ColorsEnum.Eraser)
+            {
+                BrushThickness = ThicknessEnum.Eraser;
+            }
+            else
+            {
+                BrushThickness = previousBrushThickness;
+            }
+        }
+    }
+
+    private ThicknessEnum previousBrushThickness;
+    private ThicknessEnum brushThickness;
+    private ThicknessEnum BrushThickness
+    {
+        get => brushThickness;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref brushThickness, value);
+            if (BrushColor != ColorsEnum.Eraser)
+            {
+                previousBrushThickness = brushThickness;
+            }
+            _brushService.Thickness = value;
+        }
+    }
 
     private int latency;
     private int Latency

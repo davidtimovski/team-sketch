@@ -8,7 +8,7 @@ namespace TeamSketch
 {
     public static class PayloadConverter
     {
-        public static byte[] PointToBytes(double x, double y, short size, ColorsEnum color)
+        public static byte[] PointToBytes(double x, double y, ThicknessEnum size, ColorsEnum color)
         {
             var bytes = new byte[6];
 
@@ -42,7 +42,7 @@ namespace TeamSketch
             return ellipse;
         }
 
-        public static byte[] LineToBytes(double x1, double y1, double x2, double y2, short thickness, ColorsEnum color)
+        public static byte[] LineToBytes(double x1, double y1, double x2, double y2, ThicknessEnum thickness, ColorsEnum color)
         {
             var bytes = new byte[10];
 

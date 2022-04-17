@@ -3,13 +3,15 @@
         xmlns:vm="using:TeamSketch.ViewModels"
         x:Class="TeamSketch.Views.EnterWindow"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Team Sketch" FontFamily="{StaticResource MainFontFamily}">
+        Title="Team Sketch">
 
 	<Window.Styles>
 		<Style Selector="Window">
 			<!--<Setter Property="Icon" Value="/Assets/logo.ico" />-->
 			<Setter Property="SizeToContent" Value="WidthAndHeight" />
 			<Setter Property="Padding" Value="20 15" />
+			<Setter Property="FontFamily" Value="{StaticResource MainFontFamily}" />
+			<Setter Property="FontSize" Value="16" />
 		</Style>
 
 		<Style Selector="Border.tabs">
@@ -22,7 +24,6 @@
 			<Setter Property="Padding" Value="10" />
 			<Setter Property="HorizontalAlignment" Value="Stretch" />
 			<Setter Property="HorizontalContentAlignment" Value="Center" />
-			<Setter Property="FontSize" Value="16" />
 			<Setter Property="FontWeight" Value="Medium" />
 		</Style>
 		<Style Selector="Border.tabs Button /template/ ContentPresenter">
@@ -46,7 +47,7 @@
 		</Style>
 
 		<Style Selector="Border.forms TextBox">
-			<Setter Property="Width" Value="350" />
+			<Setter Property="Width" Value="300" />
 			<Setter Property="BorderBrush" Value="#ccc" />
 			<Setter Property="Padding" Value="15 10" />
 		</Style>
@@ -105,14 +106,14 @@
 				<StackPanel IsVisible="{Binding !JoinTabVisible}">
 					<TextBox Text="{Binding Nickname}" IsEnabled="{Binding !Entering}" MaxLength="30" Watermark="Nickname" Classes.invalid="{Binding NicknameIsInvalid}" />
 
-					<Button Name="createButton" IsEnabled="{Binding !Entering}">Create</Button>
+					<Button Name="createButton" Content="{Binding CreateButtonLabel}" IsEnabled="{Binding !Entering}" />
 				</StackPanel>
 
 				<StackPanel IsVisible="{Binding JoinTabVisible}">
 					<TextBox Text="{Binding Nickname}" IsEnabled="{Binding !Entering}" MaxLength="30" Watermark="Nickname" Classes.invalid="{Binding NicknameIsInvalid}" />
-					<TextBox Name="roomTextBox" IsEnabled="{Binding !Entering}" Text="{Binding Room}" MaxLength="36" Watermark="Room" Classes.invalid="{Binding RoomIsInvalid}" />
+					<TextBox Name="roomTextBox" IsEnabled="{Binding !Entering}" Text="{Binding Room}" MaxLength="7" Watermark="Room" Classes.invalid="{Binding RoomIsInvalid}" />
 
-					<Button Name="joinButton" IsEnabled="{Binding !Entering}">Join</Button>
+					<Button Name="joinButton" Content="{Binding JoinButtonLabel}" IsEnabled="{Binding !Entering}" />
 				</StackPanel>
 			</Panel>
 		</Border>

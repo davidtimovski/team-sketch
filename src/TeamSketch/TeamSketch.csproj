@@ -38,4 +38,7 @@
 	<EmbeddedResource Include="Assets\Fonts\RedHatDisplay-Regular.ttf" />
 	<EmbeddedResource Include="Assets\Fonts\RedHatDisplay-Medium.ttf" />
   </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Update="Assets\Icons.axaml" />
+  </ItemGroup>
 </Project>

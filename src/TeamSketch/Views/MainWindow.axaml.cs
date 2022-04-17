@@ -4,10 +4,8 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
-using ReactiveUI;
 using Splat;
 using TeamSketch.DependencyInjection;
-using TeamSketch.Models;
 using TeamSketch.Services;
 using TeamSketch.Utils;
 using TeamSketch.ViewModels;
@@ -16,6 +14,7 @@ namespace TeamSketch.Views;
 
 public partial class MainWindow : Window
 {
+    private readonly IBrushService _brushService;
     private readonly IRenderer _renderer;
     private readonly ISignalRService _signalRService;
 
@@ -26,22 +25,14 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        _renderer = new Renderer(canvas);
+        _brushService = Locator.Current.GetRequiredService<IBrushService>();
+        _renderer = new Renderer(_brushService, canvas);
 
         _signalRService = Locator.Current.GetRequiredService<ISignalRService>();
         _signalRService.DrewPoint += SignalRService_DrewPoint;
         _signalRService.DrewLine += SignalRService_DrewLine;
 
         canvas.PointerMoved += ThrottleHelper.CreateThrottledEventHandler(Canvas_PointerMoved, TimeSpan.FromMilliseconds(8));
-
-        var defaultColorButton = this.FindControl<Button>("defaultColorButton");
-        defaultColorButton.Command = ReactiveCommand.Create(SetDefaultColor);
-
-        var redColorButton = this.FindControl<Button>("redColorButton");
-        redColorButton.Command = ReactiveCommand.Create(SetRedColor);
-
-        var eraserButton = this.FindControl<Button>("eraserButton");
-        eraserButton.Command = ReactiveCommand.Create(SetEraser);
     }
 
     private void SignalRService_DrewPoint(object sender, DrewEventArgs e)
@@ -64,7 +55,7 @@ public partial class MainWindow : Window
 
     private void Canvas_PointerPressed(object sender, PointerPressedEventArgs e)
     {
-        currentPoint = e.GetPosition(this);
+        currentPoint = e.GetPosition(canvas);
         pressed = true;
     }
 
@@ -75,7 +66,7 @@ public partial class MainWindow : Window
 
         try
         {
-            _ = _signalRService.DrawPointAsync(currentPoint.X, currentPoint.Y, _renderer.BrushThickness, _renderer.BrushColor);
+            _ = _signalRService.DrawPointAsync(currentPoint.X, currentPoint.Y, _brushService.Thickness, _brushService.Color);
         }
         catch (Exception ex)
         {
@@ -90,7 +81,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        Point newPosition = e.GetPosition(this);
+        Point newPosition = e.GetPosition(canvas);
 
         _renderer.DrawLine(currentPoint.X, currentPoint.Y, newPosition.X, newPosition.Y);
 
@@ -98,27 +89,12 @@ public partial class MainWindow : Window
 
         try
         {
-            _ = _signalRService.DrawLineAsync(currentPoint.X, currentPoint.Y, newPosition.X, newPosition.Y, _renderer.BrushThickness, _renderer.BrushColor);
+            _ = _signalRService.DrawLineAsync(currentPoint.X, currentPoint.Y, newPosition.X, newPosition.Y, _brushService.Thickness, _brushService.Color);
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine(ex.Message);
         }
-    }
-
-    private void SetDefaultColor()
-    {
-        _renderer.SetBrush(2, ColorsEnum.Default);
-    }
-
-    private void SetRedColor()
-    {
-        _renderer.SetBrush(2, ColorsEnum.Red);
-    }
-
-    private void SetEraser()
-    {
-        _renderer.SetEraser();
     }
 
     protected override void OnClosing(CancelEventArgs e)

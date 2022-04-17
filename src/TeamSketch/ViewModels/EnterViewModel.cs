@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Reactive;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ReactiveUI;
 using Splat;
 using TeamSketch.DependencyInjection;
 using TeamSketch.Services;
+using TeamSketch.Utils;
 
 namespace TeamSketch.ViewModels;
 
@@ -57,7 +57,7 @@ public class EnterViewModel : ViewModelBase
 
         bool valid = ValidateNickname();
 
-        if (room.Trim().Length == 0 || !Guid.TryParse(room.Trim(), out _))
+        if (room.Trim().Length != 7 || !ValidationUtil.IsAlphanumeric(room))
         {
             RoomIsInvalid = true;
             valid = false;
@@ -85,15 +85,13 @@ public class EnterViewModel : ViewModelBase
 
     private bool ValidateNickname()
     {
-        var trimmed = nickname.Trim();
-
-        if (trimmed.Length == 0)
+        if (nickname.Trim().Length < 2)
         {
             NicknameIsInvalid = true;
             return false;
         }
 
-        if (!Regex.IsMatch(trimmed, "^\\w+$"))
+        if (!ValidationUtil.IsAlphanumeric(nickname))
         {
             NicknameIsInvalid = true;
             return false;
@@ -147,10 +145,29 @@ public class EnterViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref roomIsInvalid, value);
     }
 
+    private string createButtonLabel = "Create";
+    private string CreateButtonLabel
+    {
+        get => createButtonLabel;
+        set => this.RaiseAndSetIfChanged(ref createButtonLabel, value);
+    }
+
+    private string joinButtonLabel = "Join";
+    private string JoinButtonLabel
+    {
+        get => joinButtonLabel;
+        set => this.RaiseAndSetIfChanged(ref joinButtonLabel, value);
+    }
+
     private bool entering;
     private bool Entering
     {
         get => entering;
-        set => this.RaiseAndSetIfChanged(ref entering, value);
+        set
+        {
+            this.RaiseAndSetIfChanged(ref entering, value);
+            CreateButtonLabel = value ? "Creating" : "Create";
+            JoinButtonLabel = value ? "Joining" : "Join";
+        }
     }
 }

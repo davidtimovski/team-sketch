@@ -14,6 +14,7 @@
 
     <Application.Styles>
         <FluentTheme Mode="Light"/>
+		<StyleInclude Source="avares://TeamSketch/Assets/Icons.axaml" />
 
 		<Style Selector="TextBox">
 			<Setter Property="CornerRadius" Value="5" />

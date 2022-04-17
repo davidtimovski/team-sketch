@@ -1,6 +1,8 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:TeamSketch.ViewModels"
+		xmlns:models="clr-namespace:TeamSketch.Models;assembly=TeamSketch"
+		xmlns:conv="clr-namespace:TeamSketch.Converters;assembly=TeamSketch"
         x:Class="TeamSketch.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="Team Sketch">
@@ -9,35 +11,192 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-	<Grid RowDefinitions="1*,50">
-		<Grid Grid.Row="0" ColumnDefinitions="1*,200">
-			
-			<Canvas Grid.Column="0" Name="canvas" PointerPressed="Canvas_PointerPressed" PointerReleased="Canvas_PointerReleased" >
-				<Canvas.Background>
-					<SolidColorBrush Color="White" Opacity="0" />
-				</Canvas.Background>
-			</Canvas>
+	<Window.Styles>
+		<Style Selector="Window">
+			<!--<Setter Property="Icon" Value="/Assets/logo.ico" />-->
+			<Setter Property="SizeToContent" Value="WidthAndHeight" />
+			<Setter Property="FontFamily" Value="{StaticResource MainFontFamily}" />
+			<Setter Property="FontSize" Value="16" />
+		</Style>
+
+		<Style Selector="Border.canvasContainer">
+			<Setter Property="Background" Value="#f5f5f5" />
+		</Style>
+		<Style Selector="Canvas">
+			<Setter Property="Background" Value="White" />
+			<Setter Property="Width" Value="1280" />
+			<Setter Property="Height" Value="720" />
+		</Style>
+
+		<Style Selector="Border.label">
+			<Setter Property="Margin" Value="0 0 0 10" />
+		</Style>
+		<Style Selector="Border.label TextBlock">
+			<Setter Property="FontSize" Value="16" />
+		</Style>
+
+		<Style Selector="Border.toolsPanel">
+			<Setter Property="Background" Value="#eee" />
+			<Setter Property="Padding" Value="15 15 15 20" />
+		</Style>
+		
+		<Style Selector="RadioButton.colorRadio">
+			<Setter Property="BorderBrush" Value="Transparent" />
+			<Setter Property="Template">
+				<ControlTemplate>
+					<Border Name="border" BorderBrush="{TemplateBinding BorderBrush}" Margin="0 0 2 0" BorderThickness="2" CornerRadius="5">
+						<Panel>
+							<Rectangle Fill="{TemplateBinding Background}" Width="30" Height="30" />
+							<PathIcon Data="{StaticResource paintBrush}" Foreground="#eee" />
+						</Panel>
+					</Border>
+				</ControlTemplate>
+			</Setter>
+		</Style>
+		<Style Selector="RadioButton.colorRadio /template/ Border#border:pointerover">
+			<Setter Property="BorderBrush" Value="Green" />
+		</Style>
+		<Style Selector="RadioButton.colorRadio:checked /template/ Border#border">
+			<Setter Property="BorderBrush" Value="Green" />
+		</Style>
+		<Style Selector="RadioButton.colorRadio.default">
+			<Setter Property="Background" Value="#222" />
+		</Style>
+		<Style Selector="RadioButton.colorRadio.red">
+			<Setter Property="Background" Value="#eb3324" />
+		</Style>
+		<Style Selector="RadioButton.colorRadio.blue">
+			<Setter Property="Background" Value="#00a2e8" />
+		</Style>
+		<Style Selector="RadioButton.colorRadio.green">
+			<Setter Property="Background" Value="#22b14c" />
+		</Style>
+		
+		<Style Selector="RadioButton.eraserRadio">
+			<Setter Property="BorderBrush" Value="Transparent" />
+			<Setter Property="Template">
+				<ControlTemplate>
+					<Border Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="2" CornerRadius="5">
+						<Panel>
+							<Rectangle Fill="White" Width="30" Height="30" />
+							<PathIcon Data="{StaticResource pencilEraser}" Foreground="#222" />
+						</Panel>
+					</Border>
+				</ControlTemplate>
+			</Setter>
+		</Style>
+		<Style Selector="RadioButton.eraserRadio /template/ Border#border:pointerover">
+			<Setter Property="BorderBrush" Value="Green" />
+		</Style>
+		<Style Selector="RadioButton.eraserRadio:checked /template/ Border#border">
+			<Setter Property="BorderBrush" Value="Green" />
+		</Style>
+
+		<Style Selector="RadioButton.thicknessRadio">
+			<Setter Property="BorderBrush" Value="Transparent" />
+			<Setter Property="Template">
+				<ControlTemplate>
+					<Border Name="border" BorderBrush="{TemplateBinding BorderBrush}" Margin="0 0 2 0" BorderThickness="2" CornerRadius="15">
+						<Panel>
+							<Ellipse Fill="White" Width="30" Height="30" />
+							<Ellipse Name="brushPoint" Fill="#222" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}" />
+						</Panel>
+					</Border>
+				</ControlTemplate>
+			</Setter>
+		</Style>
+		<Style Selector="RadioButton.thicknessRadio /template/ Border#border:pointerover">
+			<Setter Property="BorderBrush" Value="Green" />
+		</Style>
+		<Style Selector="RadioButton.thicknessRadio:checked /template/ Border#border">
+			<Setter Property="BorderBrush" Value="Green" />
+		</Style>
+		<Style Selector="RadioButton.thicknessRadio.thin /template/ Ellipse#brushPoint">
+			<Setter Property="Width" Value="4" />
+			<Setter Property="Height" Value="4" />
+		</Style>
+		<Style Selector="RadioButton.thicknessRadio.slightlyThin /template/ Ellipse#brushPoint">
+			<Setter Property="Width" Value="6" />
+			<Setter Property="Height" Value="6" />
+		</Style>
+		<Style Selector="RadioButton.thicknessRadio.medium /template/ Ellipse#brushPoint">
+			<Setter Property="Width" Value="8" />
+			<Setter Property="Height" Value="8" />
+		</Style>
+		<Style Selector="RadioButton.thicknessRadio.slightlyThick /template/ Ellipse#brushPoint">
+			<Setter Property="Width" Value="10" />
+			<Setter Property="Height" Value="10" />
+		</Style>
+		<Style Selector="RadioButton.thicknessRadio.thick /template/ Ellipse#brushPoint">
+			<Setter Property="Width" Value="12" />
+			<Setter Property="Height" Value="12" />
+		</Style>
+
+		<Style Selector="Border.usersPanel">
+			<Setter Property="Background" Value="#ddd" />
+			<Setter Property="Padding" Value="10" />
+			<Setter Property="VerticalAlignment" Value="Stretch" />
+		</Style>
+		<Style Selector="Border.user">
+			<Setter Property="Background" Value="#eee" />
+			<Setter Property="Padding" Value="15 10" />
+			<Setter Property="Margin" Value="0 0 0 7" />
+		</Style>
+
+		<Style Selector="Border.footer">
+			<Setter Property="Height" Value="50" />
+			<Setter Property="Background" Value="#eee" />
+			<Setter Property="Padding" Value="15 0" />
+		</Style>
+	</Window.Styles>
+
+	<Grid RowDefinitions="*,50">
+		<Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+
+			<Border Grid.Column="0" Classes="canvasContainer">
+				<Canvas Name="canvas" PointerPressed="Canvas_PointerPressed" PointerReleased="Canvas_PointerReleased" />
+			</Border>
 
 			<Border Grid.Column="1">
-				<Grid RowDefinitions="200,1*">
-					<Border Grid.Row="0" Background="#eee" Padding="10 10 10 30">
-						<DockPanel VerticalAlignment="Top">
-							<Button Name="defaultColorButton">Default</Button>
-							<Button Name="redColorButton">Red</Button>
-							<Button Name="eraserButton">Eraser</Button>
-						</DockPanel>
+				<Grid RowDefinitions="Auto,1*">
+					<Border Grid.Row="0" Classes="toolsPanel">
+						<StackPanel VerticalAlignment="Top">
+							<StackPanel.Resources>
+								<conv:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
+							</StackPanel.Resources>
+
+							<Border Classes="label">
+								<TextBlock>Tools</TextBlock>
+							</Border>
+							
+							<DockPanel>
+								<RadioButton Classes="colorRadio default" GroupName="brushColor" IsChecked="{Binding Path=BrushColor, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ColorsEnum.Default}}" />
+								<RadioButton Classes="colorRadio red" GroupName="brushColor" IsChecked="{Binding Path=BrushColor, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ColorsEnum.Red}}" />
+								<RadioButton Classes="colorRadio blue" GroupName="brushColor" IsChecked="{Binding Path=BrushColor, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ColorsEnum.Blue}}" />
+								<RadioButton Classes="colorRadio green" GroupName="brushColor" IsChecked="{Binding Path=BrushColor, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ColorsEnum.Green}}" />
+								<RadioButton Classes="eraserRadio" GroupName="brushColor" IsChecked="{Binding Path=BrushColor, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ColorsEnum.Eraser}}" />
+							</DockPanel>
+
+							<DockPanel Margin="0 15 0 0">
+								<RadioButton Classes="thicknessRadio thin" GroupName="brushThickness" IsChecked="{Binding Path=BrushThickness, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ThicknessEnum.Thin}}" />
+								<RadioButton Classes="thicknessRadio slightlyThin" GroupName="brushThickness" IsChecked="{Binding Path=BrushThickness, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ThicknessEnum.SlightlyThin}}" />
+								<RadioButton Classes="thicknessRadio medium" GroupName="brushThickness" IsChecked="{Binding Path=BrushThickness, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ThicknessEnum.Medium}}" />
+								<RadioButton Classes="thicknessRadio slightlyThick" GroupName="brushThickness" IsChecked="{Binding Path=BrushThickness, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ThicknessEnum.SlightlyThick}}" />
+								<RadioButton Classes="thicknessRadio thick" GroupName="brushThickness" IsChecked="{Binding Path=BrushThickness, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ThicknessEnum.Thick}}" />
+							</DockPanel>
+						</StackPanel>
 					</Border>
 
-					<Border Grid.Row="1" Background="#ddd" Padding="10" VerticalAlignment="Stretch">
+					<Border Grid.Row="1" Classes="usersPanel">
 						<StackPanel>
-							<Border Margin="0 0 0 10">
+							<Border Classes="label">
 								<TextBlock>Users</TextBlock>
 							</Border>
 
 							<ItemsControl Items="{Binding Users}">
 								<ItemsControl.ItemTemplate>
 									<DataTemplate DataType="vm:UserViewModel">
-										<Border Padding="15 10" Margin="0 0 0 7" Background="#eee">
+										<Border Classes="user">
 											<TextBlock Text="{Binding Nickname}" />
 										</Border>
 									</DataTemplate>
@@ -46,11 +205,11 @@
 						</StackPanel>
 					</Border>
 				</Grid>
-
 			</Border>
+			
 		</Grid>
 		
-		<Border Grid.Row="1" Height="50" Padding="15 0 " Background="#eee">
+		<Border Grid.Row="1" Classes="footer">
 
 			<DockPanel>
 				<Border VerticalAlignment="Center">

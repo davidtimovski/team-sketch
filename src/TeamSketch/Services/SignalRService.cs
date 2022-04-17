@@ -16,8 +16,8 @@ public interface ISignalRService
     Task JoinRoomAsync(string userNickname, string joinedRoom);
     Task WaveAsync();
     Task DisconnectAsync();
-    Task DrawPointAsync(double x, double y, short size, ColorsEnum color);
-    Task DrawLineAsync(double x1, double y1, double x2, double y2, short thickness, ColorsEnum color);
+    Task DrawPointAsync(double x, double y, ThicknessEnum size, ColorsEnum color);
+    Task DrawLineAsync(double x1, double y1, double x2, double y2, ThicknessEnum thickness, ColorsEnum color);
 
     event EventHandler<UserEventArgs> Waved;
     event EventHandler<UserEventArgs> Joined;
@@ -36,7 +36,7 @@ public class SignalRService : ISignalRService
     {
         Connection = new HubConnectionBuilder()
 #if DEBUG
-           .WithUrl("http://localhost:5206/actionHub")
+           .WithUrl("http://localhost:5150/actionHub")
 #else
            .WithUrl("https://team-sketch.davidtimovski.com/actionHub")
 #endif
@@ -88,13 +88,13 @@ public class SignalRService : ISignalRService
         await Connection.StopAsync();
     }
 
-    public async Task DrawPointAsync(double x, double y, short size, ColorsEnum color)
+    public async Task DrawPointAsync(double x, double y, ThicknessEnum size, ColorsEnum color)
     {
         var data = PayloadConverter.PointToBytes(x, y, size, color);
         await Connection.InvokeAsync("DrawPoint", Nickname, Room, data);
     }
 
-    public async Task DrawLineAsync(double x1, double y1, double x2, double y2, short thickness, ColorsEnum color)
+    public async Task DrawLineAsync(double x1, double y1, double x2, double y2, ThicknessEnum thickness, ColorsEnum color)
     {
         var data = PayloadConverter.LineToBytes(x1, y1, x2, y2, thickness, color);
         await Connection.InvokeAsync("DrawLine", Nickname, Room, data);

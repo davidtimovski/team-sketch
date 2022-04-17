@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using TeamSketch.Web.Utils;
 
 namespace TeamSketch.Web.Hubs;
 
@@ -6,7 +7,7 @@ public class ActionHub : Hub
 {
     public async Task CreateRoom()
     {
-        string room = Guid.NewGuid().ToString();
+        string room = RoomNameGenerator.Generate();
         await Groups.AddToGroupAsync(Context.ConnectionId, room);
         await Clients.Caller.SendAsync("RoomCreated", room);
     }
