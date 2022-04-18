@@ -11,6 +11,7 @@ public interface IRenderer
 {
     void DrawPoint(double x, double y);
     void DrawLine(double x1, double y1, double x2, double y2);
+    (double x, double y) RestrictPointToCanvas(double x, double y);
 }
 
 public class Renderer : IRenderer
@@ -47,6 +48,29 @@ public class Renderer : IRenderer
         _canvas.Children.Add(line);
     }
 
+    public (double x, double y) RestrictPointToCanvas(double x, double y)
+    {
+        if (x > 1280)
+        {
+            x = 1280;
+        }
+        else if (x < 0)
+        {
+            x = 0;
+        }
+
+        if (y > 720)
+        {
+            y = 720;
+        }
+        else if (y < 0)
+        {
+            y = 0;
+        }
+
+        return (x, y);
+    }
+
     private static SolidColorBrush GetBrushColor(ColorsEnum color)
     {
         return color switch
@@ -65,9 +89,9 @@ public class Renderer : IRenderer
         return thickness switch
         {
             ThicknessEnum.Thin => 2,
-            ThicknessEnum.SlightlyThin => 4,
+            ThicknessEnum.SemiThin => 4,
             ThicknessEnum.Medium => 6,
-            ThicknessEnum.SlightlyThick => 8,
+            ThicknessEnum.SemiThick => 8,
             ThicknessEnum.Thick => 10,
             ThicknessEnum.Eraser => 50,
             _ => throw new ArgumentException(null, nameof(thickness))

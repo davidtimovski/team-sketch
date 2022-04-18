@@ -3,9 +3,9 @@
     public enum ThicknessEnum
     {
         Thin,
-        SlightlyThin,
+        SemiThin,
         Medium,
-        SlightlyThick,
+        SemiThick,
         Thick,
         Eraser
     }

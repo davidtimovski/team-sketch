@@ -10,6 +10,10 @@
 		<FontFamily x:Key="MainFontFamily">resm:TeamSketch.Assets.Fonts?assembly=TeamSketch#Red Hat Display</FontFamily>
 		<SolidColorBrush x:Key="PrimaryColor">#2181ff</SolidColorBrush>
 		<SolidColorBrush x:Key="PrimaryColorLight">#3191ff</SolidColorBrush>
+
+		<SolidColorBrush x:Key="RedColor">#eb3324</SolidColorBrush>
+		<SolidColorBrush x:Key="BlueColor">#00a2e8</SolidColorBrush>
+		<SolidColorBrush x:Key="GreenColor">#22b14c</SolidColorBrush>
 	</Application.Resources>
 
     <Application.Styles>

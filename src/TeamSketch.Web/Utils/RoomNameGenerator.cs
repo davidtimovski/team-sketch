@@ -1,21 +1,31 @@
-﻿namespace TeamSketch.Web.Utils
+﻿using System.Security.Cryptography;
+using System.Text;
+
+namespace TeamSketch.Web.Utils
 {
     public static class RoomNameGenerator
     {
-        private static readonly Random _random = new();
+        private static readonly char[] chars = "abcdefghkmnprstuvwxyz123456789".ToCharArray();
         private const int Length = 7;
 
         public static string Generate()
         {
-            var chars = "abcdefghijkmnoprstuvwxyz0123456789";
-            var result = new char[Length];
-
-            for (int i = 0; i < result.Length; i++)
+            var data = new byte[4 * Length];
+            using (var crypto = RandomNumberGenerator.Create())
             {
-                result[i] = chars[_random.Next(Length)];
+                crypto.GetBytes(data);
             }
 
-            return new string(result);
+            var result = new StringBuilder(Length);
+            for (int i = 0; i < Length; i++)
+            {
+                var random = BitConverter.ToUInt32(data, i * 4);
+                var index = random % chars.Length;
+
+                result.Append(chars[index]);
+            }
+
+            return result.ToString();
         }
     }
 }

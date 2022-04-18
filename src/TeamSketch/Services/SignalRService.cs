@@ -29,6 +29,7 @@ public interface ISignalRService
 
 public class SignalRService : ISignalRService
 {
+    private const int PingIntervalSeconds = 4;
     private readonly DispatcherTimer _pingTimer = new();
     private DateTime lastPing;
 
@@ -143,7 +144,7 @@ public class SignalRService : ISignalRService
         });
 
         _pingTimer.Tick += PingTimer_Tick;
-        _pingTimer.Interval = TimeSpan.FromSeconds(3);
+        _pingTimer.Interval = TimeSpan.FromSeconds(PingIntervalSeconds);
         _pingTimer.Start();
     }
 

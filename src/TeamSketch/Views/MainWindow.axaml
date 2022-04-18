@@ -54,22 +54,22 @@
 			</Setter>
 		</Style>
 		<Style Selector="RadioButton.colorRadio /template/ Border#border:pointerover">
-			<Setter Property="BorderBrush" Value="Green" />
+			<Setter Property="BorderBrush" Value="#bbb" />
 		</Style>
 		<Style Selector="RadioButton.colorRadio:checked /template/ Border#border">
-			<Setter Property="BorderBrush" Value="Green" />
+			<Setter Property="BorderBrush" Value="#bbb" />
 		</Style>
 		<Style Selector="RadioButton.colorRadio.default">
 			<Setter Property="Background" Value="#222" />
 		</Style>
 		<Style Selector="RadioButton.colorRadio.red">
-			<Setter Property="Background" Value="#eb3324" />
+			<Setter Property="Background" Value="{StaticResource RedColor}" />
 		</Style>
 		<Style Selector="RadioButton.colorRadio.blue">
-			<Setter Property="Background" Value="#00a2e8" />
+			<Setter Property="Background" Value="{StaticResource BlueColor}" />
 		</Style>
 		<Style Selector="RadioButton.colorRadio.green">
-			<Setter Property="Background" Value="#22b14c" />
+			<Setter Property="Background" Value="{StaticResource GreenColor}" />
 		</Style>
 		
 		<Style Selector="RadioButton.eraserRadio">
@@ -86,10 +86,10 @@
 			</Setter>
 		</Style>
 		<Style Selector="RadioButton.eraserRadio /template/ Border#border:pointerover">
-			<Setter Property="BorderBrush" Value="Green" />
+			<Setter Property="BorderBrush" Value="#bbb" />
 		</Style>
 		<Style Selector="RadioButton.eraserRadio:checked /template/ Border#border">
-			<Setter Property="BorderBrush" Value="Green" />
+			<Setter Property="BorderBrush" Value="#bbb" />
 		</Style>
 
 		<Style Selector="RadioButton.thicknessRadio">
@@ -106,16 +106,16 @@
 			</Setter>
 		</Style>
 		<Style Selector="RadioButton.thicknessRadio /template/ Border#border:pointerover">
-			<Setter Property="BorderBrush" Value="Green" />
+			<Setter Property="BorderBrush" Value="#bbb" />
 		</Style>
 		<Style Selector="RadioButton.thicknessRadio:checked /template/ Border#border">
-			<Setter Property="BorderBrush" Value="Green" />
+			<Setter Property="BorderBrush" Value="#bbb" />
 		</Style>
 		<Style Selector="RadioButton.thicknessRadio.thin /template/ Ellipse#brushPoint">
 			<Setter Property="Width" Value="4" />
 			<Setter Property="Height" Value="4" />
 		</Style>
-		<Style Selector="RadioButton.thicknessRadio.slightlyThin /template/ Ellipse#brushPoint">
+		<Style Selector="RadioButton.thicknessRadio.semiThin /template/ Ellipse#brushPoint">
 			<Setter Property="Width" Value="6" />
 			<Setter Property="Height" Value="6" />
 		</Style>
@@ -123,7 +123,7 @@
 			<Setter Property="Width" Value="8" />
 			<Setter Property="Height" Value="8" />
 		</Style>
-		<Style Selector="RadioButton.thicknessRadio.slightlyThick /template/ Ellipse#brushPoint">
+		<Style Selector="RadioButton.thicknessRadio.semiThick /template/ Ellipse#brushPoint">
 			<Setter Property="Width" Value="10" />
 			<Setter Property="Height" Value="10" />
 		</Style>
@@ -139,18 +139,64 @@
 		</Style>
 		<Style Selector="Border.user">
 			<Setter Property="Background" Value="#eee" />
+			<Setter Property="CornerRadius" Value="5" />
 			<Setter Property="Padding" Value="15 10" />
 			<Setter Property="Margin" Value="0 0 0 7" />
 		</Style>
 
 		<Style Selector="Border.footer">
-			<Setter Property="Height" Value="50" />
 			<Setter Property="Background" Value="#eee" />
 			<Setter Property="Padding" Value="15 0" />
 		</Style>
+		<Style Selector="Border.roomSection">
+			<Setter Property="Height" Value="36" />
+			<Setter Property="Background" Value="#fff" />
+			<Setter Property="CornerRadius" Value="5" />
+			<Setter Property="Padding" Value="10 0 5 0" />
+			<Setter Property="VerticalAlignment" Value="Center" />
+		</Style>
+		<Style Selector="Border.roomSection TextBlock">
+			<Setter Property="VerticalAlignment" Value="Center" />
+			<Setter Property="Foreground" Value="#888" />
+		</Style>
+		<Style Selector="Border.roomSection TextBlock.roomName">
+			<Setter Property="Foreground" Value="{StaticResource GreenColor}" />
+			<Setter Property="FontWeight" Value="Medium" />
+		</Style>
+		<Style Selector="Border.roomSection Button">
+			<Setter Property="Background" Value="#ccc" />
+			<Setter Property="Padding" Value="10 3" />
+			<Setter Property="Margin" Value="15 0 0 0" />
+			<Setter Property="Foreground" Value="#fff" />
+			<Setter Property="FontSize" Value="14" />
+		</Style>
+		<Style Selector="Border.roomSection Button:pointerover /template/ ContentPresenter">
+			<Setter Property="Background" Value="#bbb" />
+			<Setter Property="TextBlock.Foreground" Value="#fff" />
+		</Style>
+		<Style Selector="Border.pingSection">
+			<Setter Property="Width" Value="180" />
+			<Setter Property="Height" Value="36" />
+			<Setter Property="Background" Value="#fff" />
+			<Setter Property="CornerRadius" Value="5" />
+			<Setter Property="Padding" Value="10 0" />
+			<Setter Property="VerticalAlignment" Value="Center" />
+			<Setter Property="HorizontalAlignment" Value="Right" />
+		</Style>
+		<Style Selector="Border.pingSection DockPanel">
+			<Setter Property="HorizontalAlignment" Value="Center" />
+			<Setter Property="VerticalAlignment" Value="Center" />
+		</Style>
+		<Style Selector="Border.pingSection TextBlock">
+			<Setter Property="Foreground" Value="#888" />
+		</Style>
+		<Style Selector="Border.pingSection TextBlock.latency">
+			<Setter Property="Foreground" Value="{StaticResource BlueColor}" />
+			<Setter Property="FontWeight" Value="Medium" />
+		</Style>
 	</Window.Styles>
 
-	<Grid RowDefinitions="*,50">
+	<Grid RowDefinitions="*,60">
 		<Grid Grid.Row="0" ColumnDefinitions="*,Auto">
 
 			<Border Grid.Column="0" Classes="canvasContainer">
@@ -179,9 +225,9 @@
 
 							<DockPanel Margin="0 15 0 0">
 								<RadioButton Classes="thicknessRadio thin" GroupName="brushThickness" IsChecked="{Binding Path=BrushThickness, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ThicknessEnum.Thin}}" />
-								<RadioButton Classes="thicknessRadio slightlyThin" GroupName="brushThickness" IsChecked="{Binding Path=BrushThickness, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ThicknessEnum.SlightlyThin}}" />
+								<RadioButton Classes="thicknessRadio semiThin" GroupName="brushThickness" IsChecked="{Binding Path=BrushThickness, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ThicknessEnum.SemiThin}}" />
 								<RadioButton Classes="thicknessRadio medium" GroupName="brushThickness" IsChecked="{Binding Path=BrushThickness, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ThicknessEnum.Medium}}" />
-								<RadioButton Classes="thicknessRadio slightlyThick" GroupName="brushThickness" IsChecked="{Binding Path=BrushThickness, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ThicknessEnum.SlightlyThick}}" />
+								<RadioButton Classes="thicknessRadio semiThick" GroupName="brushThickness" IsChecked="{Binding Path=BrushThickness, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ThicknessEnum.SemiThick}}" />
 								<RadioButton Classes="thicknessRadio thick" GroupName="brushThickness" IsChecked="{Binding Path=BrushThickness, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ThicknessEnum.Thick}}" />
 							</DockPanel>
 						</StackPanel>
@@ -212,19 +258,21 @@
 		<Border Grid.Row="1" Classes="footer">
 
 			<DockPanel>
-				<Border VerticalAlignment="Center">
+				<Border Classes="roomSection">
 					<DockPanel>
 						<TextBlock Text="Room: " />
-						<TextBox Text="{Binding Room}" IsReadOnly="True" />
+						<TextBlock Text="{Binding Room}" Classes="roomName" />
 						<Button Command="{Binding OnCopyRoomCommand}">Copy</Button>
 					</DockPanel>
 				</Border>
-				
-				<DockPanel HorizontalAlignment="Right" VerticalAlignment="Center">
-					<TextBlock Text="Connected. Ping: " />
-					<TextBlock Text="{Binding Latency}" />
-					<TextBlock Text=" ms" />
-				</DockPanel>
+
+				<Border Classes="pingSection">
+					<DockPanel>
+						<TextBlock Text="Ping: " />
+						<TextBlock Text="{Binding Latency}" Classes="latency" />
+						<TextBlock Text=" ms" />
+					</DockPanel>
+				</Border>
 			</DockPanel>
 			
 		</Border>

@@ -62,7 +62,9 @@ public partial class MainWindow : Window
     private void Canvas_PointerReleased(object sender, PointerReleasedEventArgs e)
     {
         pressed = false;
-        _renderer.DrawPoint(currentPoint.X, currentPoint.Y);
+
+        var (x, y) = _renderer.RestrictPointToCanvas(currentPoint.X, currentPoint.Y);
+        _renderer.DrawPoint(x, y);
 
         try
         {
@@ -82,10 +84,11 @@ public partial class MainWindow : Window
         }
 
         Point newPosition = e.GetPosition(canvas);
+        var (x, y) = _renderer.RestrictPointToCanvas(newPosition.X, newPosition.Y);
 
-        _renderer.DrawLine(currentPoint.X, currentPoint.Y, newPosition.X, newPosition.Y);
+        _renderer.DrawLine(currentPoint.X, currentPoint.Y, x, y);
 
-        currentPoint = newPosition;
+        currentPoint = new Point(x, y);
 
         try
         {
