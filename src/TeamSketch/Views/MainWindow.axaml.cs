@@ -14,7 +14,6 @@ namespace TeamSketch.Views;
 
 public partial class MainWindow : Window
 {
-    private readonly IBrushService _brushService;
     private readonly IRenderer _renderer;
     private readonly ISignalRService _signalRService;
 
@@ -25,8 +24,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        _brushService = Locator.Current.GetRequiredService<IBrushService>();
-        _renderer = new Renderer(_brushService, canvas);
+        _renderer = new Renderer(canvas);
 
         _signalRService = Locator.Current.GetRequiredService<ISignalRService>();
         _signalRService.DrewPoint += SignalRService_DrewPoint;
@@ -39,7 +37,7 @@ public partial class MainWindow : Window
     {
         Dispatcher.UIThread.InvokeAsync(() =>
         {
-            var point = PayloadConverter.BytesToPoint(e.Data);
+            var point = PayloadConverter.ToPoint(e.Data);
             canvas.Children.Add(point);
         });
     }
@@ -48,8 +46,8 @@ public partial class MainWindow : Window
     {
         Dispatcher.UIThread.InvokeAsync(() =>
         {
-            var point = PayloadConverter.BytesToLine(e.Data);
-            canvas.Children.Add(point);
+            var shapes = PayloadConverter.ToLineShapes(e.Data);
+            canvas.Children.AddRange(shapes);
         });
     }
 
@@ -68,7 +66,7 @@ public partial class MainWindow : Window
 
         try
         {
-            _ = _signalRService.DrawPointAsync(currentPoint.X, currentPoint.Y, _brushService.Thickness, _brushService.Color);
+            _ = _signalRService.DrawPointAsync(x, y, BrushSettings.Thickness, BrushSettings.BrushColor);
         }
         catch (Exception ex)
         {
@@ -88,16 +86,16 @@ public partial class MainWindow : Window
 
         _renderer.DrawLine(currentPoint.X, currentPoint.Y, x, y);
 
-        currentPoint = new Point(x, y);
-
         try
         {
-            _ = _signalRService.DrawLineAsync(currentPoint.X, currentPoint.Y, newPosition.X, newPosition.Y, _brushService.Thickness, _brushService.Color);
+            _ = _signalRService.DrawLineAsync(currentPoint.X, currentPoint.Y, x, y, BrushSettings.Thickness, BrushSettings.BrushColor);
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine(ex.Message);
         }
+
+        currentPoint = new Point(x, y);
     }
 
     protected override void OnClosing(CancelEventArgs e)

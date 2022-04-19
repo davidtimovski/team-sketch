@@ -1,9 +1,7 @@
-﻿using System;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
-using Avalonia.Media;
-using TeamSketch.Models;
+using TeamSketch.Utils;
 
 namespace TeamSketch.Services;
 
@@ -16,22 +14,20 @@ public interface IRenderer
 
 public class Renderer : IRenderer
 {
-    private readonly IBrushService _brushService;
     private readonly Canvas _canvas;
 
-    public Renderer(IBrushService brushService, Canvas canvas)
+    public Renderer(Canvas canvas)
     {
-        _brushService = brushService;
         _canvas = canvas;
     }
 
     public void DrawPoint(double x, double y)
     {
-        var thickness = GetBrushThickness(_brushService.Thickness);
+        var thickness = BrushSettings.GetThicknessNumber();
         var ellipse = new Ellipse
         {
             Margin = new Thickness(x - (thickness / 2), y - (thickness / 2), 0, 0),
-            Fill = GetBrushColor(_brushService.Color),
+            Fill = BrushSettings.GetColorBrush(),
             Width = thickness,
             Height = thickness
         };
@@ -40,11 +36,24 @@ public class Renderer : IRenderer
 
     public void DrawLine(double x1, double y1, double x2, double y2)
     {
+        var thickness = BrushSettings.GetThicknessNumber();
+        var colorBrush = BrushSettings.GetColorBrush();
+
+        var ellipse = new Ellipse
+        {
+            Margin = new Thickness(x1 - (thickness / 2), y1 - (thickness / 2), 0, 0),
+            Fill = colorBrush,
+            Width = thickness,
+            Height = thickness
+        };
+        _canvas.Children.Add(ellipse);
+
         Line line = new();
-        line.StrokeThickness = GetBrushThickness(_brushService.Thickness);
-        line.Stroke = GetBrushColor(_brushService.Color);
+        line.StrokeThickness = thickness;
+        line.Stroke = colorBrush;
         line.StartPoint = new Point(x1, y1);
         line.EndPoint = new Point(x2, y2);
+
         _canvas.Children.Add(line);
     }
 
@@ -69,32 +78,5 @@ public class Renderer : IRenderer
         }
 
         return (x, y);
-    }
-
-    private static SolidColorBrush GetBrushColor(ColorsEnum color)
-    {
-        return color switch
-        {
-            ColorsEnum.Default => new SolidColorBrush(Color.FromRgb(34, 34, 34)),
-            ColorsEnum.Eraser => new SolidColorBrush(Color.FromRgb(255, 255, 255)),
-            ColorsEnum.Red => new SolidColorBrush(Color.FromRgb(235, 51, 36)),
-            ColorsEnum.Blue => new SolidColorBrush(Color.FromRgb(0, 162, 232)),
-            ColorsEnum.Green => new SolidColorBrush(Color.FromRgb(34, 177, 76)),
-            _ => throw new ArgumentException(null, nameof(color))
-        };
-    }
-
-    private static double GetBrushThickness(ThicknessEnum thickness)
-    {
-        return thickness switch
-        {
-            ThicknessEnum.Thin => 2,
-            ThicknessEnum.SemiThin => 4,
-            ThicknessEnum.Medium => 6,
-            ThicknessEnum.SemiThick => 8,
-            ThicknessEnum.Thick => 10,
-            ThicknessEnum.Eraser => 50,
-            _ => throw new ArgumentException(null, nameof(thickness))
-        };
     }
 }

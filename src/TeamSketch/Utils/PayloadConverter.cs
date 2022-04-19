@@ -1,14 +1,15 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
-using Avalonia.Media;
 using TeamSketch.Models;
+using TeamSketch.Utils;
 
 namespace TeamSketch
 {
     public static class PayloadConverter
     {
-        public static byte[] PointToBytes(double x, double y, ThicknessEnum size, ColorsEnum color)
+        public static byte[] ToBytes(double x, double y, ThicknessEnum size, ColorsEnum color)
         {
             var bytes = new byte[6];
 
@@ -24,17 +25,17 @@ namespace TeamSketch
             return bytes;
         }
 
-        public static Ellipse BytesToPoint(byte[] bytes)
+        public static Ellipse ToPoint(byte[] bytes)
         {
             var x = (bytes[1] << 8) + bytes[0];
             var y = (bytes[3] << 8) + bytes[2];
-            var size = bytes[4];
-            var color = bytes[5];
+            var size = BrushSettings.GetThicknessNumber(bytes[4]);
+            var colorBrush = BrushSettings.GetColorBrush(bytes[5]);
 
             var ellipse = new Ellipse
             {
                 Margin = new Thickness(x - (size / 2), y - (size / 2), 0, 0),
-                Fill = ColorByteToBrush(color),
+                Fill = colorBrush,
                 Width = size,
                 Height = size
             };
@@ -42,7 +43,7 @@ namespace TeamSketch
             return ellipse;
         }
 
-        public static byte[] LineToBytes(double x1, double y1, double x2, double y2, ThicknessEnum thickness, ColorsEnum color)
+        public static byte[] ToBytes(double x1, double y1, double x2, double y2, ThicknessEnum thickness, ColorsEnum color)
         {
             var bytes = new byte[10];
 
@@ -64,35 +65,34 @@ namespace TeamSketch
             return bytes;
         }
 
-        public static Line BytesToLine(byte[] bytes)
+        public static IEnumerable<IControl> ToLineShapes(byte[] bytes)
         {
             var x1 = (bytes[1] << 8) + bytes[0];
             var y1 = (bytes[3] << 8) + bytes[2];
             var x2 = (bytes[5] << 8) + bytes[4];
             var y2 = (bytes[7] << 8) + bytes[6];
-            var thickness = bytes[8];
-            var color = bytes[9];
+            var thickness = BrushSettings.GetThicknessNumber(bytes[8]);
+            var colorBrush = BrushSettings.GetColorBrush(bytes[9]);
 
-            Line result = new();
-            result.StrokeThickness = thickness;
-            result.StartPoint = new Point(x1, y1);
-            result.EndPoint = new Point(x2, y2);
-            result.Stroke = ColorByteToBrush(color);
+            var result = new List<IControl>(2);
+
+            var ellipse = new Ellipse
+            {
+                Margin = new Thickness(x1 - (thickness / 2), y1 - (thickness / 2), 0, 0),
+                Fill = colorBrush,
+                Width = thickness,
+                Height = thickness
+            };
+            result.Add(ellipse);
+
+            Line line = new();
+            line.StrokeThickness = thickness;
+            line.StartPoint = new Point(x1, y1);
+            line.EndPoint = new Point(x2, y2);
+            line.Stroke = colorBrush;
+            result.Add(line);
 
             return result;
-        }
-
-        private static SolidColorBrush ColorByteToBrush(byte color)
-        {
-            return color switch
-            {
-                0b_0000 => new SolidColorBrush(Color.FromRgb(0, 0, 0)),
-                0b_0001 => new SolidColorBrush(Color.FromRgb(255, 255, 255)),
-                0b_0010 => new SolidColorBrush(Color.FromRgb(255, 0, 0)),
-                0b_0011 => new SolidColorBrush(Color.FromRgb(0, 0, 255)),
-                0b_0100 => new SolidColorBrush(Color.FromRgb(0, 255, 0)),
-                _ => throw new ArgumentException(null, nameof(color))
-            };
         }
     }
 }

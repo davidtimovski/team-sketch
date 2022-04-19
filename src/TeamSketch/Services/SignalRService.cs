@@ -91,13 +91,13 @@ public class SignalRService : ISignalRService
 
     public async Task DrawPointAsync(double x, double y, ThicknessEnum size, ColorsEnum color)
     {
-        var data = PayloadConverter.PointToBytes(x, y, size, color);
+        var data = PayloadConverter.ToBytes(x, y, size, color);
         await Connection.InvokeAsync("DrawPoint", Nickname, Room, data);
     }
 
     public async Task DrawLineAsync(double x1, double y1, double x2, double y2, ThicknessEnum thickness, ColorsEnum color)
     {
-        var data = PayloadConverter.LineToBytes(x1, y1, x2, y2, thickness, color);
+        var data = PayloadConverter.ToBytes(x1, y1, x2, y2, thickness, color);
         await Connection.InvokeAsync("DrawLine", Nickname, Room, data);
     }
 

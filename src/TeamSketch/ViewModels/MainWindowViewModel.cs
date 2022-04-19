@@ -9,20 +9,19 @@ using Splat;
 using TeamSketch.DependencyInjection;
 using TeamSketch.Models;
 using TeamSketch.Services;
+using TeamSketch.Utils;
 
 namespace TeamSketch.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {
     private readonly ISignalRService _signalRService;
-    private readonly IBrushService _brushService;
 
     private ReactiveCommand<Unit, Unit> OnCopyRoomCommand { get; }
 
     public MainWindowViewModel()
     {
         _signalRService = Locator.Current.GetRequiredService<ISignalRService>();
-        _brushService = Locator.Current.GetRequiredService<IBrushService>();
 
         OnCopyRoomCommand = ReactiveCommand.Create(CopyRoom);
 
@@ -97,7 +96,7 @@ public class MainWindowViewModel : ViewModelBase
         set
         {
             this.RaiseAndSetIfChanged(ref brushColor, value);
-            _brushService.Color = value;
+            BrushSettings.BrushColor = value;
 
             if (value == ColorsEnum.Eraser)
             {
@@ -122,7 +121,7 @@ public class MainWindowViewModel : ViewModelBase
             {
                 previousBrushThickness = brushThickness;
             }
-            _brushService.Thickness = value;
+            BrushSettings.Thickness = value;
         }
     }
 
