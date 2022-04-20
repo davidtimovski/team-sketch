@@ -29,8 +29,8 @@ namespace TeamSketch
         {
             var x = (bytes[1] << 8) + bytes[0];
             var y = (bytes[3] << 8) + bytes[2];
-            var size = BrushSettings.GetThicknessNumber(bytes[4]);
-            var colorBrush = BrushSettings.GetColorBrush(bytes[5]);
+            var size = BrushSettings.FindThickness(bytes[4]);
+            var colorBrush = BrushSettings.FindColorBrush(bytes[5]);
 
             var ellipse = new Ellipse
             {
@@ -71,8 +71,8 @@ namespace TeamSketch
             var y1 = (bytes[3] << 8) + bytes[2];
             var x2 = (bytes[5] << 8) + bytes[4];
             var y2 = (bytes[7] << 8) + bytes[6];
-            var thickness = BrushSettings.GetThicknessNumber(bytes[8]);
-            var colorBrush = BrushSettings.GetColorBrush(bytes[9]);
+            var thickness = BrushSettings.FindThickness(bytes[8]);
+            var colorBrush = BrushSettings.FindColorBrush(bytes[9]);
 
             var result = new List<IControl>(2);
 

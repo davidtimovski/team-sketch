@@ -96,8 +96,8 @@
 	<StackPanel>
 		<Border Classes="tabs">
 			<Grid ColumnDefinitions="*,14,*">
-				<Button Grid.Column="0" Command="{Binding OnToggleTabCommand}" IsEnabled="{Binding JoinTabVisible}">Create room</Button>
-				<Button Grid.Column="2" Command="{Binding OnToggleTabCommand}" IsEnabled="{Binding !JoinTabVisible}">Join room</Button>
+				<Button Grid.Column="0" Command="{Binding ToggleTab}" IsEnabled="{Binding JoinTabVisible}">Create room</Button>
+				<Button Grid.Column="2" Command="{Binding ToggleTab}" IsEnabled="{Binding !JoinTabVisible}">Join room</Button>
 			</Grid>
 		</Border>
 

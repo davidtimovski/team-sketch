@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reactive;
 using System.Threading.Tasks;
 using ReactiveUI;
 using Splat;
@@ -12,13 +11,10 @@ namespace TeamSketch.ViewModels;
 public class EnterViewModel : ViewModelBase
 {
     private readonly ISignalRService _signalRService;
-    private ReactiveCommand<Unit, Unit> OnToggleTabCommand { get; }
 
     public EnterViewModel()
     {
         _signalRService = Locator.Current.GetRequiredService<ISignalRService>();
-
-        OnToggleTabCommand = ReactiveCommand.Create(ToggleTab);
 
         if (_signalRService.Nickname != null)
         {

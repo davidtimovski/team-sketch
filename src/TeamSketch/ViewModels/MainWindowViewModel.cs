@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive;
 using System.Threading.Tasks;
 using Avalonia;
 using ReactiveUI;
@@ -17,13 +16,9 @@ public class MainWindowViewModel : ViewModelBase
 {
     private readonly ISignalRService _signalRService;
 
-    private ReactiveCommand<Unit, Unit> OnCopyRoomCommand { get; }
-
     public MainWindowViewModel()
     {
         _signalRService = Locator.Current.GetRequiredService<ISignalRService>();
-
-        OnCopyRoomCommand = ReactiveCommand.Create(CopyRoom);
 
         _signalRService.Waved += SignalRService_Waved;
         _signalRService.Joined += SignalRService_Joined;
@@ -121,7 +116,7 @@ public class MainWindowViewModel : ViewModelBase
             {
                 previousBrushThickness = brushThickness;
             }
-            BrushSettings.Thickness = value;
+            BrushSettings.BrushThickness = value;
         }
     }
 

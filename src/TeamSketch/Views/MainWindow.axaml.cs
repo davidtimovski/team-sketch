@@ -62,11 +62,11 @@ public partial class MainWindow : Window
         pressed = false;
 
         var (x, y) = _renderer.RestrictPointToCanvas(currentPoint.X, currentPoint.Y);
-        _renderer.DrawPoint(x, y);
+         _renderer.DrawPoint(x, y);
 
         try
         {
-            _ = _signalRService.DrawPointAsync(x, y, BrushSettings.Thickness, BrushSettings.BrushColor);
+            _ = _signalRService.DrawPointAsync(x, y);
         }
         catch (Exception ex)
         {
@@ -88,7 +88,7 @@ public partial class MainWindow : Window
 
         try
         {
-            _ = _signalRService.DrawLineAsync(currentPoint.X, currentPoint.Y, x, y, BrushSettings.Thickness, BrushSettings.BrushColor);
+            _ = _signalRService.DrawLineAsync(currentPoint.X, currentPoint.Y, x, y);
         }
         catch (Exception ex)
         {

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Avalonia.Threading;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
-using TeamSketch.Models;
+using TeamSketch.Utils;
 
 namespace TeamSketch.Services;
 
@@ -16,8 +16,8 @@ public interface ISignalRService
     Task JoinRoomAsync(string userNickname, string joinedRoom);
     Task WaveAsync();
     Task DisconnectAsync();
-    Task DrawPointAsync(double x, double y, ThicknessEnum size, ColorsEnum color);
-    Task DrawLineAsync(double x1, double y1, double x2, double y2, ThicknessEnum thickness, ColorsEnum color);
+    Task DrawPointAsync(double x, double y);
+    Task DrawLineAsync(double x1, double y1, double x2, double y2);
 
     event EventHandler<UserEventArgs> Waved;
     event EventHandler<UserEventArgs> Joined;
@@ -89,15 +89,15 @@ public class SignalRService : ISignalRService
         await Connection.StopAsync();
     }
 
-    public async Task DrawPointAsync(double x, double y, ThicknessEnum size, ColorsEnum color)
+    public async Task DrawPointAsync(double x, double y)
     {
-        var data = PayloadConverter.ToBytes(x, y, size, color);
+        var data = PayloadConverter.ToBytes(x, y, BrushSettings.BrushThickness, BrushSettings.BrushColor);
         await Connection.InvokeAsync("DrawPoint", Nickname, Room, data);
     }
 
-    public async Task DrawLineAsync(double x1, double y1, double x2, double y2, ThicknessEnum thickness, ColorsEnum color)
+    public async Task DrawLineAsync(double x1, double y1, double x2, double y2)
     {
-        var data = PayloadConverter.ToBytes(x1, y1, x2, y2, thickness, color);
+        var data = PayloadConverter.ToBytes(x1, y1, x2, y2, BrushSettings.BrushThickness, BrushSettings.BrushColor);
         await Connection.InvokeAsync("DrawLine", Nickname, Room, data);
     }
 

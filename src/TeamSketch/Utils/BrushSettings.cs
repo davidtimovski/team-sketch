@@ -24,26 +24,47 @@ public static class BrushSettings
         { 0b_0101, 50 }
     };
 
-    public static ColorsEnum BrushColor { get; set; }
-    public static ThicknessEnum Thickness { get; set; }
+    private static ColorsEnum brushColor;
+    public static ColorsEnum BrushColor
+    {
+        get => brushColor;
+        set
+        {
+            brushColor = value;
+            ColorBrush = new SolidColorBrush(colorLookup[(byte)value]);
+        }
+    }
+    public static SolidColorBrush ColorBrush { get; private set; } = new SolidColorBrush(colorLookup[0b_0000]);
 
-    public static SolidColorBrush GetColorBrush(byte color)
+    private static ThicknessEnum brushThickness;
+    public static ThicknessEnum BrushThickness
+    {
+        get => brushThickness; 
+        set
+        {
+            brushThickness = value;
+            Thickness = thicknessLookup[(byte)value];
+            HalfThickness = Thickness / 2;
+
+            MaxBrushPointX = Globals.CanvasWidth - HalfThickness;
+            MaxBrushPointY = Globals.CanvasHeight - HalfThickness;
+            MinBrushPoint = HalfThickness;
+        }
+    }
+    public static double Thickness { get; private set; } = thicknessLookup[0b_0000];
+    public static double HalfThickness { get; private set; } = thicknessLookup[0b_0000] / 2;
+
+    public static double MaxBrushPointX { get; private set; } = Globals.CanvasWidth - thicknessLookup[0b_0000] / 2;
+    public static double MaxBrushPointY { get; private set; } = Globals.CanvasHeight - thicknessLookup[0b_0000] / 2;
+    public static double MinBrushPoint { get; private set; } = thicknessLookup[0b_0000] / 2;
+
+    public static SolidColorBrush FindColorBrush(byte color)
     {
         return new SolidColorBrush(colorLookup[color]);
     }
 
-    public static SolidColorBrush GetColorBrush()
-    {
-        return new SolidColorBrush(colorLookup[(byte)BrushColor]);
-    }
-
-    public static double GetThicknessNumber(byte thickness)
+    public static double FindThickness(byte thickness)
     {
         return thicknessLookup[thickness];
-    }
-
-    public static double GetThicknessNumber()
-    {
-        return thicknessLookup[(byte)Thickness];
     }
 }

@@ -206,7 +206,7 @@
 			<Border Grid.Column="1">
 				<Grid RowDefinitions="Auto,1*">
 					<Border Grid.Row="0" Classes="toolsPanel">
-						<StackPanel VerticalAlignment="Top">
+						<StackPanel>
 							<StackPanel.Resources>
 								<conv:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
 							</StackPanel.Resources>
@@ -262,7 +262,7 @@
 					<DockPanel>
 						<TextBlock Text="Room: " />
 						<TextBlock Text="{Binding Room}" Classes="roomName" />
-						<Button Command="{Binding OnCopyRoomCommand}">Copy</Button>
+						<Button Command="{Binding CopyRoom}">Copy</Button>
 					</DockPanel>
 				</Border>
 

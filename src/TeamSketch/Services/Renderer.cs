@@ -23,58 +23,54 @@ public class Renderer : IRenderer
 
     public void DrawPoint(double x, double y)
     {
-        var thickness = BrushSettings.GetThicknessNumber();
         var ellipse = new Ellipse
         {
-            Margin = new Thickness(x - (thickness / 2), y - (thickness / 2), 0, 0),
-            Fill = BrushSettings.GetColorBrush(),
-            Width = thickness,
-            Height = thickness
+            Margin = new Thickness(x - BrushSettings.HalfThickness, y - BrushSettings.HalfThickness, 0, 0),
+            Fill = BrushSettings.ColorBrush,
+            Width = BrushSettings.Thickness,
+            Height = BrushSettings.Thickness
         };
         _canvas.Children.Add(ellipse);
     }
 
     public void DrawLine(double x1, double y1, double x2, double y2)
     {
-        var thickness = BrushSettings.GetThicknessNumber();
-        var colorBrush = BrushSettings.GetColorBrush();
-
         var ellipse = new Ellipse
         {
-            Margin = new Thickness(x1 - (thickness / 2), y1 - (thickness / 2), 0, 0),
-            Fill = colorBrush,
-            Width = thickness,
-            Height = thickness
+            Margin = new Thickness(x1 - BrushSettings.HalfThickness, y1 - BrushSettings.HalfThickness, 0, 0),
+            Fill = BrushSettings.ColorBrush,
+            Width = BrushSettings.Thickness,
+            Height = BrushSettings.Thickness
         };
         _canvas.Children.Add(ellipse);
 
         Line line = new();
-        line.StrokeThickness = thickness;
-        line.Stroke = colorBrush;
+        line.StrokeThickness = BrushSettings.Thickness;
         line.StartPoint = new Point(x1, y1);
         line.EndPoint = new Point(x2, y2);
+        line.Stroke = BrushSettings.ColorBrush;
 
         _canvas.Children.Add(line);
     }
 
     public (double x, double y) RestrictPointToCanvas(double x, double y)
     {
-        if (x > 1280)
+        if (x > BrushSettings.MaxBrushPointX)
         {
-            x = 1280;
+            x = BrushSettings.MaxBrushPointX;
         }
-        else if (x < 0)
+        else if (x < BrushSettings.MinBrushPoint)
         {
-            x = 0;
+            x = BrushSettings.MinBrushPoint;
         }
 
-        if (y > 720)
+        if (y > BrushSettings.MaxBrushPointY)
         {
-            y = 720;
+            y = BrushSettings.MaxBrushPointY;
         }
-        else if (y < 0)
+        else if (y < BrushSettings.MinBrushPoint)
         {
-            y = 0;
+            y = BrushSettings.MinBrushPoint;
         }
 
         return (x, y);
