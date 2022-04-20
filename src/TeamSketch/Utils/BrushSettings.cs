@@ -6,22 +6,27 @@ namespace TeamSketch.Utils;
 
 public static class BrushSettings
 {
-    private static readonly Dictionary<byte, Color> colorLookup = new(5)
+    private static readonly Dictionary<ColorsEnum, SolidColorBrush> colorLookup = new(5)
     {
-        { 0b_0000, Color.FromRgb(34, 34, 34) },
-        { 0b_0001, Color.FromRgb(255, 255, 255) },
-        { 0b_0010, Color.FromRgb(235, 51, 36) },
-        { 0b_0011, Color.FromRgb(0, 162, 232) },
-        { 0b_0100, Color.FromRgb(34, 177, 76) }
+        { ColorsEnum.Default, new SolidColorBrush(Color.FromRgb(34, 34, 34)) },
+        { ColorsEnum.Eraser, new SolidColorBrush(Color.FromRgb(255, 255, 255)) },
+        { ColorsEnum.Red, new SolidColorBrush(Color.FromRgb(235, 51, 36)) },
+        { ColorsEnum.Blue, new SolidColorBrush(Color.FromRgb(0, 162, 232)) },
+        { ColorsEnum.Green, new SolidColorBrush(Color.FromRgb(34, 177, 76)) },
+        { ColorsEnum.Yellow, new SolidColorBrush(Color.FromRgb(255, 242, 0)) },
+        { ColorsEnum.Orange, new SolidColorBrush(Color.FromRgb(255, 127, 39)) },
+        { ColorsEnum.Purple, new SolidColorBrush(Color.FromRgb(163, 73, 164)) },
+        { ColorsEnum.Pink, new SolidColorBrush(Color.FromRgb(255, 174, 201)) },
+        { ColorsEnum.Gray, new SolidColorBrush(Color.FromRgb(195, 195, 195)) }
     };
-    private static readonly Dictionary<byte, double> thicknessLookup = new(6)
+    private static readonly Dictionary<ThicknessEnum, double> thicknessLookup = new(6)
     {
-        { 0b_0000, 2 },
-        { 0b_0001, 4 },
-        { 0b_0010, 6 },
-        { 0b_0011, 8 },
-        { 0b_0100, 10 },
-        { 0b_0101, 50 }
+        { ThicknessEnum.Thin, 2 },
+        { ThicknessEnum.SemiThin, 4 },
+        { ThicknessEnum.Medium, 6 },
+        { ThicknessEnum.SemiThick, 8 },
+        { ThicknessEnum.Thick, 10 },
+        { ThicknessEnum.Eraser, 50 }
     };
 
     private static ColorsEnum brushColor;
@@ -31,19 +36,19 @@ public static class BrushSettings
         set
         {
             brushColor = value;
-            ColorBrush = new SolidColorBrush(colorLookup[(byte)value]);
+            ColorBrush = colorLookup[value];
         }
     }
-    public static SolidColorBrush ColorBrush { get; private set; } = new SolidColorBrush(colorLookup[0b_0000]);
+    public static SolidColorBrush ColorBrush { get; private set; } = colorLookup[ColorsEnum.Default];
 
-    private static ThicknessEnum brushThickness;
+    private static ThicknessEnum brushThickness = ThicknessEnum.SemiThin;
     public static ThicknessEnum BrushThickness
     {
         get => brushThickness; 
         set
         {
             brushThickness = value;
-            Thickness = thicknessLookup[(byte)value];
+            Thickness = thicknessLookup[value];
             HalfThickness = Thickness / 2;
 
             MaxBrushPointX = Globals.CanvasWidth - HalfThickness;
@@ -51,20 +56,20 @@ public static class BrushSettings
             MinBrushPoint = HalfThickness;
         }
     }
-    public static double Thickness { get; private set; } = thicknessLookup[0b_0000];
-    public static double HalfThickness { get; private set; } = thicknessLookup[0b_0000] / 2;
+    public static double Thickness { get; private set; } = thicknessLookup[brushThickness];
+    public static double HalfThickness { get; private set; } = thicknessLookup[brushThickness] / 2;
 
-    public static double MaxBrushPointX { get; private set; } = Globals.CanvasWidth - thicknessLookup[0b_0000] / 2;
-    public static double MaxBrushPointY { get; private set; } = Globals.CanvasHeight - thicknessLookup[0b_0000] / 2;
-    public static double MinBrushPoint { get; private set; } = thicknessLookup[0b_0000] / 2;
+    public static double MaxBrushPointX { get; private set; } = Globals.CanvasWidth - thicknessLookup[brushThickness] / 2;
+    public static double MaxBrushPointY { get; private set; } = Globals.CanvasHeight - thicknessLookup[brushThickness] / 2;
+    public static double MinBrushPoint { get; private set; } = thicknessLookup[brushThickness] / 2;
 
     public static SolidColorBrush FindColorBrush(byte color)
     {
-        return new SolidColorBrush(colorLookup[color]);
+        return colorLookup[(ColorsEnum)color];
     }
 
     public static double FindThickness(byte thickness)
     {
-        return thicknessLookup[thickness];
+        return thicknessLookup[(ThicknessEnum)thickness];
     }
 }

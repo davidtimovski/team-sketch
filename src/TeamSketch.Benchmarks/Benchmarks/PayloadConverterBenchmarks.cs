@@ -22,9 +22,9 @@ namespace TeamSketch.Benchmarks
         }
 
         [Benchmark]
-        public void PointToBytes() => PayloadConverter.ToBytes(x1, y1, ThicknessEnum.Thin, ColorsEnum.Blue);
+        public void PointToBytes() => PayloadConverter.ToBytes(x1, y1, ThicknessEnum.SemiThin, ColorsEnum.Blue);
 
         [Benchmark]
-        public void LineToBytes() => PayloadConverter.ToBytes(x1, y1, x2, y2, ThicknessEnum.Thin, ColorsEnum.Blue);
+        public void LineToBytes() => PayloadConverter.ToBytes(x1, y1, x2, y2, ThicknessEnum.SemiThin, ColorsEnum.Blue);
     }
 }

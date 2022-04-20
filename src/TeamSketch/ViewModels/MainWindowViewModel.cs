@@ -84,7 +84,7 @@ public class MainWindowViewModel : ViewModelBase
 
     private ObservableCollection<UserViewModel> Users { get; } = new ObservableCollection<UserViewModel>();
 
-    private ColorsEnum brushColor = ColorsEnum.Default;
+    private ColorsEnum brushColor = BrushSettings.BrushColor;
     private ColorsEnum BrushColor
     {
         get => brushColor;
@@ -104,19 +104,20 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
-    private ThicknessEnum previousBrushThickness;
-    private ThicknessEnum brushThickness;
+    private ThicknessEnum previousBrushThickness = BrushSettings.BrushThickness;
+    private ThicknessEnum brushThickness = BrushSettings.BrushThickness;
     private ThicknessEnum BrushThickness
     {
         get => brushThickness;
         set
         {
             this.RaiseAndSetIfChanged(ref brushThickness, value);
-            if (BrushColor != ColorsEnum.Eraser)
+            BrushSettings.BrushThickness = value;
+
+            if (brushColor != ColorsEnum.Eraser || value != ThicknessEnum.Eraser)
             {
                 previousBrushThickness = brushThickness;
             }
-            BrushSettings.BrushThickness = value;
         }
     }
 

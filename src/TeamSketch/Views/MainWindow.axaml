@@ -42,12 +42,13 @@
 		
 		<Style Selector="RadioButton.colorRadio">
 			<Setter Property="BorderBrush" Value="Transparent" />
+			<Setter Property="Foreground" Value="#eee" />
 			<Setter Property="Template">
 				<ControlTemplate>
 					<Border Name="border" BorderBrush="{TemplateBinding BorderBrush}" Margin="0 0 2 0" BorderThickness="2" CornerRadius="5">
 						<Panel>
 							<Rectangle Fill="{TemplateBinding Background}" Width="30" Height="30" />
-							<PathIcon Data="{StaticResource paintBrush}" Foreground="#eee" />
+							<PathIcon Data="{StaticResource paintBrush}" Foreground="{TemplateBinding Foreground}" />
 						</Panel>
 					</Border>
 				</ControlTemplate>
@@ -70,6 +71,25 @@
 		</Style>
 		<Style Selector="RadioButton.colorRadio.green">
 			<Setter Property="Background" Value="{StaticResource GreenColor}" />
+		</Style>
+		<Style Selector="RadioButton.colorRadio.yellow">
+			<Setter Property="Background" Value="{StaticResource YellowColor}" />
+			<Setter Property="Foreground" Value="#555" />
+		</Style>
+		<Style Selector="RadioButton.colorRadio.orange">
+			<Setter Property="Background" Value="{StaticResource OrangeColor}" />
+			<Setter Property="Foreground" Value="#555" />
+		</Style>
+		<Style Selector="RadioButton.colorRadio.purple">
+			<Setter Property="Background" Value="{StaticResource PurpleColor}" />
+		</Style>
+		<Style Selector="RadioButton.colorRadio.pink">
+			<Setter Property="Background" Value="{StaticResource PinkColor}" />
+			<Setter Property="Foreground" Value="#555" />
+		</Style>
+		<Style Selector="RadioButton.colorRadio.gray">
+			<Setter Property="Background" Value="{StaticResource GrayColor}" />
+			<Setter Property="Foreground" Value="#333" />
 		</Style>
 		
 		<Style Selector="RadioButton.eraserRadio">
@@ -141,7 +161,7 @@
 			<Setter Property="Background" Value="#eee" />
 			<Setter Property="CornerRadius" Value="5" />
 			<Setter Property="Padding" Value="15 10" />
-			<Setter Property="Margin" Value="0 0 0 7" />
+			<Setter Property="Margin" Value="0 0 0 8" />
 		</Style>
 
 		<Style Selector="Border.footer">
@@ -166,7 +186,8 @@
 		<Style Selector="Border.roomSection Button">
 			<Setter Property="Background" Value="#ccc" />
 			<Setter Property="Padding" Value="10 3" />
-			<Setter Property="Margin" Value="15 0 0 0" />
+			<Setter Property="Margin" Value="12 0 0 0" />
+			<Setter Property="VerticalAlignment" Value="Center" />
 			<Setter Property="Foreground" Value="#fff" />
 			<Setter Property="FontSize" Value="14" />
 		</Style>
@@ -220,6 +241,14 @@
 								<RadioButton Classes="colorRadio red" GroupName="brushColor" IsChecked="{Binding Path=BrushColor, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ColorsEnum.Red}}" />
 								<RadioButton Classes="colorRadio blue" GroupName="brushColor" IsChecked="{Binding Path=BrushColor, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ColorsEnum.Blue}}" />
 								<RadioButton Classes="colorRadio green" GroupName="brushColor" IsChecked="{Binding Path=BrushColor, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ColorsEnum.Green}}" />
+								<RadioButton Classes="colorRadio yellow" GroupName="brushColor" IsChecked="{Binding Path=BrushColor, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ColorsEnum.Yellow}}" />
+							</DockPanel>
+
+							<DockPanel Margin="0 8 0 0">
+								<RadioButton Classes="colorRadio orange" GroupName="brushColor" IsChecked="{Binding Path=BrushColor, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ColorsEnum.Orange}}" />
+								<RadioButton Classes="colorRadio purple" GroupName="brushColor" IsChecked="{Binding Path=BrushColor, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ColorsEnum.Purple}}" />
+								<RadioButton Classes="colorRadio pink" GroupName="brushColor" IsChecked="{Binding Path=BrushColor, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ColorsEnum.Pink}}" />
+								<RadioButton Classes="colorRadio gray" GroupName="brushColor" IsChecked="{Binding Path=BrushColor, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ColorsEnum.Gray}}" />
 								<RadioButton Classes="eraserRadio" GroupName="brushColor" IsChecked="{Binding Path=BrushColor, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ColorsEnum.Eraser}}" />
 							</DockPanel>
 

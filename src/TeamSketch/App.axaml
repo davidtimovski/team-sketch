@@ -14,6 +14,11 @@
 		<SolidColorBrush x:Key="RedColor">#eb3324</SolidColorBrush>
 		<SolidColorBrush x:Key="BlueColor">#00a2e8</SolidColorBrush>
 		<SolidColorBrush x:Key="GreenColor">#22b14c</SolidColorBrush>
+		<SolidColorBrush x:Key="YellowColor">#fff200</SolidColorBrush>
+		<SolidColorBrush x:Key="OrangeColor">#ff7f27</SolidColorBrush>
+		<SolidColorBrush x:Key="PurpleColor">#a349a4</SolidColorBrush>
+		<SolidColorBrush x:Key="PinkColor">#ffaec9</SolidColorBrush>
+		<SolidColorBrush x:Key="GrayColor">#c3c3c3</SolidColorBrush>
 	</Application.Resources>
 
     <Application.Styles>

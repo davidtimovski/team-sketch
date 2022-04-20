@@ -6,6 +6,11 @@
         Eraser,
         Red,
         Blue,
-        Green
+        Green,
+        Yellow,
+        Orange,
+        Purple,
+        Pink,
+        Gray
     }
 }
