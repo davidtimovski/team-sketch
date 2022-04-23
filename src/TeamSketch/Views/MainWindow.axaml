@@ -48,7 +48,7 @@
 					<Border Name="border" BorderBrush="{TemplateBinding BorderBrush}" Margin="0 0 2 0" BorderThickness="2" CornerRadius="5">
 						<Panel>
 							<Rectangle Fill="{TemplateBinding Background}" Width="30" Height="30" />
-							<PathIcon Data="{StaticResource paintBrush}" Foreground="{TemplateBinding Foreground}" />
+							<PathIcon Data="{StaticResource brush}" Foreground="{TemplateBinding Foreground}" />
 						</Panel>
 					</Border>
 				</ControlTemplate>
@@ -163,13 +163,22 @@
 			<Setter Property="Padding" Value="15 10" />
 			<Setter Property="Margin" Value="0 0 0 8" />
 		</Style>
+		<Style Selector="Border.user Ellipse.drawingIndicator">
+			<Setter Property="Width" Value="10" />
+			<Setter Property="Height" Value="10" />
+			<Setter Property="Fill" Value="#ccc" />
+			<Setter Property="HorizontalAlignment" Value="Right" />
+		</Style>
+		<Style Selector="Border.user Ellipse.drawingIndicator.active">
+			<Setter Property="Fill" Value="{StaticResource GreenColor}" />
+		</Style>
 
 		<Style Selector="Border.footer">
 			<Setter Property="Background" Value="#eee" />
 			<Setter Property="Padding" Value="15 0" />
 		</Style>
 		<Style Selector="Border.roomSection">
-			<Setter Property="Height" Value="36" />
+			<Setter Property="Height" Value="37" />
 			<Setter Property="Background" Value="#fff" />
 			<Setter Property="CornerRadius" Value="5" />
 			<Setter Property="Padding" Value="10 0 5 0" />
@@ -197,7 +206,7 @@
 		</Style>
 		<Style Selector="Border.pingSection">
 			<Setter Property="Width" Value="180" />
-			<Setter Property="Height" Value="36" />
+			<Setter Property="Height" Value="37" />
 			<Setter Property="Background" Value="#fff" />
 			<Setter Property="CornerRadius" Value="5" />
 			<Setter Property="Padding" Value="10 0" />
@@ -272,7 +281,10 @@
 								<ItemsControl.ItemTemplate>
 									<DataTemplate DataType="vm:UserViewModel">
 										<Border Classes="user">
-											<TextBlock Text="{Binding Nickname}" />
+											<DockPanel>
+												<TextBlock Text="{Binding Nickname}" />
+												<Ellipse Classes="drawingIndicator" Classes.active="{Binding Drawing}" />
+											</DockPanel>
 										</Border>
 									</DataTemplate>
 								</ItemsControl.ItemTemplate>

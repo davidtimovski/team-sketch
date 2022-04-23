@@ -55,7 +55,7 @@
 			<Setter Property="Background" Value="#eee" />
 		</Style>
 		<Style Selector="Border.forms TextBox.invalid">
-			<Setter Property="BorderBrush" Value="#ee5555" />
+			<Setter Property="BorderBrush" Value="#eb3324" />
 		</Style>
 		<Style Selector="Border.forms TextBox#roomTextBox">
 			<Setter Property="Margin" Value="0 10 0 0" />

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
@@ -25,12 +24,21 @@ public class MainWindowViewModel : ViewModelBase
         _signalRService.Left += SignalRService_Left;
         _signalRService.Pong += SignalRService_Pong;
 
-        Users.Add(new UserViewModel { Nickname = _signalRService.Nickname });
+        Users.Add(new UserViewModel(_signalRService.Nickname));
 
         Room = _signalRService.Room;
     }
 
     public string Room { get; }
+
+    public void IndicateUserDrawing(string nickname)
+    {
+        UserViewModel user = Users.FirstOrDefault(x => x.Nickname == nickname);
+        if (user != null)
+        {
+            user.Drawing = true;
+        }
+    }
 
     private async void CopyRoom()
     {
@@ -42,13 +50,13 @@ public class MainWindowViewModel : ViewModelBase
         UserViewModel user = Users.FirstOrDefault(x => x.Nickname == e.User);
         if (user == null)
         {
-            Users.Add(new UserViewModel { Nickname = e.User });
+            Users.Add(new UserViewModel(e.User));
         }
     }
 
     private void SignalRService_Joined(object sender, UserEventArgs e)
     {
-        Users.Add(new UserViewModel { Nickname = e.User });
+        Users.Add(new UserViewModel(e.User));
     }
 
     private void SignalRService_Left(object sender, UserEventArgs e)
@@ -59,16 +67,6 @@ public class MainWindowViewModel : ViewModelBase
     private void SignalRService_Pong(object sender, PongEventArgs e)
     {
         Latency = e.Latency;
-    }
-
-    public void InitializeUsers(List<string> others)
-    {
-        Users.Add(new UserViewModel { Nickname = _signalRService.Nickname });
-
-        foreach (var user in others)
-        {
-            Users.Add(new UserViewModel { Nickname = user });
-        }
     }
 
     public void UserLeft(string nickname)

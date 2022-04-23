@@ -16,7 +16,7 @@ public partial class MainWindow : Window
 {
     private readonly IRenderer _renderer;
     private readonly ISignalRService _signalRService;
-
+    
     private Point currentPoint = new();
     private bool pressed;
 
@@ -30,7 +30,15 @@ public partial class MainWindow : Window
         _signalRService.DrewPoint += SignalRService_DrewPoint;
         _signalRService.DrewLine += SignalRService_DrewLine;
 
+        canvas.Cursor = BrushSettings.Cursor;
         canvas.PointerMoved += ThrottleHelper.CreateThrottledEventHandler(Canvas_PointerMoved, TimeSpan.FromMilliseconds(8));
+
+        BrushSettings.BrushChanged += BrushSettings_BrushChanged;
+    }
+
+    private void BrushSettings_BrushChanged(object sender, BrushChangedEventArgs e)
+    {
+        canvas.Cursor = e.Cursor;
     }
 
     private void SignalRService_DrewPoint(object sender, DrewEventArgs e)
@@ -40,6 +48,8 @@ public partial class MainWindow : Window
             var point = PayloadConverter.ToPoint(e.Data);
             canvas.Children.Add(point);
         });
+
+        IndicateUserDrawing(e.User);
     }
 
     private void SignalRService_DrewLine(object sender, DrewEventArgs e)
@@ -49,6 +59,8 @@ public partial class MainWindow : Window
             var shapes = PayloadConverter.ToLineShapes(e.Data);
             canvas.Children.AddRange(shapes);
         });
+
+        IndicateUserDrawing(e.User);
     }
 
     private void Canvas_PointerPressed(object sender, PointerPressedEventArgs e)
@@ -72,6 +84,8 @@ public partial class MainWindow : Window
         {
             System.Diagnostics.Debug.WriteLine(ex.Message);
         }
+
+        IndicateUserDrawing(_signalRService.Nickname);
     }
 
     private void Canvas_PointerMoved(object sender, PointerEventArgs e)
@@ -96,6 +110,14 @@ public partial class MainWindow : Window
         }
 
         currentPoint = new Point(x, y);
+
+        IndicateUserDrawing(_signalRService.Nickname);
+    }
+
+    private void IndicateUserDrawing(string nickname)
+    {
+        var vm = DataContext as MainWindowViewModel;
+        vm.IndicateUserDrawing(nickname);
     }
 
     protected override void OnClosing(CancelEventArgs e)
