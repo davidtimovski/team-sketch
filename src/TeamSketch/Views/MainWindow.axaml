@@ -28,10 +28,10 @@
 			<Setter Property="Height" Value="720" />
 		</Style>
 
-		<Style Selector="Border.label">
+		<Style Selector="Border.panelLabel">
 			<Setter Property="Margin" Value="0 0 0 10" />
 		</Style>
-		<Style Selector="Border.label TextBlock">
+		<Style Selector="Border.panelLabel TextBlock">
 			<Setter Property="FontSize" Value="16" />
 		</Style>
 
@@ -48,7 +48,7 @@
 					<Border Name="border" BorderBrush="{TemplateBinding BorderBrush}" Margin="0 0 2 0" BorderThickness="2" CornerRadius="5">
 						<Panel>
 							<Rectangle Fill="{TemplateBinding Background}" Width="30" Height="30" />
-							<PathIcon Data="{StaticResource brush}" Foreground="{TemplateBinding Foreground}" />
+							<PathIcon Data="{StaticResource paintBucket}" Foreground="{TemplateBinding Foreground}" />
 						</Panel>
 					</Border>
 				</ControlTemplate>
@@ -99,7 +99,7 @@
 					<Border Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="2" CornerRadius="5">
 						<Panel>
 							<Rectangle Fill="White" Width="30" Height="30" />
-							<PathIcon Data="{StaticResource pencilEraser}" Foreground="#222" />
+							<PathIcon Data="{StaticResource eraser}" Foreground="#222" />
 						</Panel>
 					</Border>
 				</ControlTemplate>
@@ -173,6 +173,29 @@
 			<Setter Property="Fill" Value="{StaticResource GreenColor}" />
 		</Style>
 
+		<Style Selector="Border.eventsPanel">
+			<Setter Property="Background" Value="#eee" />
+			<Setter Property="Padding" Value="10" />
+			<Setter Property="VerticalAlignment" Value="Stretch" />
+		</Style>
+		<Style Selector="Border.eventsPanel ScrollViewer">
+			<Setter Property="Height" Value="170" />
+		</Style>
+		<Style Selector="Border.eventsPanel ItemsControl">
+			<Setter Property="Padding" Value="0 0 0 30" />
+		</Style>
+		<Style Selector="Border.event">
+			<Setter Property="Padding" Value="2 0" />
+			<Setter Property="Margin" Value="0 5" />
+		</Style>
+		<Style Selector="Border.event TextBlock">
+			<Setter Property="Foreground" Value="#888" />
+			<Setter Property="FontSize" Value="14" />
+		</Style>
+		<Style Selector="Border.event TextBlock.nickname">
+			<Setter Property="Foreground" Value="{StaticResource BlueColor}" />
+		</Style>
+
 		<Style Selector="Border.footer">
 			<Setter Property="Background" Value="#eee" />
 			<Setter Property="Padding" Value="15 0" />
@@ -234,14 +257,14 @@
 			</Border>
 
 			<Border Grid.Column="1">
-				<Grid RowDefinitions="Auto,1*">
+				<Grid RowDefinitions="Auto,1*,210">
 					<Border Grid.Row="0" Classes="toolsPanel">
 						<StackPanel>
 							<StackPanel.Resources>
 								<conv:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
 							</StackPanel.Resources>
 
-							<Border Classes="label">
+							<Border Classes="panelLabel">
 								<TextBlock>Tools</TextBlock>
 							</Border>
 							
@@ -273,7 +296,7 @@
 
 					<Border Grid.Row="1" Classes="usersPanel">
 						<StackPanel>
-							<Border Classes="label">
+							<Border Classes="panelLabel">
 								<TextBlock>Users</TextBlock>
 							</Border>
 
@@ -289,6 +312,29 @@
 									</DataTemplate>
 								</ItemsControl.ItemTemplate>
 							</ItemsControl>
+						</StackPanel>
+					</Border>
+
+					<Border Grid.Row="2" Classes="eventsPanel">
+						<StackPanel>
+							<Border Classes="panelLabel">
+								<TextBlock>Events</TextBlock>
+							</Border>
+
+							<ScrollViewer>
+								<ItemsControl Items="{Binding Events}">
+									<ItemsControl.ItemTemplate>
+										<DataTemplate DataType="vm:EventViewModel">
+											<Border Classes="event">
+												<DockPanel>
+													<TextBlock Text="{Binding User}" Classes="nickname" />
+													<TextBlock Text="{Binding EventMessage}" />
+												</DockPanel>
+											</Border>
+										</DataTemplate>
+									</ItemsControl.ItemTemplate>
+								</ItemsControl>
+							</ScrollViewer>
 						</StackPanel>
 					</Border>
 				</Grid>

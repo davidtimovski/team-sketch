@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading.Tasks;
 using Avalonia;
 using ReactiveUI;
 using Splat;
@@ -19,12 +18,14 @@ public class MainWindowViewModel : ViewModelBase
     {
         _signalRService = Locator.Current.GetRequiredService<ISignalRService>();
 
-        _signalRService.Waved += SignalRService_Waved;
         _signalRService.Joined += SignalRService_Joined;
         _signalRService.Left += SignalRService_Left;
         _signalRService.Pong += SignalRService_Pong;
 
-        Users.Add(new UserViewModel(_signalRService.Nickname));
+        foreach (var user in _signalRService.UsersInRoom)
+        {
+            Users.Add(new UserViewModel(user));
+        }
 
         Room = _signalRService.Room;
     }
@@ -45,23 +46,19 @@ public class MainWindowViewModel : ViewModelBase
         await Application.Current.Clipboard.SetTextAsync(Room);
     }
 
-    private void SignalRService_Waved(object sender, UserEventArgs e)
-    {
-        UserViewModel user = Users.FirstOrDefault(x => x.Nickname == e.User);
-        if (user == null)
-        {
-            Users.Add(new UserViewModel(e.User));
-        }
-    }
-
     private void SignalRService_Joined(object sender, UserEventArgs e)
     {
         Users.Add(new UserViewModel(e.User));
+
+        Events.Add(new EventViewModel(e.User, " joined."));
     }
 
     private void SignalRService_Left(object sender, UserEventArgs e)
     {
-        UserLeft(e.User);
+        UserViewModel user = Users.FirstOrDefault(x => x.Nickname == e.User);
+        Users.Remove(user);
+
+        Events.Add(new EventViewModel(e.User, " left."));
     }
 
     private void SignalRService_Pong(object sender, PongEventArgs e)
@@ -69,18 +66,8 @@ public class MainWindowViewModel : ViewModelBase
         Latency = e.Latency;
     }
 
-    public void UserLeft(string nickname)
-    {
-        UserViewModel user = Users.FirstOrDefault(x => x.Nickname == nickname);
-        Users.Remove(user);
-    }
-
-    public async Task Disconnect()
-    {
-        await _signalRService.DisconnectAsync();
-    }
-
-    private ObservableCollection<UserViewModel> Users { get; } = new ObservableCollection<UserViewModel>();
+    private ObservableCollection<UserViewModel> Users { get; } = new();
+    private ObservableCollection<EventViewModel> Events { get; } = new();
 
     private ColorsEnum brushColor = BrushSettings.BrushColor;
     private ColorsEnum BrushColor

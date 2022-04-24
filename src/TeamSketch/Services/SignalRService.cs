@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -12,14 +13,13 @@ public interface ISignalRService
     HubConnection Connection { get; }
     string Nickname { get; }
     string Room { get; }
+    List<string> UsersInRoom { get; }
     Task CreateRoomAsync(string userNickname);
     Task JoinRoomAsync(string userNickname, string joinedRoom);
-    Task WaveAsync();
     Task DisconnectAsync();
     Task DrawPointAsync(double x, double y);
     Task DrawLineAsync(double x1, double y1, double x2, double y2);
 
-    event EventHandler<UserEventArgs> Waved;
     event EventHandler<UserEventArgs> Joined;
     event EventHandler<UserEventArgs> Left;
     event EventHandler<DrewEventArgs> DrewPoint;
@@ -48,12 +48,14 @@ public class SignalRService : ISignalRService
     public HubConnection Connection { get; }
     public string Nickname { get; private set; }
     public string Room { get; private set; }
+    public List<string> UsersInRoom { get; private set; } = new();
 
     public async Task CreateRoomAsync(string nickname)
     {
         await Connection.StartAsync();
 
         Nickname = nickname.Trim();
+        UsersInRoom.Add(Nickname);
 
         InitializeHandlersAndPingTimer();
 
@@ -62,7 +64,7 @@ public class SignalRService : ISignalRService
             Room = room;
         });
 
-        await Connection.InvokeAsync("CreateRoom");
+        await Connection.InvokeAsync("CreateRoom", nickname);
     }
 
     public async Task JoinRoomAsync(string nickname, string room)
@@ -71,21 +73,16 @@ public class SignalRService : ISignalRService
 
         Nickname = nickname.Trim();
         Room = room;
+        UsersInRoom.Add(Nickname);
 
         InitializeHandlersAndPingTimer();
 
         await Connection.InvokeAsync("JoinRoom", Nickname, Room);
     }
 
-    public async Task WaveAsync()
-    {
-        await Connection.InvokeAsync("Wave", Nickname, Room);
-    }
-
     public async Task DisconnectAsync()
     {
         _pingTimer.Stop();
-        await Connection.InvokeAsync("LeaveRoom", Nickname, Room);
         await Connection.StopAsync();
     }
 
@@ -101,7 +98,6 @@ public class SignalRService : ISignalRService
         await Connection.InvokeAsync("DrawLine", Nickname, Room, data);
     }
 
-    public event EventHandler<UserEventArgs> Waved;
     public event EventHandler<UserEventArgs> Joined;
     public event EventHandler<UserEventArgs> Left;
     public event EventHandler<DrewEventArgs> DrewPoint;
@@ -110,15 +106,13 @@ public class SignalRService : ISignalRService
 
     private void InitializeHandlersAndPingTimer()
     {
-        Connection.On<string>("Waved", (user) =>
+        Connection.On<List<string>>("UsersInRoom", (users) =>
         {
-            Waved.Invoke(this, new UserEventArgs(user));
+            UsersInRoom.AddRange(users);
         });
 
-        Connection.On<string>("JoinedRoom", async (user) =>
+        Connection.On<string>("JoinedRoom", (user) =>
         {
-            await WaveAsync();
-
             Joined.Invoke(this, new UserEventArgs(user));
         });
 

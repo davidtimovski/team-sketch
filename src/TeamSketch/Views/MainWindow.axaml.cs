@@ -122,8 +122,7 @@ public partial class MainWindow : Window
 
     protected override void OnClosing(CancelEventArgs e)
     {
-        var vm = DataContext as MainWindowViewModel;
-        _ = vm.Disconnect();
+        _ = _signalRService.DisconnectAsync();
 
         var window = new EnterWindow
         {
