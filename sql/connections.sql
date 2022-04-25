@@ -7,6 +7,7 @@ CREATE TABLE public.connections
     "user" character varying(30) NOT NULL COLLATE pg_catalog."default",
 	is_connected boolean NOT NULL DEFAULT TRUE,
     created timestamp with time zone NOT NULL,
+	modified timestamp with time zone NOT NULL,
 	CONSTRAINT "PK_connections" PRIMARY KEY (id),
     CONSTRAINT "FK_connections_rooms_room_id" FOREIGN KEY (room_id)
     REFERENCES public.rooms (id) MATCH SIMPLE

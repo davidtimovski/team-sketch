@@ -36,11 +36,7 @@ public class SignalRService : ISignalRService
     public SignalRService()
     {
         Connection = new HubConnectionBuilder()
-#if DEBUG
-           .WithUrl("http://localhost:5150/actionHub")
-#else
-           .WithUrl("https://team-sketch.davidtimovski.com/actionHub")
-#endif
+           .WithUrl(Globals.ServerUri + "/actionHub")
            .AddMessagePackProtocol()
            .Build();
     }
@@ -134,7 +130,7 @@ public class SignalRService : ISignalRService
         Connection.On("Pong", () =>
         {
             TimeSpan diff = DateTime.Now - lastPing;
-            Pong.Invoke(this, new PongEventArgs(diff.Milliseconds));
+            Pong?.Invoke(this, new PongEventArgs(diff.Milliseconds));
         });
 
         _pingTimer.Tick += PingTimer_Tick;

@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using ReactiveUI;
 using Splat;
+using TeamSketch.Common;
 using TeamSketch.DependencyInjection;
 using TeamSketch.Services;
-using TeamSketch.Utils;
 
 namespace TeamSketch.ViewModels;
 
@@ -22,78 +22,104 @@ public class EnterViewModel : ViewModelBase
         }
     }
 
-    public async Task<bool> CreateRoomAsync()
+    public async Task<EnterValidationResult> CreateRoomAsync()
     {
         Entering = true;
 
-        if (!ValidateNickname())
+        if (nickname.Trim().Length == 0)
         {
+            NicknameIsInvalid = true;
             Entering = false;
-            return false;
+            return new EnterValidationResult(false, null, false, false);
+        }
+
+        var error = Validations.ValidateNickname(nickname);
+        if (error != null)
+        {
+            NicknameIsInvalid = true;
+            Entering = false;
+            return new EnterValidationResult(false, error, true, false);
         }
 
         try
         {
             await _signalRService.CreateRoomAsync(nickname);
-            return true;
+            return new EnterValidationResult(true, null, false, false);
         }
         catch (Exception ex)
         {
-            // TODO
-            Console.WriteLine(ex.Message);
             Entering = false;
-            return false;
+            return new EnterValidationResult(false, ex.Message, true, true);
         }
     }
 
-    public async Task<bool> JoinRoomAsync()
+    public async Task<EnterValidationResult> JoinRoomAsync()
     {
         Entering = true;
         NicknameIsInvalid = RoomIsInvalid = false;
 
-        bool valid = ValidateNickname();
-
-        if (room.Trim().Length != 7 || !ValidationUtil.IsAlphanumeric(room))
+        if (nickname.Trim().Length == 0)
         {
-            RoomIsInvalid = true;
-            valid = false;
+            NicknameIsInvalid = true;
+            Entering = false;
+            return new EnterValidationResult(false, null, false, false);
         }
 
-        if (!valid)
+        if (room.Trim().Length == 0)
         {
+            RoomIsInvalid = true;
             Entering = false;
-            return false;
+            return new EnterValidationResult(false, null, false, false);
+        }
+
+        var nicknameError = Validations.ValidateNickname(nickname);
+        if (nicknameError != null)
+        {
+            NicknameIsInvalid = true;
+            Entering = false;
+            return new EnterValidationResult(false, nicknameError, true, false);
+        }
+
+        var roomError = Validations.ValidateRoomName(room);
+        if (roomError != null)
+        {
+            RoomIsInvalid = true;
+            Entering = false;
+            return new EnterValidationResult(false, roomError, true, false);
+        }
+
+        var validationResult = await HttpProxy.ValidateJoinRoomAsync(room, nickname);
+        if (!validationResult.RoomExists)
+        {
+            RoomIsInvalid = true;
+            Entering = false;
+            return new EnterValidationResult(false, "Room does not exist.", true, false);
+        }
+
+        if (validationResult.RoomIsFull)
+        {
+            RoomIsInvalid = true;
+            Entering = false;
+            return new EnterValidationResult(false, "Room is at capacity.", true, false);
+        }
+
+        if (validationResult.NicknameIsTaken)
+        {
+            RoomIsInvalid = true;
+            Entering = false;
+            return new EnterValidationResult(false, "The nickname is taken in that room.", true, false);
         }
 
         try
         {
             await _signalRService.JoinRoomAsync(nickname, room);
-            return true;
+            return new EnterValidationResult(true, null, false, false);
         }
         catch (Exception ex)
         {
-            // TODO
-            Console.WriteLine(ex.Message);
             Entering = false;
-            return false;
+            return new EnterValidationResult(false, ex.Message, true, true);
         }
-    }
-
-    private bool ValidateNickname()
-    {
-        if (nickname.Trim().Length < 2)
-        {
-            NicknameIsInvalid = true;
-            return false;
-        }
-
-        if (!ValidationUtil.IsAlphanumeric(nickname))
-        {
-            NicknameIsInvalid = true;
-            return false;
-        }
-
-        return true;
     }
 
     private void ToggleTab()
@@ -167,3 +193,5 @@ public class EnterViewModel : ViewModelBase
         }
     }
 }
+
+public readonly record struct EnterValidationResult(bool Success, string ErrorMessage, bool ShowError, bool IsSystemError);

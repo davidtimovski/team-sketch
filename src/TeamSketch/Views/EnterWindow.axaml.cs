@@ -22,31 +22,46 @@ public partial class EnterWindow : Window
     {
         var vm = (EnterViewModel)DataContext;
 
-        var success = await vm.CreateRoomAsync();
-        if (!success)
+        var result = await vm.CreateRoomAsync();
+        if (result.Success)
         {
-            return;
+            Start();
         }
-
-        var mainWindow = new MainWindow()
+        else if (result.ShowError)
         {
-            DataContext = new MainWindowViewModel()
-        };
-        mainWindow.Show();
-
-        Close();
+            ShowError(result.ErrorMessage, result.IsSystemError);
+        }
     }
 
     private async Task JoinButtonClicked()
     {
         var vm = (EnterViewModel)DataContext;
-        var success = await vm.JoinRoomAsync();
-        if (!success)
-        {
-            return;
-        }
 
-        var mainWindow = new MainWindow()
+        var result = await vm.JoinRoomAsync();
+        if (result.Success)
+        {
+            Start();
+        }
+        else if (result.ShowError)
+        {
+            ShowError(result.ErrorMessage, result.IsSystemError);
+        }
+    }
+
+    private void ShowError(string message, bool isSystemError)
+    {
+        var mainWindow = new ErrorWindow
+        {
+            DataContext = new ErrorViewModel(message, isSystemError),
+            Topmost = true,
+            CanResize = false
+        };
+        mainWindow.Show();
+    }
+
+    private void Start()
+    {
+        var mainWindow = new MainWindow
         {
             DataContext = new MainWindowViewModel()
         };

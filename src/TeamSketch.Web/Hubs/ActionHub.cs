@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.SignalR;
+using TeamSketch.Common;
 using TeamSketch.Web.Persistence;
 using TeamSketch.Web.Utils;
 
@@ -16,7 +17,14 @@ public class ActionHub : Hub
 
     public async Task CreateRoom(string user)
     {
+        var nicknameError = Validations.ValidateNickname(user);
+        if (nicknameError != null)
+        {
+            throw new InvalidOperationException(nicknameError);
+        }
+
         string room = RoomNameGenerator.Generate();
+
         await Groups.AddToGroupAsync(Context.ConnectionId, room);
         await Clients.Caller.SendAsync("RoomCreated", room);
 
@@ -25,10 +33,33 @@ public class ActionHub : Hub
 
     public async Task JoinRoom(string user, string room)
     {
+        var nicknameError = Validations.ValidateNickname(user);
+        if (nicknameError != null)
+        {
+            throw new InvalidOperationException(nicknameError);
+        }
+
+        var exists = await _repository.RoomExistsAsync(room);
+        if (!exists)
+        {
+            throw new InvalidOperationException($"Room '{room}' does not exist.");
+        }
+
+        var usersInRoom = await _repository.GetActiveUsersInRoomAsync(room);
+        if (usersInRoom.Count > 4)
+        {
+            throw new InvalidOperationException($"Room '{room}' is currently full.");
+        }
+
+        if (usersInRoom.Contains(user))
+        {
+            throw new InvalidOperationException($"Nickname '{user}' is taken in room '{room}'.");
+        }
+
         await Groups.AddToGroupAsync(Context.ConnectionId, room);
         await Clients.OthersInGroup(room).SendAsync("JoinedRoom", user);
 
-        var usersInRoom = await _repository.JoinRoomAsync(room, user, Context.ConnectionId, GetIPAddress());
+        await _repository.JoinRoomAsync(room, user, Context.ConnectionId, GetIPAddress());
         await Clients.Caller.SendAsync("UsersInRoom", usersInRoom);
     }
 

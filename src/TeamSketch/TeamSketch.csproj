@@ -45,6 +45,9 @@
 	<EmbeddedResource Include="Assets\Fonts\RedHatDisplay-Medium.ttf" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\TeamSketch.Common\TeamSketch.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <AvaloniaResource Update="Assets\Icons.axaml" />
   </ItemGroup>
 </Project>

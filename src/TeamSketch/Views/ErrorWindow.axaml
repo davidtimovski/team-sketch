@@ -1,0 +1,73 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:TeamSketch.ViewModels"
+        x:Class="TeamSketch.Views.ErrorWindow"
+        Title="Error"
+		ExtendClientAreaToDecorationsHint="True"
+		ExtendClientAreaChromeHints="NoChrome"
+		ExtendClientAreaTitleBarHeightHint="-1">
+
+	<Window.Styles>
+		<Style Selector="Window">
+			<!--<Setter Property="Icon" Value="/Assets/logo.ico" />-->
+			<Setter Property="SizeToContent" Value="WidthAndHeight" />
+			<Setter Property="Padding" Value="20" />
+			<Setter Property="FontFamily" Value="{StaticResource MainFontFamily}" />
+			<Setter Property="FontSize" Value="16" />
+		</Style>
+
+		<Style Selector="TextBlock.title">
+			<Setter Property="Margin" Value="0 0 0 20" />
+			<Setter Property="HorizontalAlignment" Value="Center" />
+			<Setter Property="FontSize" Value="18" />
+			<Setter Property="FontWeight" Value="Medium" />
+		</Style>
+
+		<Style Selector="TextBlock.message">
+			<Setter Property="MaxWidth" Value="500" />
+			<Setter Property="TextWrapping" Value="Wrap" />
+		</Style>
+
+		<Style Selector="PathIcon">
+			<Setter Property="Margin" Value="0 0 12 0" />
+			<Setter Property="Foreground" Value="{StaticResource RedColor}" />
+		</Style>
+
+		<Style Selector="Button">
+			<Setter Property="Background" Value="{StaticResource PrimaryColor}" />
+			<Setter Property="Foreground" Value="#fff" />
+			<Setter Property="HorizontalAlignment" Value="Right" />
+			<Setter Property="HorizontalContentAlignment" Value="Center" />
+			<Setter Property="Padding" Value="15 5" />
+			<Setter Property="Margin" Value="0 20 0 0" />
+		</Style>
+		<Style Selector="Button:pointerover /template/ ContentPresenter">
+			<Setter Property="Background" Value="{StaticResource PrimaryColorLight}" />
+		</Style>
+		<Style Selector="Button:pointerover /template/ ContentPresenter">
+			<Setter Property="TextBlock.Foreground" Value="#fff" />
+		</Style>
+		<Style Selector="Button /template/ ContentPresenter">
+			<Setter Property="Transitions">
+				<Transitions>
+					<BrushTransition Property="Background" Duration="0:0:0.2" Easing="CubicEaseOut" />
+				</Transitions>
+			</Setter>
+		</Style>
+	</Window.Styles>
+
+	<Design.DataContext>
+		<vm:ErrorViewModel/>
+	</Design.DataContext>
+
+	<StackPanel>
+		<TextBlock Text="{Binding Title}" Classes="title" />
+
+		<DockPanel>
+			<PathIcon Data="{StaticResource warning}" />
+			<TextBlock Text="{Binding Message}" Classes="message" />
+		</DockPanel>
+		
+		<Button Click="OnCloseClick">Okay</Button>
+	</StackPanel>
+</Window>
