@@ -1,8 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:TeamSketch.ViewModels"
-		xmlns:models="clr-namespace:TeamSketch.Models;assembly=TeamSketch"
-		xmlns:conv="clr-namespace:TeamSketch.Converters;assembly=TeamSketch"
+		xmlns:controls="using:TeamSketch.UserControls"
         x:Class="TeamSketch.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="Team Sketch">
@@ -27,6 +26,9 @@
 			<Setter Property="Width" Value="1280" />
 			<Setter Property="Height" Value="720" />
 		</Style>
+		<Style Selector="Canvas.disconnected">
+			<Setter Property="Opacity" Value="0.4" />
+		</Style>
 
 		<Style Selector="Border.panelLabel">
 			<Setter Property="Margin" Value="0 0 0 10" />
@@ -40,182 +42,38 @@
 			<Setter Property="Padding" Value="15 15 15 20" />
 		</Style>
 		
-		<Style Selector="RadioButton.colorRadio">
-			<Setter Property="BorderBrush" Value="Transparent" />
-			<Setter Property="Foreground" Value="#eee" />
-			<Setter Property="Template">
-				<ControlTemplate>
-					<Border Name="border" BorderBrush="{TemplateBinding BorderBrush}" Margin="0 0 2 0" BorderThickness="2" CornerRadius="5">
-						<Panel>
-							<Rectangle Fill="{TemplateBinding Background}" Width="30" Height="30" />
-							<PathIcon Data="{StaticResource paintBucket}" Foreground="{TemplateBinding Foreground}" />
-						</Panel>
-					</Border>
-				</ControlTemplate>
-			</Setter>
-		</Style>
-		<Style Selector="RadioButton.colorRadio /template/ Border#border:pointerover">
-			<Setter Property="BorderBrush" Value="#bbb" />
-		</Style>
-		<Style Selector="RadioButton.colorRadio:checked /template/ Border#border">
-			<Setter Property="BorderBrush" Value="#bbb" />
-		</Style>
-		<Style Selector="RadioButton.colorRadio.default">
-			<Setter Property="Background" Value="#222" />
-		</Style>
-		<Style Selector="RadioButton.colorRadio.red">
-			<Setter Property="Background" Value="{StaticResource RedColor}" />
-		</Style>
-		<Style Selector="RadioButton.colorRadio.blue">
-			<Setter Property="Background" Value="{StaticResource BlueColor}" />
-		</Style>
-		<Style Selector="RadioButton.colorRadio.green">
-			<Setter Property="Background" Value="{StaticResource GreenColor}" />
-		</Style>
-		<Style Selector="RadioButton.colorRadio.yellow">
-			<Setter Property="Background" Value="{StaticResource YellowColor}" />
-			<Setter Property="Foreground" Value="#555" />
-		</Style>
-		<Style Selector="RadioButton.colorRadio.orange">
-			<Setter Property="Background" Value="{StaticResource OrangeColor}" />
-			<Setter Property="Foreground" Value="#555" />
-		</Style>
-		<Style Selector="RadioButton.colorRadio.purple">
-			<Setter Property="Background" Value="{StaticResource PurpleColor}" />
-		</Style>
-		<Style Selector="RadioButton.colorRadio.pink">
-			<Setter Property="Background" Value="{StaticResource PinkColor}" />
-			<Setter Property="Foreground" Value="#555" />
-		</Style>
-		<Style Selector="RadioButton.colorRadio.gray">
-			<Setter Property="Background" Value="{StaticResource GrayColor}" />
-			<Setter Property="Foreground" Value="#333" />
-		</Style>
-		
-		<Style Selector="RadioButton.eraserRadio">
-			<Setter Property="BorderBrush" Value="Transparent" />
-			<Setter Property="Template">
-				<ControlTemplate>
-					<Border Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="2" CornerRadius="5">
-						<Panel>
-							<Rectangle Fill="White" Width="30" Height="30" />
-							<PathIcon Data="{StaticResource eraser}" Foreground="#222" />
-						</Panel>
-					</Border>
-				</ControlTemplate>
-			</Setter>
-		</Style>
-		<Style Selector="RadioButton.eraserRadio /template/ Border#border:pointerover">
-			<Setter Property="BorderBrush" Value="#bbb" />
-		</Style>
-		<Style Selector="RadioButton.eraserRadio:checked /template/ Border#border">
-			<Setter Property="BorderBrush" Value="#bbb" />
-		</Style>
-
-		<Style Selector="RadioButton.thicknessRadio">
-			<Setter Property="BorderBrush" Value="Transparent" />
-			<Setter Property="Template">
-				<ControlTemplate>
-					<Border Name="border" BorderBrush="{TemplateBinding BorderBrush}" Margin="0 0 2 0" BorderThickness="2" CornerRadius="15">
-						<Panel>
-							<Ellipse Fill="White" Width="30" Height="30" />
-							<Ellipse Name="brushPoint" Fill="#222" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}" />
-						</Panel>
-					</Border>
-				</ControlTemplate>
-			</Setter>
-		</Style>
-		<Style Selector="RadioButton.thicknessRadio /template/ Border#border:pointerover">
-			<Setter Property="BorderBrush" Value="#bbb" />
-		</Style>
-		<Style Selector="RadioButton.thicknessRadio:checked /template/ Border#border">
-			<Setter Property="BorderBrush" Value="#bbb" />
-		</Style>
-		<Style Selector="RadioButton.thicknessRadio.thin /template/ Ellipse#brushPoint">
-			<Setter Property="Width" Value="4" />
-			<Setter Property="Height" Value="4" />
-		</Style>
-		<Style Selector="RadioButton.thicknessRadio.semiThin /template/ Ellipse#brushPoint">
-			<Setter Property="Width" Value="6" />
-			<Setter Property="Height" Value="6" />
-		</Style>
-		<Style Selector="RadioButton.thicknessRadio.medium /template/ Ellipse#brushPoint">
-			<Setter Property="Width" Value="8" />
-			<Setter Property="Height" Value="8" />
-		</Style>
-		<Style Selector="RadioButton.thicknessRadio.semiThick /template/ Ellipse#brushPoint">
-			<Setter Property="Width" Value="10" />
-			<Setter Property="Height" Value="10" />
-		</Style>
-		<Style Selector="RadioButton.thicknessRadio.thick /template/ Ellipse#brushPoint">
-			<Setter Property="Width" Value="12" />
-			<Setter Property="Height" Value="12" />
-		</Style>
-
 		<Style Selector="Border.usersPanel">
 			<Setter Property="Background" Value="#ddd" />
 			<Setter Property="Padding" Value="10" />
 			<Setter Property="VerticalAlignment" Value="Stretch" />
 		</Style>
-		<Style Selector="Border.user">
-			<Setter Property="Background" Value="#eee" />
-			<Setter Property="CornerRadius" Value="5" />
-			<Setter Property="Padding" Value="15 10" />
-			<Setter Property="Margin" Value="0 0 0 8" />
-		</Style>
-		<Style Selector="Border.user Ellipse.drawingIndicator">
-			<Setter Property="Width" Value="10" />
-			<Setter Property="Height" Value="10" />
-			<Setter Property="Fill" Value="#ccc" />
-			<Setter Property="HorizontalAlignment" Value="Right" />
-		</Style>
-		<Style Selector="Border.user Ellipse.drawingIndicator.active">
-			<Setter Property="Fill" Value="{StaticResource GreenColor}" />
-		</Style>
-
+		
 		<Style Selector="Border.eventsPanel">
 			<Setter Property="Background" Value="#eee" />
 			<Setter Property="Padding" Value="10" />
 			<Setter Property="VerticalAlignment" Value="Stretch" />
-		</Style>
-		<Style Selector="Border.eventsPanel ScrollViewer">
-			<Setter Property="Height" Value="170" />
-		</Style>
-		<Style Selector="Border.eventsPanel ItemsControl">
-			<Setter Property="Padding" Value="0 0 0 30" />
-		</Style>
-		<Style Selector="Border.event">
-			<Setter Property="Padding" Value="2 0" />
-			<Setter Property="Margin" Value="0 5" />
-		</Style>
-		<Style Selector="Border.event TextBlock">
-			<Setter Property="Foreground" Value="#888" />
-			<Setter Property="FontSize" Value="14" />
-		</Style>
-		<Style Selector="Border.event TextBlock.nickname">
-			<Setter Property="Foreground" Value="{StaticResource BlueColor}" />
 		</Style>
 
 		<Style Selector="Border.footer">
 			<Setter Property="Background" Value="#eee" />
 			<Setter Property="Padding" Value="15 0" />
 		</Style>
-		<Style Selector="Border.roomSection">
+		<Style Selector="Border.roomNameSection">
 			<Setter Property="Height" Value="37" />
 			<Setter Property="Background" Value="#fff" />
 			<Setter Property="CornerRadius" Value="5" />
 			<Setter Property="Padding" Value="10 0 5 0" />
 			<Setter Property="VerticalAlignment" Value="Center" />
 		</Style>
-		<Style Selector="Border.roomSection TextBlock">
+		<Style Selector="Border.roomNameSection TextBlock">
 			<Setter Property="VerticalAlignment" Value="Center" />
 			<Setter Property="Foreground" Value="#888" />
 		</Style>
-		<Style Selector="Border.roomSection TextBlock.roomName">
+		<Style Selector="Border.roomNameSection TextBlock.roomName">
 			<Setter Property="Foreground" Value="{StaticResource GreenColor}" />
 			<Setter Property="FontWeight" Value="Medium" />
 		</Style>
-		<Style Selector="Border.roomSection Button">
+		<Style Selector="Border.roomNameSection Button">
 			<Setter Property="Background" Value="#ccc" />
 			<Setter Property="Padding" Value="10 3" />
 			<Setter Property="Margin" Value="12 0 0 0" />
@@ -223,29 +81,9 @@
 			<Setter Property="Foreground" Value="#fff" />
 			<Setter Property="FontSize" Value="14" />
 		</Style>
-		<Style Selector="Border.roomSection Button:pointerover /template/ ContentPresenter">
+		<Style Selector="Border.roomNameSection Button:pointerover /template/ ContentPresenter">
 			<Setter Property="Background" Value="#bbb" />
 			<Setter Property="TextBlock.Foreground" Value="#fff" />
-		</Style>
-		<Style Selector="Border.pingSection">
-			<Setter Property="Width" Value="180" />
-			<Setter Property="Height" Value="37" />
-			<Setter Property="Background" Value="#fff" />
-			<Setter Property="CornerRadius" Value="5" />
-			<Setter Property="Padding" Value="10 0" />
-			<Setter Property="VerticalAlignment" Value="Center" />
-			<Setter Property="HorizontalAlignment" Value="Right" />
-		</Style>
-		<Style Selector="Border.pingSection DockPanel">
-			<Setter Property="HorizontalAlignment" Value="Center" />
-			<Setter Property="VerticalAlignment" Value="Center" />
-		</Style>
-		<Style Selector="Border.pingSection TextBlock">
-			<Setter Property="Foreground" Value="#888" />
-		</Style>
-		<Style Selector="Border.pingSection TextBlock.latency">
-			<Setter Property="Foreground" Value="{StaticResource BlueColor}" />
-			<Setter Property="FontWeight" Value="Medium" />
 		</Style>
 	</Window.Styles>
 
@@ -253,89 +91,21 @@
 		<Grid Grid.Row="0" ColumnDefinitions="*,Auto">
 
 			<Border Grid.Column="0" Classes="canvasContainer">
-				<Canvas Name="canvas" PointerPressed="Canvas_PointerPressed" PointerReleased="Canvas_PointerReleased" />
+				<Canvas Name="canvas" IsEnabled="{Binding Connected}" PointerPressed="Canvas_PointerPressed" PointerReleased="Canvas_PointerReleased" Classes.disconnected="{Binding !Connected}" />
 			</Border>
 
 			<Border Grid.Column="1">
 				<Grid RowDefinitions="Auto,1*,210">
 					<Border Grid.Row="0" Classes="toolsPanel">
-						<StackPanel>
-							<StackPanel.Resources>
-								<conv:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
-							</StackPanel.Resources>
-
-							<Border Classes="panelLabel">
-								<TextBlock>Tools</TextBlock>
-							</Border>
-							
-							<DockPanel>
-								<RadioButton Classes="colorRadio default" GroupName="brushColor" IsChecked="{Binding Path=BrushColor, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ColorsEnum.Default}}" />
-								<RadioButton Classes="colorRadio red" GroupName="brushColor" IsChecked="{Binding Path=BrushColor, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ColorsEnum.Red}}" />
-								<RadioButton Classes="colorRadio blue" GroupName="brushColor" IsChecked="{Binding Path=BrushColor, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ColorsEnum.Blue}}" />
-								<RadioButton Classes="colorRadio green" GroupName="brushColor" IsChecked="{Binding Path=BrushColor, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ColorsEnum.Green}}" />
-								<RadioButton Classes="colorRadio yellow" GroupName="brushColor" IsChecked="{Binding Path=BrushColor, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ColorsEnum.Yellow}}" />
-							</DockPanel>
-
-							<DockPanel Margin="0 8 0 0">
-								<RadioButton Classes="colorRadio orange" GroupName="brushColor" IsChecked="{Binding Path=BrushColor, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ColorsEnum.Orange}}" />
-								<RadioButton Classes="colorRadio purple" GroupName="brushColor" IsChecked="{Binding Path=BrushColor, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ColorsEnum.Purple}}" />
-								<RadioButton Classes="colorRadio pink" GroupName="brushColor" IsChecked="{Binding Path=BrushColor, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ColorsEnum.Pink}}" />
-								<RadioButton Classes="colorRadio gray" GroupName="brushColor" IsChecked="{Binding Path=BrushColor, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ColorsEnum.Gray}}" />
-								<RadioButton Classes="eraserRadio" GroupName="brushColor" IsChecked="{Binding Path=BrushColor, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ColorsEnum.Eraser}}" />
-							</DockPanel>
-
-							<DockPanel Margin="0 15 0 0">
-								<RadioButton Classes="thicknessRadio thin" GroupName="brushThickness" IsChecked="{Binding Path=BrushThickness, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ThicknessEnum.Thin}}" />
-								<RadioButton Classes="thicknessRadio semiThin" GroupName="brushThickness" IsChecked="{Binding Path=BrushThickness, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ThicknessEnum.SemiThin}}" />
-								<RadioButton Classes="thicknessRadio medium" GroupName="brushThickness" IsChecked="{Binding Path=BrushThickness, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ThicknessEnum.Medium}}" />
-								<RadioButton Classes="thicknessRadio semiThick" GroupName="brushThickness" IsChecked="{Binding Path=BrushThickness, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ThicknessEnum.SemiThick}}" />
-								<RadioButton Classes="thicknessRadio thick" GroupName="brushThickness" IsChecked="{Binding Path=BrushThickness, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static models:ThicknessEnum.Thick}}" />
-							</DockPanel>
-						</StackPanel>
+						<controls:ToolsPanel DataContext="{Binding ToolsPanel}" />
 					</Border>
 
 					<Border Grid.Row="1" Classes="usersPanel">
-						<StackPanel>
-							<Border Classes="panelLabel">
-								<TextBlock>Users</TextBlock>
-							</Border>
-
-							<ItemsControl Items="{Binding Users}">
-								<ItemsControl.ItemTemplate>
-									<DataTemplate DataType="vm:UserViewModel">
-										<Border Classes="user">
-											<DockPanel>
-												<TextBlock Text="{Binding Nickname}" />
-												<Ellipse Classes="drawingIndicator" Classes.active="{Binding Drawing}" />
-											</DockPanel>
-										</Border>
-									</DataTemplate>
-								</ItemsControl.ItemTemplate>
-							</ItemsControl>
-						</StackPanel>
+						<controls:UsersPanel DataContext="{Binding UsersPanel}" />
 					</Border>
 
 					<Border Grid.Row="2" Classes="eventsPanel">
-						<StackPanel>
-							<Border Classes="panelLabel">
-								<TextBlock>Events</TextBlock>
-							</Border>
-
-							<ScrollViewer>
-								<ItemsControl Items="{Binding Events}">
-									<ItemsControl.ItemTemplate>
-										<DataTemplate DataType="vm:EventViewModel">
-											<Border Classes="event">
-												<DockPanel>
-													<TextBlock Text="{Binding User}" Classes="nickname" />
-													<TextBlock Text="{Binding EventMessage}" />
-												</DockPanel>
-											</Border>
-										</DataTemplate>
-									</ItemsControl.ItemTemplate>
-								</ItemsControl>
-							</ScrollViewer>
-						</StackPanel>
+						<controls:EventsPanel DataContext="{Binding EventsPanel}" />
 					</Border>
 				</Grid>
 			</Border>
@@ -345,7 +115,7 @@
 		<Border Grid.Row="1" Classes="footer">
 
 			<DockPanel>
-				<Border Classes="roomSection">
+				<Border Classes="roomNameSection">
 					<DockPanel>
 						<TextBlock Text="Room: " />
 						<TextBlock Text="{Binding Room}" Classes="roomName" />
@@ -353,13 +123,7 @@
 					</DockPanel>
 				</Border>
 
-				<Border Classes="pingSection">
-					<DockPanel>
-						<TextBlock Text="Ping: " />
-						<TextBlock Text="{Binding Latency}" Classes="latency" />
-						<TextBlock Text=" ms" />
-					</DockPanel>
-				</Border>
+				<controls:ConnectionStatus DataContext="{Binding ConnectionStatus}" />
 			</DockPanel>
 			
 		</Border>

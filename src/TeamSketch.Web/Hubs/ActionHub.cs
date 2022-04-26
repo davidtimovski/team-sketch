@@ -60,7 +60,6 @@ public class ActionHub : Hub
         await Clients.OthersInGroup(room).SendAsync("JoinedRoom", user);
 
         await _repository.JoinRoomAsync(room, user, Context.ConnectionId, GetIPAddress());
-        await Clients.Caller.SendAsync("UsersInRoom", usersInRoom);
     }
 
     public async Task DrawPoint(string user, string room, byte[] data)

@@ -32,15 +32,27 @@ namespace TeamSketch.Web.Controllers
             var usersInRoom = await _repository.GetActiveUsersInRoomAsync(room);
             if (usersInRoom.Count > 4)
             {
-                return Ok(new JoinRoomValidationResult { RoomIsFull = true });
+                return Ok(new JoinRoomValidationResult { RoomExists = true, RoomIsFull = true });
             }
 
             if (usersInRoom.Contains(user))
             {
-                return Ok(new JoinRoomValidationResult { NicknameIsTaken = true });
+                return Ok(new JoinRoomValidationResult { RoomExists = true, RoomIsFull = false, NicknameIsTaken = true });
             }
 
-            return Ok(new JoinRoomValidationResult());
+            return Ok(new JoinRoomValidationResult { RoomExists = true });
+        }
+
+        [HttpGet("{room}/users")]
+        public async Task<IActionResult> GetUsersInRoom(string room)
+        {
+            if (string.IsNullOrEmpty(room))
+            {
+                return BadRequest();
+            }
+
+            var usersInRoom = await _repository.GetActiveUsersInRoomAsync(room);
+            return Ok(usersInRoom);
         }
     }
 }

@@ -48,15 +48,16 @@ public partial class EnterWindow : Window
         }
     }
 
-    private void ShowError(string message, bool isSystemError)
+    private static void ShowError(string message, bool isSystemError)
     {
-        var mainWindow = new ErrorWindow
+        var errorWindow = new ErrorWindow
         {
             DataContext = new ErrorViewModel(message, isSystemError),
             Topmost = true,
             CanResize = false
         };
-        mainWindow.Show();
+        errorWindow.Show();
+        errorWindow.Activate();
     }
 
     private void Start()
@@ -66,6 +67,7 @@ public partial class EnterWindow : Window
             DataContext = new MainWindowViewModel()
         };
         mainWindow.Show();
+        mainWindow.Activate();
 
         Close();
     }

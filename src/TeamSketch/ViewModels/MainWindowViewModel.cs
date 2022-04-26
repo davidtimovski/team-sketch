@@ -1,12 +1,11 @@
-﻿using System.Collections.ObjectModel;
-using System.Linq;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Avalonia;
 using ReactiveUI;
 using Splat;
 using TeamSketch.DependencyInjection;
-using TeamSketch.Models;
 using TeamSketch.Services;
-using TeamSketch.Utils;
+using TeamSketch.ViewModels.UserControls;
 
 namespace TeamSketch.ViewModels;
 
@@ -18,27 +17,33 @@ public class MainWindowViewModel : ViewModelBase
     {
         _signalRService = Locator.Current.GetRequiredService<ISignalRService>();
 
-        _signalRService.Joined += SignalRService_Joined;
-        _signalRService.Left += SignalRService_Left;
-        _signalRService.Pong += SignalRService_Pong;
-
-        foreach (var user in _signalRService.UsersInRoom)
-        {
-            Users.Add(new UserViewModel(user));
-        }
-
         Room = _signalRService.Room;
+
+        _ = GetUsersInRoomAsync();
     }
 
     public string Room { get; }
 
     public void IndicateUserDrawing(string nickname)
     {
-        UserViewModel user = Users.FirstOrDefault(x => x.Nickname == nickname);
+        UserViewModel user = UsersPanel.Users.FirstOrDefault(x => x.Nickname == nickname);
         if (user != null)
         {
             user.Drawing = true;
         }
+    }
+
+    private async Task GetUsersInRoomAsync()
+    {
+        var usersInRoom = await HttpProxy.GetUsersInRoomAsync(Room);
+
+        foreach (var user in usersInRoom)
+        {
+            UsersPanel.Users.Add(new UserViewModel(user));
+        }
+
+        var initialEventMessage = usersInRoom.Count == 1 ? "Room created." : "Joined room.";
+        EventsPanel.Events.Add(new EventViewModel(initialEventMessage));
     }
 
     private async void CopyRoom()
@@ -46,70 +51,31 @@ public class MainWindowViewModel : ViewModelBase
         await Application.Current.Clipboard.SetTextAsync(Room);
     }
 
-    private void SignalRService_Joined(object sender, UserEventArgs e)
+    private ToolsPanelViewModel toolsPanel = new();
+    private ToolsPanelViewModel ToolsPanel
     {
-        Users.Add(new UserViewModel(e.User));
-
-        Events.Add(new EventViewModel(e.User, " joined."));
+        get => toolsPanel;
+        set => this.RaiseAndSetIfChanged(ref toolsPanel, value);
     }
 
-    private void SignalRService_Left(object sender, UserEventArgs e)
+    private UsersPanelViewModel usersPanel = new();
+    private UsersPanelViewModel UsersPanel
     {
-        UserViewModel user = Users.FirstOrDefault(x => x.Nickname == e.User);
-        Users.Remove(user);
-
-        Events.Add(new EventViewModel(e.User, " left."));
+        get => usersPanel;
+        set => this.RaiseAndSetIfChanged(ref usersPanel, value);
     }
 
-    private void SignalRService_Pong(object sender, PongEventArgs e)
+    private EventsPanelViewModel eventsPanel = new();
+    private EventsPanelViewModel EventsPanel
     {
-        Latency = e.Latency;
+        get => eventsPanel;
+        set => this.RaiseAndSetIfChanged(ref eventsPanel, value);
     }
 
-    private ObservableCollection<UserViewModel> Users { get; } = new();
-    private ObservableCollection<EventViewModel> Events { get; } = new();
-
-    private ColorsEnum brushColor = BrushSettings.BrushColor;
-    private ColorsEnum BrushColor
+    private ConnectionStatusViewModel connectionStatus = new();
+    private ConnectionStatusViewModel ConnectionStatus
     {
-        get => brushColor;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref brushColor, value);
-            BrushSettings.BrushColor = value;
-
-            if (value == ColorsEnum.Eraser)
-            {
-                BrushThickness = ThicknessEnum.Eraser;
-            }
-            else
-            {
-                BrushThickness = previousBrushThickness;
-            }
-        }
-    }
-
-    private ThicknessEnum previousBrushThickness = BrushSettings.BrushThickness;
-    private ThicknessEnum brushThickness = BrushSettings.BrushThickness;
-    private ThicknessEnum BrushThickness
-    {
-        get => brushThickness;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref brushThickness, value);
-            BrushSettings.BrushThickness = value;
-
-            if (brushColor != ColorsEnum.Eraser || value != ThicknessEnum.Eraser)
-            {
-                previousBrushThickness = brushThickness;
-            }
-        }
-    }
-
-    private int latency;
-    private int Latency
-    {
-        get => latency;
-        set => this.RaiseAndSetIfChanged(ref latency, value);
+        get => connectionStatus;
+        set => this.RaiseAndSetIfChanged(ref connectionStatus, value);
     }
 }

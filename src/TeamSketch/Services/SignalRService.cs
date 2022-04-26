@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -10,124 +9,121 @@ namespace TeamSketch.Services;
 
 public interface ISignalRService
 {
-    HubConnection Connection { get; }
     string Nickname { get; }
     string Room { get; }
-    List<string> UsersInRoom { get; }
     Task CreateRoomAsync(string userNickname);
     Task JoinRoomAsync(string userNickname, string joinedRoom);
     Task DisconnectAsync();
     Task DrawPointAsync(double x, double y);
     Task DrawLineAsync(double x1, double y1, double x2, double y2);
 
-    event EventHandler<UserEventArgs> Joined;
-    event EventHandler<UserEventArgs> Left;
-    event EventHandler<DrewEventArgs> DrewPoint;
-    event EventHandler<DrewEventArgs> DrewLine;
+    event EventHandler<UserEventArgs> UserJoined;
+    event EventHandler<UserEventArgs> UserLeft;
+    event EventHandler<DrewEventArgs> UserDrewPoint;
+    event EventHandler<DrewEventArgs> UserDrewLine;
     event EventHandler<PongEventArgs> Pong;
+    event EventHandler<EventArgs> Disconnected;
+    event EventHandler<EventArgs> Reconnected;
 }
 
 public class SignalRService : ISignalRService
 {
     private const int PingIntervalSeconds = 4;
+    private readonly HubConnection _connection;
     private readonly DispatcherTimer _pingTimer = new();
     private DateTime lastPing;
 
     public SignalRService()
     {
-        Connection = new HubConnectionBuilder()
+        _connection = new HubConnectionBuilder()
            .WithUrl(Globals.ServerUri + "/actionHub")
            .AddMessagePackProtocol()
            .Build();
     }
-
-    public HubConnection Connection { get; }
+    
     public string Nickname { get; private set; }
     public string Room { get; private set; }
-    public List<string> UsersInRoom { get; private set; } = new();
 
     public async Task CreateRoomAsync(string nickname)
     {
-        await Connection.StartAsync();
+        await _connection.StartAsync();
 
         Nickname = nickname.Trim();
-        UsersInRoom.Add(Nickname);
 
         InitializeHandlersAndPingTimer();
 
-        Connection.On<string>("RoomCreated", (room) =>
+        _connection.On<string>("RoomCreated", (room) =>
         {
             Room = room;
         });
 
-        await Connection.InvokeAsync("CreateRoom", nickname);
+        await _connection.InvokeAsync("CreateRoom", nickname);
     }
 
     public async Task JoinRoomAsync(string nickname, string room)
     {
-        await Connection.StartAsync();
+        await _connection.StartAsync();
 
         Nickname = nickname.Trim();
         Room = room;
-        UsersInRoom.Add(Nickname);
 
         InitializeHandlersAndPingTimer();
 
-        await Connection.InvokeAsync("JoinRoom", Nickname, Room);
+        await _connection.InvokeAsync("JoinRoom", Nickname, Room);
     }
 
     public async Task DisconnectAsync()
     {
         _pingTimer.Stop();
-        await Connection.StopAsync();
+        await _connection.StopAsync();
     }
 
     public async Task DrawPointAsync(double x, double y)
     {
         var data = PayloadConverter.ToBytes(x, y, BrushSettings.BrushThickness, BrushSettings.BrushColor);
-        await Connection.InvokeAsync("DrawPoint", Nickname, Room, data);
+        await _connection.InvokeAsync("DrawPoint", Nickname, Room, data);
     }
 
     public async Task DrawLineAsync(double x1, double y1, double x2, double y2)
     {
         var data = PayloadConverter.ToBytes(x1, y1, x2, y2, BrushSettings.BrushThickness, BrushSettings.BrushColor);
-        await Connection.InvokeAsync("DrawLine", Nickname, Room, data);
+        await _connection.InvokeAsync("DrawLine", Nickname, Room, data);
     }
 
-    public event EventHandler<UserEventArgs> Joined;
-    public event EventHandler<UserEventArgs> Left;
-    public event EventHandler<DrewEventArgs> DrewPoint;
-    public event EventHandler<DrewEventArgs> DrewLine;
+    public event EventHandler<UserEventArgs> UserJoined;
+    public event EventHandler<UserEventArgs> UserLeft;
+    public event EventHandler<DrewEventArgs> UserDrewPoint;
+    public event EventHandler<DrewEventArgs> UserDrewLine;
     public event EventHandler<PongEventArgs> Pong;
+    public event EventHandler<EventArgs> Disconnected;
+    public event EventHandler<EventArgs> Reconnected;
 
     private void InitializeHandlersAndPingTimer()
     {
-        Connection.On<List<string>>("UsersInRoom", (users) =>
+        _connection.Closed += Connection_Closed;
+        _connection.Reconnected += Connection_Reconnected;
+
+        _connection.On<string>("JoinedRoom", (user) =>
         {
-            UsersInRoom.AddRange(users);
+            UserJoined.Invoke(this, new UserEventArgs(user));
         });
 
-        Connection.On<string>("JoinedRoom", (user) =>
+        _connection.On<string>("LeftRoom", (user) =>
         {
-            Joined.Invoke(this, new UserEventArgs(user));
+            UserLeft.Invoke(this, new UserEventArgs(user));
         });
 
-        Connection.On<string>("LeftRoom", (user) =>
+        _connection.On<string, byte[]>("DrewPoint", (user, data) =>
         {
-            Left.Invoke(this, new UserEventArgs(user));
+            UserDrewPoint.Invoke(this, new DrewEventArgs(user, data));
         });
 
-        Connection.On<string, byte[]>("DrewPoint", (user, data) =>
+        _connection.On<string, byte[]>("DrewLine", (user, data) =>
         {
-            DrewPoint.Invoke(this, new DrewEventArgs(user, data));
+            UserDrewLine.Invoke(this, new DrewEventArgs(user, data));
         });
 
-        Connection.On<string, byte[]>("DrewLine", (user, data) =>
-        {
-            DrewLine.Invoke(this, new DrewEventArgs(user, data));
-        });
-
-        Connection.On("Pong", () =>
+        _connection.On("Pong", () =>
         {
             TimeSpan diff = DateTime.Now - lastPing;
             Pong?.Invoke(this, new PongEventArgs(diff.Milliseconds));
@@ -138,10 +134,26 @@ public class SignalRService : ISignalRService
         _pingTimer.Start();
     }
 
+    private Task Connection_Closed(Exception arg)
+    {
+        if (arg != null)
+        {
+            Disconnected.Invoke(this, null);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task Connection_Reconnected(string arg)
+    {
+        Reconnected.Invoke(this, null);
+        return Task.CompletedTask;
+    }
+
     private async void PingTimer_Tick(object sender, EventArgs e)
     {
         lastPing = DateTime.Now;
-        await Connection.InvokeAsync("Ping");
+        await _connection.InvokeAsync("Ping");
     }
 }
 

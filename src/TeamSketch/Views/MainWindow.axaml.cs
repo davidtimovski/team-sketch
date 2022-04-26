@@ -27,8 +27,8 @@ public partial class MainWindow : Window
         _renderer = new Renderer(canvas);
 
         _signalRService = Locator.Current.GetRequiredService<ISignalRService>();
-        _signalRService.DrewPoint += SignalRService_DrewPoint;
-        _signalRService.DrewLine += SignalRService_DrewLine;
+        _signalRService.UserDrewPoint += SignalRService_UserDrewPoint;
+        _signalRService.UserDrewLine += SignalRService_UserDrewLine;
 
         canvas.Cursor = BrushSettings.Cursor;
         canvas.PointerMoved += ThrottleHelper.CreateThrottledEventHandler(Canvas_PointerMoved, TimeSpan.FromMilliseconds(8));
@@ -41,7 +41,7 @@ public partial class MainWindow : Window
         canvas.Cursor = e.Cursor;
     }
 
-    private void SignalRService_DrewPoint(object sender, DrewEventArgs e)
+    private void SignalRService_UserDrewPoint(object sender, DrewEventArgs e)
     {
         Dispatcher.UIThread.InvokeAsync(() =>
         {
@@ -52,7 +52,7 @@ public partial class MainWindow : Window
         IndicateUserDrawing(e.User);
     }
 
-    private void SignalRService_DrewLine(object sender, DrewEventArgs e)
+    private void SignalRService_UserDrewLine(object sender, DrewEventArgs e)
     {
         Dispatcher.UIThread.InvokeAsync(() =>
         {

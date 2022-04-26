@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:vm="using:TeamSketch.ViewModels.UserControls"
+             x:Class="TeamSketch.UserControls.EventsPanel">
+
+	<UserControl.Styles>
+		<Style Selector="Border.label">
+			<Setter Property="Margin" Value="0 0 0 10" />
+		</Style>
+		<Style Selector="Border.label TextBlock">
+			<Setter Property="FontSize" Value="16" />
+		</Style>
+
+		<Style Selector="ScrollViewer">
+			<Setter Property="Height" Value="170" />
+		</Style>
+		<Style Selector="ItemsControl">
+			<Setter Property="Padding" Value="0 0 0 30" />
+		</Style>
+		<Style Selector="Border.event">
+			<Setter Property="Padding" Value="2 0" />
+			<Setter Property="Margin" Value="0 5" />
+		</Style>
+		<Style Selector="Border.event TextBlock">
+			<Setter Property="Foreground" Value="#888" />
+			<Setter Property="FontSize" Value="14" />
+		</Style>
+		<Style Selector="Border.event TextBlock.nickname">
+			<Setter Property="Foreground" Value="{StaticResource BlueColor}" />
+		</Style>
+	</UserControl.Styles>
+
+	<Design.DataContext>
+		<vm:EventsPanelViewModel />
+	</Design.DataContext>
+	
+	<StackPanel>
+		<Border Classes="label">
+			<TextBlock>Events</TextBlock>
+		</Border>
+
+		<ScrollViewer>
+			<ItemsControl Items="{Binding Events}">
+				<ItemsControl.ItemTemplate>
+					<DataTemplate DataType="vm:EventViewModel">
+						<Border Classes="event">
+							<Panel>
+								<DockPanel IsVisible="{Binding HasUser}">
+									<TextBlock Text="{Binding User}" Classes="nickname" />
+									<TextBlock Text="{Binding EventMessage}" />
+								</DockPanel>
+
+								<TextBlock IsVisible="{Binding !HasUser}" Text="{Binding EventMessage}" />
+							</Panel>
+						</Border>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		</ScrollViewer>
+	</StackPanel>
+</UserControl>
