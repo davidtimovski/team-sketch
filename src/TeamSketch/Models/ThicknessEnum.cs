@@ -1,12 +1,11 @@
-﻿namespace TeamSketch.Models
+﻿namespace TeamSketch.Models;
+
+public enum ThicknessEnum
 {
-    public enum ThicknessEnum
-    {
-        Thin,
-        SemiThin,
-        Medium,
-        SemiThick,
-        Thick,
-        Eraser
-    }
+    Thin,
+    SemiThin,
+    Medium,
+    SemiThick,
+    Thick,
+    Eraser
 }

@@ -91,7 +91,7 @@
 		<Grid Grid.Row="0" ColumnDefinitions="*,Auto">
 
 			<Border Grid.Column="0" Classes="canvasContainer">
-				<Canvas Name="canvas" IsEnabled="{Binding Connected}" PointerPressed="Canvas_PointerPressed" PointerReleased="Canvas_PointerReleased" Classes.disconnected="{Binding !Connected}" />
+				<Canvas Name="canvas" DataContext="{Binding Path=ConnectionStatus}" IsEnabled="{Binding Connected}" PointerPressed="Canvas_PointerPressed" PointerReleased="Canvas_PointerReleased" Classes.disconnected="{Binding !Connected}" />
 			</Border>
 
 			<Border Grid.Column="1">

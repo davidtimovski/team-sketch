@@ -16,7 +16,8 @@ public partial class MainWindow : Window
 {
     private readonly IRenderer _renderer;
     private readonly ISignalRService _signalRService;
-    
+    private Action onCloseAction; 
+
     private Point currentPoint = new();
     private bool pressed;
 
@@ -27,6 +28,7 @@ public partial class MainWindow : Window
         _renderer = new Renderer(canvas);
 
         _signalRService = Locator.Current.GetRequiredService<ISignalRService>();
+        _signalRService.Disconnected += SignalRService_Disconnected;
         _signalRService.UserDrewPoint += SignalRService_UserDrewPoint;
         _signalRService.UserDrewLine += SignalRService_UserDrewLine;
 
@@ -34,11 +36,23 @@ public partial class MainWindow : Window
         canvas.PointerMoved += ThrottleHelper.CreateThrottledEventHandler(Canvas_PointerMoved, TimeSpan.FromMilliseconds(8));
 
         BrushSettings.BrushChanged += BrushSettings_BrushChanged;
+
+        onCloseAction = NormalClose;
     }
 
     private void BrushSettings_BrushChanged(object sender, BrushChangedEventArgs e)
     {
         canvas.Cursor = e.Cursor;
+    }
+
+    private void SignalRService_Disconnected(object sender, EventArgs e)
+    {
+        onCloseAction = CloseFromDisconnect;
+
+        Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            Close();
+        });
     }
 
     private void SignalRService_UserDrewPoint(object sender, DrewEventArgs e)
@@ -76,14 +90,7 @@ public partial class MainWindow : Window
         var (x, y) = _renderer.RestrictPointToCanvas(currentPoint.X, currentPoint.Y);
          _renderer.DrawPoint(x, y);
 
-        try
-        {
-            _ = _signalRService.DrawPointAsync(x, y);
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine(ex.Message);
-        }
+        _ = _signalRService.DrawPointAsync(x, y);
 
         IndicateUserDrawing(_signalRService.Nickname);
     }
@@ -100,14 +107,7 @@ public partial class MainWindow : Window
 
         _renderer.DrawLine(currentPoint.X, currentPoint.Y, x, y);
 
-        try
-        {
-            _ = _signalRService.DrawLineAsync(currentPoint.X, currentPoint.Y, x, y);
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine(ex.Message);
-        }
+        _ = _signalRService.DrawLineAsync(currentPoint.X, currentPoint.Y, x, y);
 
         currentPoint = new Point(x, y);
 
@@ -120,17 +120,41 @@ public partial class MainWindow : Window
         vm.IndicateUserDrawing(nickname);
     }
 
-    protected override void OnClosing(CancelEventArgs e)
+    private void NormalClose()
     {
         _ = _signalRService.DisconnectAsync();
 
         var window = new EnterWindow
         {
-            DataContext = new EnterViewModel(),
+            DataContext = new EnterViewModel(true),
             Topmost = true,
             CanResize = false
         };
         window.Show();
-        window.Activate();
+    }
+
+    private void CloseFromDisconnect()
+    {
+        var enterWindow = new EnterWindow
+        {
+            DataContext = new EnterViewModel(true),
+            Topmost = true,
+            CanResize = false
+        };
+        enterWindow.Show();
+
+        var errorWindow = new ErrorWindow
+        {
+            DataContext = new ErrorViewModel("You got disconnected :( Please check your internet connection.", true),
+            Topmost = true,
+            CanResize = false
+        };
+        errorWindow.Show();
+        errorWindow.Activate();
+    }
+
+    protected override void OnClosing(CancelEventArgs e)
+    {
+        onCloseAction();
     }
 }

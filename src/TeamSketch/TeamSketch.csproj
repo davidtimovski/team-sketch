@@ -8,9 +8,9 @@
 	<Product>Team Sketch</Product>
 	<Copyright>Copyright © David Timovski 2022</Copyright>
 	<Company>David Timovski</Company>
-	<AssemblyVersion>0.3.0</AssemblyVersion>
-	<FileVersion>0.3.0</FileVersion>
-	<Version>0.3.0</Version>
+	<AssemblyVersion>0.4.0</AssemblyVersion>
+	<FileVersion>0.4.0</FileVersion>
+	<Version>0.4.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />

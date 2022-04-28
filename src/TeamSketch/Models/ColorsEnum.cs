@@ -1,16 +1,15 @@
-﻿namespace TeamSketch.Models
+﻿namespace TeamSketch.Models;
+
+public enum ColorsEnum
 {
-    public enum ColorsEnum
-    {
-        Default,
-        Eraser,
-        Red,
-        Blue,
-        Green,
-        Yellow,
-        Orange,
-        Purple,
-        Pink,
-        Gray
-    }
+    Default,
+    Eraser,
+    Red,
+    Blue,
+    Green,
+    Yellow,
+    Orange,
+    Purple,
+    Pink,
+    Gray
 }

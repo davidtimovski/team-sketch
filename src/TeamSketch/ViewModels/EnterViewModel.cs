@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using ReactiveUI;
 using Splat;
 using TeamSketch.Common;
@@ -12,13 +11,17 @@ public class EnterViewModel : ViewModelBase
 {
     private readonly ISignalRService _signalRService;
 
-    public EnterViewModel()
+    public EnterViewModel(bool fromMainWindow = false)
     {
         _signalRService = Locator.Current.GetRequiredService<ISignalRService>();
 
-        if (_signalRService.Nickname != null)
+        if (fromMainWindow)
         {
+            joinTabVisible = true;
             nickname = _signalRService.Nickname;
+            room = _signalRService.Room;
+
+            _signalRService.ClearEventHandlers();
         }
     }
 
@@ -46,10 +49,10 @@ public class EnterViewModel : ViewModelBase
             await _signalRService.CreateRoomAsync(nickname);
             return new EnterValidationResult(true, null, false, false);
         }
-        catch (Exception ex)
+        catch
         {
             Entering = false;
-            return new EnterValidationResult(false, ex.Message, true, true);
+            return new EnterValidationResult(false, "Could not connect to the server. Please check your internet connection.", true, true);
         }
     }
 
@@ -88,37 +91,38 @@ public class EnterViewModel : ViewModelBase
             return new EnterValidationResult(false, roomError, true, false);
         }
 
-        var validationResult = await HttpProxy.ValidateJoinRoomAsync(room, nickname);
-        if (!validationResult.RoomExists)
-        {
-            RoomIsInvalid = true;
-            Entering = false;
-            return new EnterValidationResult(false, "Room does not exist.", true, false);
-        }
-
-        if (validationResult.RoomIsFull)
-        {
-            RoomIsInvalid = true;
-            Entering = false;
-            return new EnterValidationResult(false, "Room is at capacity.", true, false);
-        }
-
-        if (validationResult.NicknameIsTaken)
-        {
-            RoomIsInvalid = true;
-            Entering = false;
-            return new EnterValidationResult(false, "The nickname is taken in that room.", true, false);
-        }
-
         try
         {
+            var validationResult = await HttpProxy.ValidateJoinRoomAsync(room, nickname);
+            if (!validationResult.RoomExists)
+            {
+                RoomIsInvalid = true;
+                Entering = false;
+                return new EnterValidationResult(false, "Room does not exist.", true, false);
+            }
+
+            if (validationResult.RoomIsFull)
+            {
+                RoomIsInvalid = true;
+                Entering = false;
+                return new EnterValidationResult(false, "Room is at capacity.", true, false);
+            }
+
+            if (validationResult.NicknameIsTaken)
+            {
+                RoomIsInvalid = true;
+                Entering = false;
+                return new EnterValidationResult(false, "The nickname is taken in that room.", true, false);
+            }
+
+
             await _signalRService.JoinRoomAsync(nickname, room);
             return new EnterValidationResult(true, null, false, false);
         }
-        catch (Exception ex)
+        catch
         {
             Entering = false;
-            return new EnterValidationResult(false, ex.Message, true, true);
+            return new EnterValidationResult(false, "Could not connect to the server. Please check your internet connection.", true, true);
         }
     }
 

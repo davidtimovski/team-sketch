@@ -15,7 +15,7 @@ public class MainWindowViewModel : ViewModelBase
 
     public MainWindowViewModel()
     {
-        _signalRService = Locator.Current.GetRequiredService<ISignalRService>();
+       _signalRService = Locator.Current.GetRequiredService<ISignalRService>();
 
         Room = _signalRService.Room;
 

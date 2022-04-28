@@ -15,7 +15,7 @@ public class ConnectionStatusViewModel : ViewModelBase
         _signalRService = Locator.Current.GetRequiredService<ISignalRService>();
 
         _signalRService.Pong += SignalRService_Pong;
-        _signalRService.Disconnected += SignalRService_Disconnected;
+        _signalRService.Reconnecting += SignalRService_Reconnecting;
         _signalRService.Reconnected += SignalRService_Reconnected;
     }
 
@@ -24,7 +24,7 @@ public class ConnectionStatusViewModel : ViewModelBase
         Latency = e.Latency;
     }
 
-    private void SignalRService_Disconnected(object sender, EventArgs e)
+    private void SignalRService_Reconnecting(object sender, EventArgs e)
     {
         Connected = false;
     }
