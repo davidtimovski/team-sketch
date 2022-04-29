@@ -1,11 +1,14 @@
 using System;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
+using Microsoft.AspNetCore.SignalR.Client;
 using Splat;
 using TeamSketch.DependencyInjection;
+using TeamSketch.Models;
 using TeamSketch.Services;
 using TeamSketch.Utils;
 using TeamSketch.ViewModels;
@@ -14,30 +17,34 @@ namespace TeamSketch.Views;
 
 public partial class MainWindow : Window
 {
+    private readonly IAppState _appState;
     private readonly IRenderer _renderer;
-    private readonly ISignalRService _signalRService;
-    private Action onCloseAction; 
-
     private Point currentPoint = new();
     private bool pressed;
+    private Action closeAdditionalAction = () => { };
+    private bool isClosing;
 
     public MainWindow()
     {
         InitializeComponent();
 
-        _renderer = new Renderer(canvas);
+        _appState = Locator.Current.GetRequiredService<IAppState>();
+        _renderer = new Renderer(_appState.BrushSettings, canvas);
 
-        _signalRService = Locator.Current.GetRequiredService<ISignalRService>();
-        _signalRService.Disconnected += SignalRService_Disconnected;
-        _signalRService.UserDrewPoint += SignalRService_UserDrewPoint;
-        _signalRService.UserDrewLine += SignalRService_UserDrewLine;
-
-        canvas.Cursor = BrushSettings.Cursor;
+        canvas.Cursor = _appState.BrushSettings.Cursor;
         canvas.PointerMoved += ThrottleHelper.CreateThrottledEventHandler(Canvas_PointerMoved, TimeSpan.FromMilliseconds(8));
 
-        BrushSettings.BrushChanged += BrushSettings_BrushChanged;
+        _appState.BrushSettings.BrushChanged += BrushSettings_BrushChanged;
+    }
 
-        onCloseAction = NormalClose;
+    protected override void OnDataContextChanged(EventArgs e)
+    {
+        var vm = DataContext as MainWindowViewModel;
+        vm.SignalRService.Connection.On<string, byte[]>("DrewPoint", Connection_UserDrewPoint);
+        vm.SignalRService.Connection.On<string, byte[]>("DrewLine", Connection_UserDrewLine);
+        vm.SignalRService.Connection.Closed += Connection_Closed;
+
+        base.OnDataContextChanged(e);
     }
 
     private void BrushSettings_BrushChanged(object sender, BrushChangedEventArgs e)
@@ -45,36 +52,26 @@ public partial class MainWindow : Window
         canvas.Cursor = e.Cursor;
     }
 
-    private void SignalRService_Disconnected(object sender, EventArgs e)
-    {
-        onCloseAction = CloseFromDisconnect;
-
-        Dispatcher.UIThread.InvokeAsync(() =>
-        {
-            Close();
-        });
-    }
-
-    private void SignalRService_UserDrewPoint(object sender, DrewEventArgs e)
+    private void Connection_UserDrewPoint(string user, byte[] data)
     {
         Dispatcher.UIThread.InvokeAsync(() =>
         {
-            var point = PayloadConverter.ToPoint(e.Data);
+            var point = PayloadConverter.ToPoint(data);
             canvas.Children.Add(point);
         });
 
-        IndicateUserDrawing(e.User);
+        IndicateUserDrawing(user);
     }
 
-    private void SignalRService_UserDrewLine(object sender, DrewEventArgs e)
+    private void Connection_UserDrewLine(string user, byte[] data)
     {
         Dispatcher.UIThread.InvokeAsync(() =>
         {
-            var shapes = PayloadConverter.ToLineShapes(e.Data);
+            var shapes = PayloadConverter.ToLineShapes(data);
             canvas.Children.AddRange(shapes);
         });
 
-        IndicateUserDrawing(e.User);
+        IndicateUserDrawing(user);
     }
 
     private void Canvas_PointerPressed(object sender, PointerPressedEventArgs e)
@@ -88,11 +85,12 @@ public partial class MainWindow : Window
         pressed = false;
 
         var (x, y) = _renderer.RestrictPointToCanvas(currentPoint.X, currentPoint.Y);
-         _renderer.DrawPoint(x, y);
+        _renderer.DrawPoint(x, y);
 
-        _ = _signalRService.DrawPointAsync(x, y);
+        var vm = DataContext as MainWindowViewModel;
+        _ = vm.SignalRService.DrawPointAsync(x, y);
 
-        IndicateUserDrawing(_signalRService.Nickname);
+        IndicateUserDrawing(_appState.Nickname);
     }
 
     private void Canvas_PointerMoved(object sender, PointerEventArgs e)
@@ -107,11 +105,12 @@ public partial class MainWindow : Window
 
         _renderer.DrawLine(currentPoint.X, currentPoint.Y, x, y);
 
-        _ = _signalRService.DrawLineAsync(currentPoint.X, currentPoint.Y, x, y);
+        var vm = DataContext as MainWindowViewModel;
+        _ = vm.SignalRService.DrawLineAsync(currentPoint.X, currentPoint.Y, x, y);
 
         currentPoint = new Point(x, y);
 
-        IndicateUserDrawing(_signalRService.Nickname);
+        IndicateUserDrawing(_appState.Nickname);
     }
 
     private void IndicateUserDrawing(string nickname)
@@ -120,9 +119,44 @@ public partial class MainWindow : Window
         vm.IndicateUserDrawing(nickname);
     }
 
-    private void NormalClose()
+    private Task Connection_Closed(Exception arg)
     {
-        _ = _signalRService.DisconnectAsync();
+        if (isClosing)
+        {
+            return Task.CompletedTask;
+        }
+
+        closeAdditionalAction = () =>
+        {
+            var vm = DataContext as MainWindowViewModel;
+            if (vm.SignalRService.Connection.State == HubConnectionState.Disconnected)
+            {
+                var errorWindow = new ErrorWindow
+                {
+                    DataContext = new ErrorViewModel("You got disconnected :( Please check your internet connection or try again later.", true),
+                    Topmost = true,
+                    CanResize = false
+                };
+                errorWindow.Show();
+                errorWindow.Activate();
+            }
+        };
+
+        Dispatcher.UIThread.InvokeAsync(Close);
+
+        return Task.CompletedTask;
+    }
+
+    protected override void OnClosing(CancelEventArgs e)
+    {
+        isClosing = true;
+
+        var vm = DataContext as MainWindowViewModel;
+        if (vm.SignalRService.Connection.State == HubConnectionState.Connected)
+        {
+            _ = vm.SignalRService.Connection.StopAsync();
+        }
+        _ = vm.SignalRService.Connection.DisposeAsync();
 
         var window = new EnterWindow
         {
@@ -131,30 +165,7 @@ public partial class MainWindow : Window
             CanResize = false
         };
         window.Show();
-    }
 
-    private void CloseFromDisconnect()
-    {
-        var enterWindow = new EnterWindow
-        {
-            DataContext = new EnterViewModel(true),
-            Topmost = true,
-            CanResize = false
-        };
-        enterWindow.Show();
-
-        var errorWindow = new ErrorWindow
-        {
-            DataContext = new ErrorViewModel("You got disconnected :( Please check your internet connection.", true),
-            Topmost = true,
-            CanResize = false
-        };
-        errorWindow.Show();
-        errorWindow.Activate();
-    }
-
-    protected override void OnClosing(CancelEventArgs e)
-    {
-        onCloseAction();
+        closeAdditionalAction();
     }
 }

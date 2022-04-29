@@ -1,19 +1,29 @@
 ﻿using ReactiveUI;
 using TeamSketch.Models;
-using TeamSketch.Utils;
 
 namespace TeamSketch.ViewModels.UserControls;
 
 public class ToolsPanelViewModel : ViewModelBase
 {
-    private ColorsEnum brushColor = BrushSettings.BrushColor;
+    private readonly BrushSettings _brushSettings;
+
+    public ToolsPanelViewModel(BrushSettings brushSettings)
+    {
+        _brushSettings = brushSettings;
+
+        brushColor = _brushSettings.BrushColor;
+        previousBrushThickness = _brushSettings.BrushThickness;
+        brushThickness = _brushSettings.BrushThickness;
+    }
+
+    private ColorsEnum brushColor;
     private ColorsEnum BrushColor
     {
         get => brushColor;
         set
         {
             this.RaiseAndSetIfChanged(ref brushColor, value);
-            BrushSettings.BrushColor = value;
+            _brushSettings.BrushColor = value;
 
             if (value == ColorsEnum.Eraser)
             {
@@ -26,15 +36,15 @@ public class ToolsPanelViewModel : ViewModelBase
         }
     }
 
-    private ThicknessEnum previousBrushThickness = BrushSettings.BrushThickness;
-    private ThicknessEnum brushThickness = BrushSettings.BrushThickness;
+    private ThicknessEnum previousBrushThickness;
+    private ThicknessEnum brushThickness;
     private ThicknessEnum BrushThickness
     {
         get => brushThickness;
         set
         {
             this.RaiseAndSetIfChanged(ref brushThickness, value);
-            BrushSettings.BrushThickness = value;
+            _brushSettings.BrushThickness = value;
 
             if (brushColor != ColorsEnum.Eraser || value != ThicknessEnum.Eraser)
             {

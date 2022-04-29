@@ -5,14 +5,12 @@ using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
-using TeamSketch.Models;
 
-namespace TeamSketch.Utils;
+namespace TeamSketch.Models;
 
-public static class BrushSettings
+public class BrushSettings
 {
     private const string CursorsPath = "avares://TeamSketch/Assets/Images/Cursors";
-    private static readonly IAssetLoader assetLoader;
     private static readonly Dictionary<ColorsEnum, SolidColorBrush> colorLookup = new()
     {
         { ColorsEnum.Default, new SolidColorBrush(Color.FromRgb(34, 34, 34)) },
@@ -47,21 +45,22 @@ public static class BrushSettings
         { ColorsEnum.Pink, $"{CursorsPath}/brush-pink.png" },
         { ColorsEnum.Gray, $"{CursorsPath}/brush-gray.png" }
     };
+    private readonly IAssetLoader assetLoader;
 
-    static BrushSettings()
+    public BrushSettings()
     {
         assetLoader = AvaloniaLocator.Current.GetService<IAssetLoader>();
 
-        var path = new Uri(cursorBrushPathLookup[ColorsEnum.Default]);
-        Cursor = new(new Bitmap(assetLoader.Open(path)), new PixelPoint(0, 0));
+        BrushColor = ColorsEnum.Default;
+        BrushThickness = ThicknessEnum.SemiThin;
     }
 
-    public static event EventHandler<BrushChangedEventArgs> BrushChanged;
+    public event EventHandler<BrushChangedEventArgs> BrushChanged;
 
-    public static Cursor Cursor { get; private set; }
+    public Cursor Cursor { get; private set; }
 
-    private static ColorsEnum brushColor;
-    public static ColorsEnum BrushColor
+    private ColorsEnum brushColor;
+    public ColorsEnum BrushColor
     {
         get => brushColor;
         set
@@ -79,15 +78,15 @@ public static class BrushSettings
                 var path = cursorBrushPathLookup[value];
                 Cursor = new(new Bitmap(assetLoader.Open(new Uri(path))), new PixelPoint(0, 0));
             }
-            
-            BrushChanged.Invoke(null, new BrushChangedEventArgs(Cursor));
+
+            BrushChanged?.Invoke(null, new BrushChangedEventArgs(Cursor));
         }
     }
 
-    public static SolidColorBrush ColorBrush { get; private set; } = colorLookup[ColorsEnum.Default];
+    public SolidColorBrush ColorBrush { get; private set; }
 
-    private static ThicknessEnum brushThickness = ThicknessEnum.SemiThin;
-    public static ThicknessEnum BrushThickness
+    private ThicknessEnum brushThickness;
+    public ThicknessEnum BrushThickness
     {
         get => brushThickness;
         set
@@ -105,16 +104,17 @@ public static class BrushSettings
                 var path = $"{CursorsPath}/eraser-{Thickness}.png";
                 Cursor = new(new Bitmap(assetLoader.Open(new Uri(path))), new PixelPoint((int)HalfThickness, (int)HalfThickness));
             }
-            BrushChanged.Invoke(null, new BrushChangedEventArgs(Cursor));
+
+            BrushChanged?.Invoke(null, new BrushChangedEventArgs(Cursor));
         }
     }
 
-    public static double Thickness { get; private set; } = thicknessLookup[brushThickness];
-    public static double HalfThickness { get; private set; } = thicknessLookup[brushThickness] / 2;
+    public double Thickness { get; private set; }
+    public double HalfThickness { get; private set; }
 
-    public static double MaxBrushPointX { get; private set; } = Globals.CanvasWidth - thicknessLookup[brushThickness] / 2;
-    public static double MaxBrushPointY { get; private set; } = Globals.CanvasHeight - thicknessLookup[brushThickness] / 2;
-    public static double MinBrushPoint { get; private set; } = thicknessLookup[brushThickness] / 2;
+    public double MaxBrushPointX { get; private set; }
+    public double MaxBrushPointY { get; private set; }
+    public double MinBrushPoint { get; private set; }
 
     public static SolidColorBrush FindColorBrush(byte color)
     {

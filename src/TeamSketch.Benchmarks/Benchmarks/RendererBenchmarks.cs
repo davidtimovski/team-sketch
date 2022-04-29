@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using BenchmarkDotNet.Attributes;
+using TeamSketch.Models;
 using TeamSketch.Services;
 
 namespace TeamSketch.Benchmarks
@@ -22,7 +23,7 @@ namespace TeamSketch.Benchmarks
                 Width = Globals.CanvasWidth,
                 Height = Globals.CanvasHeight
             };
-            _renderer = new Renderer(canvas);
+            _renderer = new Renderer(new BrushSettings(), canvas);
 
             x1 = _random.Next(0, Globals.CanvasWidth);
             y1 = _random.Next(0, Globals.CanvasHeight);

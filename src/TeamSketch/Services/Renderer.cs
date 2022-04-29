@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
-using TeamSketch.Utils;
+using TeamSketch.Models;
 
 namespace TeamSketch.Services;
 
@@ -14,10 +14,12 @@ public interface IRenderer
 
 public class Renderer : IRenderer
 {
+    private readonly BrushSettings _brushSettings;
     private readonly Canvas _canvas;
 
-    public Renderer(Canvas canvas)
+    public Renderer(BrushSettings brushSettings, Canvas canvas)
     {
+        _brushSettings = brushSettings;
         _canvas = canvas;
     }
 
@@ -25,10 +27,10 @@ public class Renderer : IRenderer
     {
         var ellipse = new Ellipse
         {
-            Margin = new Thickness(x - BrushSettings.HalfThickness, y - BrushSettings.HalfThickness, 0, 0),
-            Fill = BrushSettings.ColorBrush,
-            Width = BrushSettings.Thickness,
-            Height = BrushSettings.Thickness
+            Margin = new Thickness(x - _brushSettings.HalfThickness, y - _brushSettings.HalfThickness, 0, 0),
+            Fill = _brushSettings.ColorBrush,
+            Width = _brushSettings.Thickness,
+            Height = _brushSettings.Thickness
         };
         _canvas.Children.Add(ellipse);
     }
@@ -37,40 +39,40 @@ public class Renderer : IRenderer
     {
         var ellipse = new Ellipse
         {
-            Margin = new Thickness(x1 - BrushSettings.HalfThickness, y1 - BrushSettings.HalfThickness, 0, 0),
-            Fill = BrushSettings.ColorBrush,
-            Width = BrushSettings.Thickness,
-            Height = BrushSettings.Thickness
+            Margin = new Thickness(x1 - _brushSettings.HalfThickness, y1 - _brushSettings.HalfThickness, 0, 0),
+            Fill = _brushSettings.ColorBrush,
+            Width = _brushSettings.Thickness,
+            Height = _brushSettings.Thickness
         };
         _canvas.Children.Add(ellipse);
 
         Line line = new();
-        line.StrokeThickness = BrushSettings.Thickness;
+        line.StrokeThickness = _brushSettings.Thickness;
         line.StartPoint = new Point(x1, y1);
         line.EndPoint = new Point(x2, y2);
-        line.Stroke = BrushSettings.ColorBrush;
+        line.Stroke = _brushSettings.ColorBrush;
 
         _canvas.Children.Add(line);
     }
 
     public (double x, double y) RestrictPointToCanvas(double x, double y)
     {
-        if (x > BrushSettings.MaxBrushPointX)
+        if (x > _brushSettings.MaxBrushPointX)
         {
-            x = BrushSettings.MaxBrushPointX;
+            x = _brushSettings.MaxBrushPointX;
         }
-        else if (x < BrushSettings.MinBrushPoint)
+        else if (x < _brushSettings.MinBrushPoint)
         {
-            x = BrushSettings.MinBrushPoint;
+            x = _brushSettings.MinBrushPoint;
         }
 
-        if (y > BrushSettings.MaxBrushPointY)
+        if (y > _brushSettings.MaxBrushPointY)
         {
-            y = BrushSettings.MaxBrushPointY;
+            y = _brushSettings.MaxBrushPointY;
         }
-        else if (y < BrushSettings.MinBrushPoint)
+        else if (y < _brushSettings.MinBrushPoint)
         {
-            y = BrushSettings.MinBrushPoint;
+            y = _brushSettings.MinBrushPoint;
         }
 
         return (x, y);

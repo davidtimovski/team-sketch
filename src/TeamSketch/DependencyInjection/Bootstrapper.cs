@@ -12,6 +12,6 @@ public static class Bootstrapper
 
     private static void RegisterServices(IMutableDependencyResolver services)
     {
-        services.RegisterLazySingleton<ISignalRService>(() => new SignalRService());
+        services.RegisterLazySingleton<IAppState>(() => new AppState());
     }
 }

@@ -11,17 +11,24 @@ namespace TeamSketch.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {
-    private readonly ISignalRService _signalRService;
+    private readonly IAppState _appState;
 
-    public MainWindowViewModel()
+    public MainWindowViewModel(ISignalRService signalRService)
     {
-       _signalRService = Locator.Current.GetRequiredService<ISignalRService>();
+        _appState = Locator.Current.GetRequiredService<IAppState>();
+        SignalRService = signalRService;
 
-        Room = _signalRService.Room;
+        Room = _appState.Room;
+
+        toolsPanel = new ToolsPanelViewModel(_appState.BrushSettings);
+        usersPanel = new UsersPanelViewModel(signalRService);
+        eventsPanel = new EventsPanelViewModel(signalRService);
+        connectionStatus = new ConnectionStatusViewModel(signalRService);
 
         _ = GetUsersInRoomAsync();
     }
 
+    public ISignalRService SignalRService { get; }
     public string Room { get; }
 
     public void IndicateUserDrawing(string nickname)
@@ -51,28 +58,28 @@ public class MainWindowViewModel : ViewModelBase
         await Application.Current.Clipboard.SetTextAsync(Room);
     }
 
-    private ToolsPanelViewModel toolsPanel = new();
+    private ToolsPanelViewModel toolsPanel;
     private ToolsPanelViewModel ToolsPanel
     {
         get => toolsPanel;
         set => this.RaiseAndSetIfChanged(ref toolsPanel, value);
     }
 
-    private UsersPanelViewModel usersPanel = new();
+    private UsersPanelViewModel usersPanel;
     private UsersPanelViewModel UsersPanel
     {
         get => usersPanel;
         set => this.RaiseAndSetIfChanged(ref usersPanel, value);
     }
 
-    private EventsPanelViewModel eventsPanel = new();
+    private EventsPanelViewModel eventsPanel;
     private EventsPanelViewModel EventsPanel
     {
         get => eventsPanel;
         set => this.RaiseAndSetIfChanged(ref eventsPanel, value);
     }
 
-    private ConnectionStatusViewModel connectionStatus = new();
+    private ConnectionStatusViewModel connectionStatus;
     private ConnectionStatusViewModel ConnectionStatus
     {
         get => connectionStatus;

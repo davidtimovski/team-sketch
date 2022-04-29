@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using TeamSketch.Models;
+using TeamSketch.Utils;
 
 namespace TeamSketch.Benchmarks
 {

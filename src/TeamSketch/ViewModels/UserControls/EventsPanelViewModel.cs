@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using Splat;
-using TeamSketch.DependencyInjection;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR.Client;
 using TeamSketch.Services;
 
 namespace TeamSketch.ViewModels.UserControls;
@@ -10,36 +10,37 @@ public class EventsPanelViewModel : ViewModelBase
 {
     private readonly ISignalRService _signalRService;
 
-    public EventsPanelViewModel()
+    public EventsPanelViewModel(ISignalRService signalRService)
     {
-        _signalRService = Locator.Current.GetRequiredService<ISignalRService>();
-
-        _signalRService.Reconnecting += SignalRService_Reconnecting;
-        _signalRService.Reconnected += SignalRService_Reconnected;
-        _signalRService.UserJoined += SignalRService_UserJoined;
-        _signalRService.UserLeft += SignalRService_UserLeft;
+        _signalRService = signalRService;
+        _signalRService.Connection.Reconnecting += Connection_Reconnecting;
+        _signalRService.Connection.Reconnected += Connection_Reconnected;
+        _signalRService.Connection.On<string>("JoinedRoom", Connection_JoinedRoom);
+        _signalRService.Connection.On<string>("LeftRoom", Connection_LeftRoom);
     }
 
     public ObservableCollection<EventViewModel> Events { get; } = new();
 
-    private void SignalRService_Reconnecting(object sender, EventArgs e)
+    private Task Connection_Reconnecting(Exception arg)
     {
         Events.Add(new EventViewModel("Disconnected."));
+        return Task.CompletedTask;
     }
 
-    private void SignalRService_Reconnected(object sender, EventArgs e)
+    private Task Connection_Reconnected(string arg)
     {
         Events.Add(new EventViewModel("Reconnected."));
+        return Task.CompletedTask;
     }
 
-    private void SignalRService_UserJoined(object sender, UserEventArgs e)
+    private void Connection_JoinedRoom(string user)
     {
-        Events.Add(new EventViewModel(e.User, " joined."));
+        Events.Add(new EventViewModel(user, " joined."));
     }
 
-    private void SignalRService_UserLeft(object sender, UserEventArgs e)
+    private void Connection_LeftRoom(string user)
     {
-        Events.Add(new EventViewModel(e.User, " left."));
+        Events.Add(new EventViewModel(user, " left."));
     }
 }
 

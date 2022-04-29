@@ -2,9 +2,8 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using Avalonia.Threading;
+using Microsoft.AspNetCore.SignalR.Client;
 using ReactiveUI;
-using Splat;
-using TeamSketch.DependencyInjection;
 using TeamSketch.Services;
 
 namespace TeamSketch.ViewModels.UserControls;
@@ -13,24 +12,23 @@ public class UsersPanelViewModel : ViewModelBase
 {
     private readonly ISignalRService _signalRService;
 
-    public UsersPanelViewModel()
+    public UsersPanelViewModel(ISignalRService signalRService)
     {
-        _signalRService = Locator.Current.GetRequiredService<ISignalRService>();
-
-        _signalRService.UserJoined += SignalRService_UserJoined;
-        _signalRService.UserLeft += SignalRService_UserLeft;
+        _signalRService = signalRService;
+        _signalRService.Connection.On<string>("JoinedRoom", Connection_JoinedRoom);
+        _signalRService.Connection.On<string>("LeftRoom", Connection_LeftRoom);
     }
 
     public ObservableCollection<UserViewModel> Users { get; } = new();
 
-    private void SignalRService_UserJoined(object sender, UserEventArgs e)
+    private void Connection_JoinedRoom(string user)
     {
-        Users.Add(new UserViewModel(e.User));
+        Users.Add(new UserViewModel(user));
     }
 
-    private void SignalRService_UserLeft(object sender, UserEventArgs e)
+    private void Connection_LeftRoom(string nickname)
     {
-        UserViewModel user = Users.FirstOrDefault(x => x.Nickname == e.User);
+        UserViewModel user = Users.FirstOrDefault(x => x.Nickname == nickname);
         Users.Remove(user);
     }
 }

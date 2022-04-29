@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using ReactiveUI;
+using TeamSketch.Services;
 using TeamSketch.ViewModels;
 
 namespace TeamSketch.Views;
@@ -25,7 +26,7 @@ public partial class EnterWindow : Window
         var result = await vm.CreateRoomAsync();
         if (result.Success)
         {
-            Start();
+            Start(result.SignalRService);
         }
         else if (result.ShowError)
         {
@@ -40,7 +41,7 @@ public partial class EnterWindow : Window
         var result = await vm.JoinRoomAsync();
         if (result.Success)
         {
-            Start();
+            Start(result.SignalRService);
         }
         else if (result.ShowError)
         {
@@ -60,11 +61,11 @@ public partial class EnterWindow : Window
         errorWindow.Activate();
     }
 
-    private void Start()
+    private void Start(ISignalRService signalRService)
     {
         var mainWindow = new MainWindow
         {
-            DataContext = new MainWindowViewModel()
+            DataContext = new MainWindowViewModel(signalRService)
         };
         mainWindow.Show();
         mainWindow.Activate();
