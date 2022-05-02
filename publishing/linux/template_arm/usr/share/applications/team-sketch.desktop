@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Team Sketch
+Comment=Sketch with your friends
+GenericName=Text Editor
+Exec=team-sketch
+Icon=/usr/share/icons/hicolor/scalable/apps/team-sketch.svg
+Type=Application
+Categories=Art;
+Keywords=team;sketch;

@@ -9,7 +9,7 @@
 
 	<Window.Styles>
 		<Style Selector="Window">
-			<!--<Setter Property="Icon" Value="/Assets/logo.ico" />-->
+			<Setter Property="Icon" Value="/Assets/logo.ico" />
 			<Setter Property="SizeToContent" Value="WidthAndHeight" />
 			<Setter Property="Padding" Value="20" />
 			<Setter Property="FontFamily" Value="{StaticResource MainFontFamily}" />

@@ -3,7 +3,6 @@
         xmlns:vm="using:TeamSketch.ViewModels"
 		xmlns:controls="using:TeamSketch.UserControls"
         x:Class="TeamSketch.Views.MainWindow"
-        Icon="/Assets/avalonia-logo.ico"
         Title="Team Sketch">
 
     <Design.DataContext>
@@ -12,7 +11,7 @@
 
 	<Window.Styles>
 		<Style Selector="Window">
-			<!--<Setter Property="Icon" Value="/Assets/logo.ico" />-->
+			<Setter Property="Icon" Value="/Assets/logo.ico" />
 			<Setter Property="SizeToContent" Value="WidthAndHeight" />
 			<Setter Property="FontFamily" Value="{StaticResource MainFontFamily}" />
 			<Setter Property="FontSize" Value="16" />

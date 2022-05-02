@@ -5,6 +5,7 @@
 	<!--Avalonia doesen't support TrimMode=link currently,but we are working on that https://github.com/AvaloniaUI/Avalonia/issues/6892 -->
 	<TrimMode>copyused</TrimMode>
 	<BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+	<ApplicationIcon>logo.ico</ApplicationIcon>
 	<Product>Team Sketch</Product>
 	<Copyright>Copyright © David Timovski 2022</Copyright>
 	<Company>David Timovski</Company>

@@ -2,12 +2,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:TeamSketch.ViewModels"
         x:Class="TeamSketch.Views.EnterWindow"
-        Icon="/Assets/avalonia-logo.ico"
         Title="Team Sketch">
 
 	<Window.Styles>
 		<Style Selector="Window">
-			<!--<Setter Property="Icon" Value="/Assets/logo.ico" />-->
+			<Setter Property="Icon" Value="/Assets/logo.ico" />
 			<Setter Property="SizeToContent" Value="WidthAndHeight" />
 			<Setter Property="Padding" Value="20 15" />
 			<Setter Property="FontFamily" Value="{StaticResource MainFontFamily}" />
@@ -46,21 +45,21 @@
 			<Setter Property="TextBlock.Foreground" Value="{StaticResource PrimaryColor}" />
 		</Style>
 
-		<Style Selector="Border.forms TextBox">
+		<Style Selector="TextBox">
 			<Setter Property="Width" Value="300" />
 			<Setter Property="BorderBrush" Value="#ccc" />
 			<Setter Property="Padding" Value="15 10" />
 		</Style>
-		<Style Selector="Border.forms TextBox:disabled /template/ Border#border">
+		<Style Selector="TextBox:disabled /template/ Border#border">
 			<Setter Property="Background" Value="#eee" />
 		</Style>
-		<Style Selector="Border.forms TextBox.invalid">
+		<Style Selector="TextBox.invalid">
 			<Setter Property="BorderBrush" Value="#eb3324" />
 		</Style>
-		<Style Selector="Border.forms TextBox#roomTextBox">
+		<Style Selector="TextBox#roomTextBox">
 			<Setter Property="Margin" Value="0 10 0 0" />
 		</Style>
-		
+
 		<Style Selector="Border.forms Button">
 			<Setter Property="Width" Value="100" />
 			<Setter Property="Background" Value="{StaticResource PrimaryColor}" />
