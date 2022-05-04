@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -18,6 +19,7 @@ public static class HttpProxy
     static HttpProxy()
     {
         HttpClient.BaseAddress = new Uri(Globals.ServerUri + "/api/");
+        HttpClient.DefaultRequestHeaders.Add(HttpRequestHeader.Accept.ToString(), "application/json");
     }
 
     public static async Task<JoinRoomValidationResult> ValidateJoinRoomAsync(string room, string user)

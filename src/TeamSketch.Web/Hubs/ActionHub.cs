@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 using TeamSketch.Common;
 using TeamSketch.Web.Persistence;
 using TeamSketch.Web.Utils;
@@ -88,7 +87,12 @@ public class ActionHub : Hub
 
     private string? GetIPAddress()
     {
-        var httpConnection = Context.Features.Get<IHttpConnectionFeature>();
-        return httpConnection?.RemoteIpAddress?.ToString();
+        var httpContext = Context.GetHttpContext();
+        if (httpContext == null)
+        {
+            return string.Empty;
+        }
+
+        return httpContext.Request.Headers["X-Forwarded-For"];
     }
 }
