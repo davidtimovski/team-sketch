@@ -3,12 +3,14 @@ using Microsoft.AspNetCore.HttpOverrides;
 using TeamSketch.Web.Config;
 using TeamSketch.Web.Hubs;
 using TeamSketch.Web.Persistence;
+using TeamSketch.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddSignalR().AddMessagePackProtocol();
 builder.Services.AddOptions<DatabaseSettings>().Bind(builder.Configuration.GetSection("Database"));
+builder.Services.AddSingleton<IRandomRoomQueue, RandomRoomQueue>();
 builder.Services.AddTransient<IRepository, Repository>();
 
 builder.WebHost.UseUrls("http://localhost:5150");

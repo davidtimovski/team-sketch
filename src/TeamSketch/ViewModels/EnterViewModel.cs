@@ -10,20 +10,25 @@ namespace TeamSketch.ViewModels;
 public class EnterViewModel : ViewModelBase
 {
     private readonly IAppState _appState;
-    private readonly ISignalRService _signalRService;
 
     public EnterViewModel(bool fromMainWindow = false)
     {
         _appState = Locator.Current.GetRequiredService<IAppState>();
-        _signalRService = new SignalRService(_appState);
+        SignalRService = new SignalRService(_appState);
 
         if (fromMainWindow)
         {
-            joinTabVisible = true;
+            joinTabSelected = true;
             nickname = _appState.Nickname;
             room = _appState.Room;
         }
+        else
+        {
+            createTabSelected = true;
+        }
     }
+
+    public ISignalRService SignalRService { get; }
 
     public async Task<EnterValidationResult> CreateRoomAsync()
     {
@@ -47,8 +52,8 @@ public class EnterViewModel : ViewModelBase
         try
         {
             _appState.Nickname = nickname.Trim();
-            await _signalRService.CreateRoomAsync();
-            return new EnterValidationResult(true, null, false, false, _signalRService);
+            await SignalRService.CreateRoomAsync();
+            return new EnterValidationResult(true, null, false, false);
         }
         catch
         {
@@ -118,8 +123,8 @@ public class EnterViewModel : ViewModelBase
 
             _appState.Nickname = nickname.Trim();
             _appState.Room = room.Trim();
-            await _signalRService.JoinRoomAsync();
-            return new EnterValidationResult(true, null, false, false, _signalRService);
+            await SignalRService.JoinRoomAsync();
+            return new EnterValidationResult(true, null, false, false);
         }
         catch
         {
@@ -128,21 +133,82 @@ public class EnterViewModel : ViewModelBase
         }
     }
 
-    private void ToggleTab()
+    public async Task<EnterValidationResult> JoinRandomRoomAsync()
+    {
+        Entering = true;
+
+        if (nickname.Trim().Length == 0)
+        {
+            NicknameIsInvalid = true;
+            Entering = false;
+            return new EnterValidationResult(false, null, false, false);
+        }
+
+        var error = Validations.ValidateNickname(nickname);
+        if (error != null)
+        {
+            NicknameIsInvalid = true;
+            Entering = false;
+            return new EnterValidationResult(false, error, true, false);
+        }
+
+        try
+        {
+            _appState.Nickname = nickname.Trim();
+            await SignalRService.JoinRandomRoomAsync();
+            return new EnterValidationResult(true, null, false, false);
+        }
+        catch
+        {
+            Entering = false;
+            return new EnterValidationResult(false, "Could not connect to the server. Please check your internet connection or try again later.", true, true);
+        }
+    }
+
+    private void SelectTab(int tab)
     {
         if (Entering)
         {
             return;
         }
 
-        JoinTabVisible = !JoinTabVisible;
+        switch (tab)
+        {
+            case 0:
+                JoinTabSelected = JoinRandomTabSelected = false;
+                CreateTabSelected = true;
+                break;
+            case 1:
+                CreateTabSelected = JoinRandomTabSelected = false;
+                JoinTabSelected = true;
+                break;
+            case 2:
+                CreateTabSelected = JoinTabSelected = false;
+                JoinRandomTabSelected = true;
+                break;
+        }
     }
 
-    private bool joinTabVisible;
-    private bool JoinTabVisible
+
+    private bool createTabSelected;
+    private bool CreateTabSelected
     {
-        get => joinTabVisible;
-        set => this.RaiseAndSetIfChanged(ref joinTabVisible, value);
+        get => createTabSelected;
+        set => this.RaiseAndSetIfChanged(ref createTabSelected, value);
+    }
+
+    private bool joinTabSelected;
+    private bool JoinTabSelected
+    {
+        get => joinTabSelected;
+        set => this.RaiseAndSetIfChanged(ref joinTabSelected, value);
+    }
+
+    private bool joinRandomTabSelected;
+    private bool JoinRandomTabSelected
+    {
+        get => joinRandomTabSelected;
+        set => this.RaiseAndSetIfChanged(ref joinRandomTabSelected, value);
     }
 
     private string nickname = string.Empty;
@@ -187,6 +253,13 @@ public class EnterViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref joinButtonLabel, value);
     }
 
+    private string joinRandomButtonLabel = "Join random";
+    private string JoinRandomButtonLabel
+    {
+        get => joinRandomButtonLabel;
+        set => this.RaiseAndSetIfChanged(ref joinRandomButtonLabel, value);
+    }
+
     private bool entering;
     private bool Entering
     {
@@ -194,10 +267,11 @@ public class EnterViewModel : ViewModelBase
         set
         {
             this.RaiseAndSetIfChanged(ref entering, value);
-            CreateButtonLabel = value ? "Creating" : "Create";
-            JoinButtonLabel = value ? "Joining" : "Join";
+            CreateButtonLabel = value && createTabSelected ? "Creating" : "Create";
+            JoinButtonLabel = value && joinTabSelected ? "Joining" : "Join";
+            JoinRandomButtonLabel = value && joinRandomTabSelected ? "In queue" : "Join random";
         }
     }
 }
 
-public readonly record struct EnterValidationResult(bool Success, string ErrorMessage, bool ShowError, bool IsSystemError, ISignalRService SignalRService = null);
+public readonly record struct EnterValidationResult(bool Success, string ErrorMessage, bool ShowError, bool IsSystemError);

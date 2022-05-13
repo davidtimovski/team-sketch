@@ -54,7 +54,7 @@
 		</Style>
 
 		<Style Selector="Border.footer">
-			<Setter Property="Background" Value="#eee" />
+			<Setter Property="Background" Value="#ddd" />
 			<Setter Property="Padding" Value="15 0" />
 		</Style>
 		<Style Selector="Border.roomNameSection">

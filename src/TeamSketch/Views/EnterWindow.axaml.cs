@@ -1,6 +1,9 @@
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Microsoft.AspNetCore.SignalR.Client;
 using ReactiveUI;
+using Splat;
+using TeamSketch.DependencyInjection;
 using TeamSketch.Services;
 using TeamSketch.ViewModels;
 
@@ -8,15 +11,22 @@ namespace TeamSketch.Views;
 
 public partial class EnterWindow : Window
 {
+    private readonly IAppState _appState;
+
     public EnterWindow()
     {
         InitializeComponent();
+
+        _appState = Locator.Current.GetRequiredService<IAppState>();
 
         var createButton = this.FindControl<Button>("createButton");
         createButton.Command = ReactiveCommand.Create(CreateButtonClicked);
 
         var joinButton = this.FindControl<Button>("joinButton");
         joinButton.Command = ReactiveCommand.Create(JoinButtonClicked);
+
+        var joinRandomButton = this.FindControl<Button>("joinRandomButton");
+        joinRandomButton.Command = ReactiveCommand.Create(JoinRandomButtonClicked);
     }
 
     private async Task CreateButtonClicked()
@@ -26,7 +36,7 @@ public partial class EnterWindow : Window
         var result = await vm.CreateRoomAsync();
         if (result.Success)
         {
-            Start(result.SignalRService);
+            Start(vm.SignalRService);
         }
         else if (result.ShowError)
         {
@@ -41,9 +51,26 @@ public partial class EnterWindow : Window
         var result = await vm.JoinRoomAsync();
         if (result.Success)
         {
-            Start(result.SignalRService);
+            Start(vm.SignalRService);
         }
         else if (result.ShowError)
+        {
+            ShowError(result.ErrorMessage, result.IsSystemError);
+        }
+    }
+
+    private async Task JoinRandomButtonClicked()
+    {
+        var vm = (EnterViewModel)DataContext;
+
+        vm.SignalRService.Connection.On<string>("RandomRoomJoined", (room) =>
+        {
+            _appState.Room = room;
+            Start(vm.SignalRService);
+        });
+
+        var result = await vm.JoinRandomRoomAsync();
+        if (result.ShowError)
         {
             ShowError(result.ErrorMessage, result.IsSystemError);
         }

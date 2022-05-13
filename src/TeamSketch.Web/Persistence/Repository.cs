@@ -10,7 +10,7 @@ public interface IRepository
 {
     Task<bool> RoomExistsAsync(string room);
     Task<List<string>> GetActiveUsersInRoomAsync(string room);
-    Task CreateRoomAsync(string room, string user, string signalRConnectionId, string? ipAddress);
+    Task CreateRoomAsync(string room, bool isPublic, string user, string signalRConnectionId, string? ipAddress);
     Task JoinRoomAsync(string room, string user, string signalRConnectionId, string? ipAddress);
     Task<ConnectionRoom> DisconnectAsync(string signalRConnectionId);
 }
@@ -41,7 +41,7 @@ public class Repository : IRepository
             WHERE r.name = @room", new { room })).ToList();
     }
 
-    public async Task CreateRoomAsync(string room, string user, string signalRConnectionId, string? ipAddress)
+    public async Task CreateRoomAsync(string room, bool isPublic, string user, string signalRConnectionId, string? ipAddress)
     {
         var now = DateTime.UtcNow;
 
@@ -50,8 +50,8 @@ public class Repository : IRepository
 
         await conn.ExecuteAsync(@"SET CONSTRAINTS ""FK_connections_rooms_room_id"", ""FK_events_rooms_room_id"", ""FK_events_connections_connection_id"" DEFERRED", null, transaction);
 
-        var roomId = await conn.ExecuteScalarAsync<int>("INSERT INTO rooms (name, created) VALUES (@name, @created) RETURNING id",
-            new { name = room, created = now }, transaction);
+        var roomId = await conn.ExecuteScalarAsync<int>("INSERT INTO rooms (name, is_public, created) VALUES (@name, @isPublic, @created) RETURNING id",
+            new { name = room, isPublic, created = now }, transaction);
 
         var connectionId = await conn.ExecuteScalarAsync<int>(@"INSERT INTO connections (room_id, signalr_connection_id, ip_address, ""user"", is_connected, created, modified)
             VALUES (@roomId, @signalRConnectionId, @ipAddress, @user, TRUE, @created, @modified) RETURNING id", 

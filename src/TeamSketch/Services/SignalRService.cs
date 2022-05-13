@@ -10,6 +10,7 @@ public interface ISignalRService
     HubConnection Connection { get; }
     Task CreateRoomAsync();
     Task JoinRoomAsync();
+    Task JoinRandomRoomAsync();
     Task DrawPointAsync(double x, double y);
     Task DrawLineAsync(double x1, double y1, double x2, double y2);
 }
@@ -45,6 +46,12 @@ public class SignalRService : ISignalRService
     {
         await Connection.StartAsync();
         await Connection.InvokeAsync("JoinRoom", _appState.Nickname, _appState.Room);
+    }
+
+    public async Task JoinRandomRoomAsync()
+    {
+        await Connection.StartAsync();
+        await Connection.InvokeAsync("JoinRandomRoom", _appState.Nickname);
     }
 
     public async Task DrawPointAsync(double x, double y)

@@ -46,7 +46,7 @@
 		</Style>
 
 		<Style Selector="TextBox">
-			<Setter Property="Width" Value="300" />
+			<Setter Property="Width" Value="330" />
 			<Setter Property="BorderBrush" Value="#ccc" />
 			<Setter Property="Padding" Value="15 10" />
 		</Style>
@@ -61,7 +61,7 @@
 		</Style>
 
 		<Style Selector="Border.forms Button">
-			<Setter Property="Width" Value="100" />
+			<Setter Property="Width" Value="130" />
 			<Setter Property="Background" Value="{StaticResource PrimaryColor}" />
 			<Setter Property="Foreground" Value="#fff" />
 			<Setter Property="HorizontalAlignment" Value="Right" />
@@ -94,25 +94,32 @@
 
 	<StackPanel>
 		<Border Classes="tabs">
-			<Grid ColumnDefinitions="*,14,*">
-				<Button Grid.Column="0" Command="{Binding ToggleTab}" IsEnabled="{Binding JoinTabVisible}">Create room</Button>
-				<Button Grid.Column="2" Command="{Binding ToggleTab}" IsEnabled="{Binding !JoinTabVisible}">Join room</Button>
+			<Grid ColumnDefinitions="*,14,*,14,*">
+				<Button Grid.Column="0" Command="{Binding SelectTab}" CommandParameter="0" IsEnabled="{Binding !CreateTabSelected}">Create</Button>
+				<Button Grid.Column="2" Command="{Binding SelectTab}" CommandParameter="1" IsEnabled="{Binding !JoinTabSelected}">Join</Button>
+				<Button Grid.Column="4" Command="{Binding SelectTab}" CommandParameter="2" IsEnabled="{Binding !JoinRandomTabSelected}">Random</Button>
 			</Grid>
 		</Border>
 
 		<Border Classes="forms">
 			<Panel>
-				<StackPanel IsVisible="{Binding !JoinTabVisible}">
+				<StackPanel IsVisible="{Binding CreateTabSelected}">
 					<TextBox Text="{Binding Nickname}" IsEnabled="{Binding !Entering}" MaxLength="30" Watermark="Nickname" Classes.invalid="{Binding NicknameIsInvalid}" />
 
 					<Button Name="createButton" Content="{Binding CreateButtonLabel}" IsEnabled="{Binding !Entering}" />
 				</StackPanel>
 
-				<StackPanel IsVisible="{Binding JoinTabVisible}">
+				<StackPanel IsVisible="{Binding JoinTabSelected}">
 					<TextBox Text="{Binding Nickname}" IsEnabled="{Binding !Entering}" MaxLength="30" Watermark="Nickname" Classes.invalid="{Binding NicknameIsInvalid}" />
 					<TextBox Name="roomTextBox" IsEnabled="{Binding !Entering}" Text="{Binding Room}" MaxLength="7" Watermark="Room" Classes.invalid="{Binding RoomIsInvalid}" />
 
 					<Button Name="joinButton" Content="{Binding JoinButtonLabel}" IsEnabled="{Binding !Entering}" />
+				</StackPanel>
+
+				<StackPanel IsVisible="{Binding JoinRandomTabSelected}">
+					<TextBox Text="{Binding Nickname}" IsEnabled="{Binding !Entering}" MaxLength="30" Watermark="Nickname" Classes.invalid="{Binding NicknameIsInvalid}" />
+
+					<Button Name="joinRandomButton" Content="{Binding JoinRandomButtonLabel}" IsEnabled="{Binding !Entering}" />
 				</StackPanel>
 			</Panel>
 		</Border>
