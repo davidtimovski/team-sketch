@@ -9,9 +9,9 @@
 	<Product>Team Sketch</Product>
 	<Copyright>Copyright © David Timovski 2022</Copyright>
 	<Company>David Timovski</Company>
-	<AssemblyVersion>0.5.0</AssemblyVersion>
-	<FileVersion>0.5.0</FileVersion>
-	<Version>0.5.0</Version>
+	<AssemblyVersion>0.6.0</AssemblyVersion>
+	<FileVersion>0.6.0</FileVersion>
+	<Version>0.6.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
@@ -24,13 +24,13 @@
 	<TrimmableAssembly Include="Avalonia.Themes.Default" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.10.13" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.10.13" />
+    <PackageReference Include="Avalonia" Version="0.10.14" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.14" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.13" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.13" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.4" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="6.0.4" />
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.14" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.14" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="6.0.5" />
 	<PackageReference Include="XamlNameReferenceGenerator" Version="1.3.4" />
   </ItemGroup>
   <ItemGroup>

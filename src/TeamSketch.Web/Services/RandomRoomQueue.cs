@@ -6,21 +6,33 @@ public interface IRandomRoomQueue
 {
     void Enqueue(string connectionId, string nickname, string? ipAddress);
     UserInQueue? Dequeue();
+    void Remove(string connectionId);
 }
 
 public class RandomRoomQueue : IRandomRoomQueue
 {
-    private readonly ConcurrentQueue<UserInQueue> _queue = new();
+    private readonly ConcurrentDictionary<string, UserInQueue> _queue = new();
 
     public void Enqueue(string connectionId, string nickname, string? ipAddress)
     {
-        _queue.Enqueue(new UserInQueue(connectionId, nickname, ipAddress));
+        _queue.TryAdd(connectionId, new UserInQueue(connectionId, nickname, ipAddress));
     }
 
     public UserInQueue? Dequeue()
     {
-        _queue.TryDequeue(out UserInQueue? user);
-        return user;
+        if (_queue.IsEmpty)
+        {
+            return null;
+        }
+
+        _queue.Remove(_queue.First().Key, out UserInQueue? userInQueue);
+
+        return userInQueue;
+    }
+
+    public void Remove(string connectionId)
+    {
+        _queue.TryRemove(connectionId, out UserInQueue? _);
     }
 }
 

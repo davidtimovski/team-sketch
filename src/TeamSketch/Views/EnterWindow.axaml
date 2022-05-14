@@ -86,6 +86,21 @@
 			<Setter Property="Opacity" Value="0.7" />
 			<Setter Property="TextBlock.Foreground" Value="#fff" />
 		</Style>
+
+		<Style Selector="Border.forms Button.cancel">
+			<Setter Property="Width" Value="130" />
+			<Setter Property="Background" Value="#ddd" />
+			<Setter Property="Foreground" Value="#222" />
+			<Setter Property="HorizontalAlignment" Value="Right" />
+			<Setter Property="HorizontalContentAlignment" Value="Center" />
+			<Setter Property="Margin" Value="0 20 0 0" />
+		</Style>
+		<Style Selector="Border.forms Button.cancel:pointerover /template/ ContentPresenter">
+			<Setter Property="Background" Value="#e3e3e3" />
+		</Style>
+		<Style Selector="Border.forms Button.cancel:pointerover /template/ ContentPresenter">
+			<Setter Property="TextBlock.Foreground" Value="#222" />
+		</Style>
 	</Window.Styles>
 
     <Design.DataContext>
@@ -119,7 +134,10 @@
 				<StackPanel IsVisible="{Binding JoinRandomTabSelected}">
 					<TextBox Text="{Binding Nickname}" IsEnabled="{Binding !Entering}" MaxLength="30" Watermark="Nickname" Classes.invalid="{Binding NicknameIsInvalid}" />
 
-					<Button Name="joinRandomButton" Content="{Binding JoinRandomButtonLabel}" IsEnabled="{Binding !Entering}" />
+					<DockPanel>
+						<Button Command="{Binding ExitRandomRoomQueueAsync}" IsVisible="{Binding Entering}" Classes="cancel">Cancel</Button>
+						<Button Name="joinRandomButton" Content="{Binding JoinRandomButtonLabel}" IsEnabled="{Binding !Entering}" />
+					</DockPanel>
 				</StackPanel>
 			</Panel>
 		</Border>

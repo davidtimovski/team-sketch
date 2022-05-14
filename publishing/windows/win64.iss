@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Team Sketch"
-#define MyAppVersion "0.5.0"
+#define MyAppVersion "0.6.0"
 #define MyAppPublisher "David Timovski"
 #define MyAppURL "https://www.davidtimovski.com/team-sketch"
 #define MyAppExeName "TeamSketch.exe"

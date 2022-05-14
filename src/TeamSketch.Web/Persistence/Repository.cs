@@ -12,7 +12,7 @@ public interface IRepository
     Task<List<string>> GetActiveUsersInRoomAsync(string room);
     Task CreateRoomAsync(string room, bool isPublic, string user, string signalRConnectionId, string? ipAddress);
     Task JoinRoomAsync(string room, string user, string signalRConnectionId, string? ipAddress);
-    Task<ConnectionRoom> DisconnectAsync(string signalRConnectionId);
+    Task<ConnectionRoom?> DisconnectAsync(string signalRConnectionId);
 }
 
 public class Repository : IRepository
@@ -92,7 +92,7 @@ public class Repository : IRepository
         transaction.Commit();
     }
 
-    public async Task<ConnectionRoom> DisconnectAsync(string signalRConnectionId)
+    public async Task<ConnectionRoom?> DisconnectAsync(string signalRConnectionId)
     {
         var now = DateTime.UtcNow;
 
@@ -101,16 +101,19 @@ public class Repository : IRepository
 
         await conn.ExecuteAsync(@"SET CONSTRAINTS ""FK_events_rooms_room_id"", ""FK_events_connections_connection_id"" DEFERRED", null, transaction);
 
-        var connectionRoom = await conn.QueryFirstAsync<ConnectionRoom>(@"SELECT c.id AS ""ConnectionId"", c.""user"", r.id AS ""RoomId"", r.name AS ""Room""
+        var connectionRoom = await conn.QueryFirstOrDefaultAsync<ConnectionRoom>(@"SELECT c.id AS ""ConnectionId"", c.""user"", r.id AS ""RoomId"", r.name AS ""Room""
             FROM connections AS c
             INNER JOIN rooms AS r ON c.room_id = r.id
             WHERE signalr_connection_id = @signalRConnectionId", new { signalRConnectionId });
 
-        await conn.ExecuteScalarAsync<int>(@"UPDATE connections SET is_connected = FALSE, modified = @modified WHERE id = @connectionId", new { connectionId = connectionRoom.ConnectionId, modified = now }, transaction);
+        if (connectionRoom != null)
+        {
+            await conn.ExecuteScalarAsync<int>(@"UPDATE connections SET is_connected = FALSE, modified = @modified WHERE id = @connectionId", new { connectionId = connectionRoom.ConnectionId, modified = now }, transaction);
 
-        await conn.ExecuteAsync("INSERT INTO events (room_id, connection_id, type, occurred) VALUES (@roomId, @connectionId, @type, @occurred)",
-            new { roomId = connectionRoom.RoomId, connectionId = connectionRoom.ConnectionId, type = EventType.Disconnected, occurred = now }, transaction);
-
+            await conn.ExecuteAsync("INSERT INTO events (room_id, connection_id, type, occurred) VALUES (@roomId, @connectionId, @type, @occurred)",
+                new { roomId = connectionRoom.RoomId, connectionId = connectionRoom.ConnectionId, type = EventType.Disconnected, occurred = now }, transaction);
+        }
+        
         transaction.Commit();
 
         return connectionRoom;

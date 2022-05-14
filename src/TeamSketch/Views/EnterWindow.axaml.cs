@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -27,6 +28,19 @@ public partial class EnterWindow : Window
 
         var joinRandomButton = this.FindControl<Button>("joinRandomButton");
         joinRandomButton.Command = ReactiveCommand.Create(JoinRandomButtonClicked);
+    }
+
+    protected override void OnDataContextChanged(EventArgs e)
+    {
+        var vm = (EnterViewModel)DataContext;
+
+        vm.SignalRService.Connection.On<string>("RandomRoomJoined", (room) =>
+        {
+            _appState.Room = room;
+            Start(vm.SignalRService);
+        });
+
+        base.OnDataContextChanged(e);
     }
 
     private async Task CreateButtonClicked()
@@ -62,12 +76,6 @@ public partial class EnterWindow : Window
     private async Task JoinRandomButtonClicked()
     {
         var vm = (EnterViewModel)DataContext;
-
-        vm.SignalRService.Connection.On<string>("RandomRoomJoined", (room) =>
-        {
-            _appState.Room = room;
-            Start(vm.SignalRService);
-        });
 
         var result = await vm.JoinRandomRoomAsync();
         if (result.ShowError)

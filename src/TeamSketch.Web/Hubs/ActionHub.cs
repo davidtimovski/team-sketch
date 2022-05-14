@@ -103,9 +103,13 @@ public class ActionHub : Hub
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        var connectionRoom = await _repository.DisconnectAsync(Context.ConnectionId);
+        _randomRoomQueue.Remove(Context.ConnectionId);
 
-        await Clients.OthersInGroup(connectionRoom.Room).SendAsync("LeftRoom", connectionRoom.User);
+        var connectionRoom = await _repository.DisconnectAsync(Context.ConnectionId);
+        if (connectionRoom != null)
+        {
+            await Clients.OthersInGroup(connectionRoom.Room).SendAsync("LeftRoom", connectionRoom.User);
+        }
 
         await base.OnDisconnectedAsync(exception);
     }

@@ -165,6 +165,22 @@ public class EnterViewModel : ViewModelBase
         }
     }
 
+    private async Task<EnterValidationResult> ExitRandomRoomQueueAsync()
+    {
+        Entering = false;
+
+        try
+        {
+            await SignalRService.Connection.StopAsync();
+            return new EnterValidationResult(true, null, false, false);
+        }
+        catch
+        {
+            Entering = false;
+            return new EnterValidationResult(false, "Could not talk to the server. Please check your internet connection or try again later.", true, true);
+        }
+    }
+
     private void SelectTab(int tab)
     {
         if (Entering)
