@@ -13,6 +13,7 @@ public interface IRepository
     Task CreateRoomAsync(string room, bool isPublic, string user, string signalRConnectionId, string? ipAddress);
     Task JoinRoomAsync(string room, string user, string signalRConnectionId, string? ipAddress);
     Task<ConnectionRoom?> DisconnectAsync(string signalRConnectionId);
+    Task DisconnectAllAsync();
 }
 
 public class Repository : IRepository
@@ -117,6 +118,12 @@ public class Repository : IRepository
         transaction.Commit();
 
         return connectionRoom;
+    }
+
+    public async Task DisconnectAllAsync()
+    {
+        using IDbConnection conn = OpenConnection();
+        await conn.ExecuteScalarAsync<int>(@"UPDATE connections SET is_connected = FALSE, modified = @modified", new { modified = DateTime.UtcNow });
     }
 
     private IDbConnection OpenConnection()
