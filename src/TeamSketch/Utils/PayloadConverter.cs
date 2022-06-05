@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
+using Avalonia.Media;
 using TeamSketch.Models;
+using TeamSketch.Services;
 
 namespace TeamSketch.Utils;
 
@@ -42,55 +43,56 @@ public static class PayloadConverter
         return ellipse;
     }
 
-    public static byte[] ToBytes(double x1, double y1, double x2, double y2, ThicknessEnum thickness, ColorsEnum color)
+    public static byte[] ToBytes(LineDrawSegment[] segments, ThicknessEnum thickness, ColorsEnum color)
     {
-        var bytes = new byte[10];
+        var bytes = new byte[1 + segments.Length * 8 + 2];
+        int currentIndex = 0;
 
-        bytes[0] = (byte)x1;
-        bytes[1] = (byte)((short)x1 >> 8);
+        bytes[currentIndex++] = (byte)segments.Length;
 
-        bytes[2] = (byte)y1;
-        bytes[3] = (byte)((short)y1 >> 8);
+        foreach (var segment in segments)
+        {
+            bytes[currentIndex++] = (byte)segment.X1;
+            bytes[currentIndex++] = (byte)((short)segment.X1 >> 8);
 
-        bytes[4] = (byte)x2;
-        bytes[5] = (byte)((short)x2 >> 8);
+            bytes[currentIndex++] = (byte)segment.Y1;
+            bytes[currentIndex++] = (byte)((short)segment.Y1 >> 8);
 
-        bytes[6] = (byte)y2;
-        bytes[7] = (byte)((short)y2 >> 8);
+            bytes[currentIndex++] = (byte)segment.X2;
+            bytes[currentIndex++] = (byte)((short)segment.X2 >> 8);
 
-        bytes[8] = (byte)thickness;
-        bytes[9] = (byte)color;
+            bytes[currentIndex++] = (byte)segment.Y2;
+            bytes[currentIndex++] = (byte)((short)segment.Y2 >> 8);
+        }
+
+        bytes[currentIndex++] = (byte)thickness;
+        bytes[currentIndex] = (byte)color;
 
         return bytes;
     }
 
-    public static IEnumerable<IControl> ToLineShapes(byte[] bytes)
+    public static (Queue<LineDrawSegment> segments, double thickness, SolidColorBrush colorBrush) ToLine(byte[] bytes)
     {
-        var x1 = (bytes[1] << 8) + bytes[0];
-        var y1 = (bytes[3] << 8) + bytes[2];
-        var x2 = (bytes[5] << 8) + bytes[4];
-        var y2 = (bytes[7] << 8) + bytes[6];
-        var thickness = BrushSettings.FindThickness(bytes[8]);
-        var colorBrush = BrushSettings.FindColorBrush(bytes[9]);
+        int currentIndex = 0;
+        var count = (int)bytes[currentIndex++];
 
-        var result = new List<IControl>(2);
+        var result = new Queue<LineDrawSegment>(count);
 
-        var ellipse = new Ellipse
+        for (var i = 0; i < count; i++)
         {
-            Margin = new Thickness(x1 - (thickness / 2), y1 - (thickness / 2), 0, 0),
-            Fill = colorBrush,
-            Width = thickness,
-            Height = thickness
-        };
-        result.Add(ellipse);
+            var buffer = i * 8;
 
-        Line line = new();
-        line.StrokeThickness = thickness;
-        line.StartPoint = new Point(x1, y1);
-        line.EndPoint = new Point(x2, y2);
-        line.Stroke = colorBrush;
-        result.Add(line);
+            var x1 = (bytes[buffer + 2] << 8) + bytes[buffer + 1];
+            var y1 = (bytes[buffer + 4] << 8) + bytes[buffer + 3];
+            var x2 = (bytes[buffer + 6] << 8) + bytes[buffer + 5];
+            var y2 = (bytes[buffer + 8] << 8) + bytes[buffer + 7];
+            
+            result.Enqueue(new LineDrawSegment(x1, y1, x2, y2));
+        }
 
-        return result;
+        var size = BrushSettings.FindThickness(bytes[^2]);
+        var colorBrush = BrushSettings.FindColorBrush(bytes[^1]);
+
+        return (result, size, colorBrush);
     }
 }

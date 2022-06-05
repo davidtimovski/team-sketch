@@ -19,10 +19,12 @@ public partial class MainWindow : Window
 {
     private readonly IAppState _appState;
     private readonly IRenderer _renderer;
+    private readonly DispatcherTimer _lineRenderingTimer = new();
     private Point currentPoint = new();
     private bool pressed;
     private Action closeAdditionalAction = () => { };
     private bool isClosing;
+    
 
     public MainWindow()
     {
@@ -31,8 +33,12 @@ public partial class MainWindow : Window
         _appState = Locator.Current.GetRequiredService<IAppState>();
         _renderer = new Renderer(_appState.BrushSettings, canvas);
 
+        _lineRenderingTimer.Tick += LineRenderingTimer_Tick;
+        _lineRenderingTimer.Interval = TimeSpan.FromMilliseconds(10);
+        _lineRenderingTimer.Start();
+
         canvas.Cursor = _appState.BrushSettings.Cursor;
-        canvas.PointerMoved += ThrottleHelper.CreateThrottledEventHandler(Canvas_PointerMoved, TimeSpan.FromMilliseconds(8));
+        canvas.PointerMoved += Canvas_PointerMoved;
 
         _appState.BrushSettings.BrushChanged += BrushSettings_BrushChanged;
     }
@@ -47,6 +53,21 @@ public partial class MainWindow : Window
         base.OnDataContextChanged(e);
     }
 
+    private void LineRenderingTimer_Tick(object sender, EventArgs e)
+    {
+        Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            var segments = _renderer.RenderLine();
+            if (segments.Length == 0)
+            {
+                return;
+            }
+
+            var vm = DataContext as MainWindowViewModel;
+            _ = vm.SignalRService.DrawLineAsync(segments);
+        });
+    }
+
     private void BrushSettings_BrushChanged(object sender, BrushChangedEventArgs e)
     {
         canvas.Cursor = e.Cursor;
@@ -54,9 +75,10 @@ public partial class MainWindow : Window
 
     private void Connection_UserDrewPoint(string user, byte[] data)
     {
+        var point = PayloadConverter.ToPoint(data);
+
         Dispatcher.UIThread.InvokeAsync(() =>
         {
-            var point = PayloadConverter.ToPoint(data);
             canvas.Children.Add(point);
         });
 
@@ -65,10 +87,11 @@ public partial class MainWindow : Window
 
     private void Connection_UserDrewLine(string user, byte[] data)
     {
+        var (segments, thickness, colorBrush) = PayloadConverter.ToLine(data);
+
         Dispatcher.UIThread.InvokeAsync(() =>
         {
-            var shapes = PayloadConverter.ToLineShapes(data);
-            canvas.Children.AddRange(shapes);
+            _renderer.RenderLine(segments, thickness, colorBrush);
         });
 
         IndicateUserDrawing(user);
@@ -103,10 +126,7 @@ public partial class MainWindow : Window
         Point newPosition = e.GetPosition(canvas);
         var (x, y) = _renderer.RestrictPointToCanvas(newPosition.X, newPosition.Y);
 
-        _renderer.DrawLine(currentPoint.X, currentPoint.Y, x, y);
-
-        var vm = DataContext as MainWindowViewModel;
-        _ = vm.SignalRService.DrawLineAsync(currentPoint.X, currentPoint.Y, x, y);
+        _renderer.EnqueueLineSegment(new LineDrawSegment(currentPoint.X, currentPoint.Y, x, y));
 
         currentPoint = new Point(x, y);
 

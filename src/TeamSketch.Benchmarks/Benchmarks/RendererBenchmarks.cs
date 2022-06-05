@@ -10,11 +10,8 @@ namespace TeamSketch.Benchmarks
     public class RendererBenchmarks
     {
         private readonly Random _random = new();
-        private readonly int x1;
-        private readonly int y1;
-        private readonly int x2;
-        private readonly int y2;
         private readonly IRenderer _renderer;
+        private const int LineSegmentCount = 20;
 
         public RendererBenchmarks()
         {
@@ -23,15 +20,19 @@ namespace TeamSketch.Benchmarks
                 Width = Globals.CanvasWidth,
                 Height = Globals.CanvasHeight
             };
-            _renderer = new Renderer(new BrushSettings(), canvas);
+            _renderer = new Renderer(new BrushSettings(""), canvas);
 
-            x1 = _random.Next(0, Globals.CanvasWidth);
-            y1 = _random.Next(0, Globals.CanvasHeight);
-            x2 = _random.Next(0, Globals.CanvasWidth);
-            y2 = _random.Next(0, Globals.CanvasHeight);
+            for (int i = 0; i < LineSegmentCount; i++)
+            {
+                var x1 = _random.Next(0, Globals.CanvasWidth);
+                var y1 = _random.Next(0, Globals.CanvasHeight);
+                var x2 = _random.Next(0, Globals.CanvasWidth);
+                var y2 = _random.Next(0, Globals.CanvasHeight);
+                _renderer.EnqueueLineSegment(new LineDrawSegment(x1, y1, x2, y2));
+            }
         }
 
         [Benchmark]
-        public void DrawLine() => _renderer.DrawLine(x1, y1, x2, y2);
+        public void RenderLine() => _renderer.RenderLine();
     }
 }
