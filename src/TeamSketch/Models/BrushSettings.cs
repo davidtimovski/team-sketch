@@ -42,18 +42,21 @@ public class BrushSettings
     {
         _cursorsPath = cursorsPath ?? throw new ArgumentException("Argument required.", nameof(cursorsPath));
 
-        _cursorBrushPathLookup = new()
+        if (_cursorsPath != string.Empty)
         {
-            { ColorsEnum.Default, $"{_cursorsPath}/brush-black.png" },
-            { ColorsEnum.Red, $"{_cursorsPath}/brush-red.png" },
-            { ColorsEnum.Blue, $"{_cursorsPath}/brush-blue.png" },
-            { ColorsEnum.Green, $"{_cursorsPath}/brush-green.png" },
-            { ColorsEnum.Yellow, $"{_cursorsPath}/brush-yellow.png" },
-            { ColorsEnum.Orange, $"{_cursorsPath}/brush-orange.png" },
-            { ColorsEnum.Purple, $"{_cursorsPath}/brush-purple.png" },
-            { ColorsEnum.Pink, $"{_cursorsPath}/brush-pink.png" },
-            { ColorsEnum.Gray, $"{_cursorsPath}/brush-gray.png" }
-        };
+            _cursorBrushPathLookup = new()
+            {
+                { ColorsEnum.Default, $"{_cursorsPath}/brush-black.png" },
+                { ColorsEnum.Red, $"{_cursorsPath}/brush-red.png" },
+                { ColorsEnum.Blue, $"{_cursorsPath}/brush-blue.png" },
+                { ColorsEnum.Green, $"{_cursorsPath}/brush-green.png" },
+                { ColorsEnum.Yellow, $"{_cursorsPath}/brush-yellow.png" },
+                { ColorsEnum.Orange, $"{_cursorsPath}/brush-orange.png" },
+                { ColorsEnum.Purple, $"{_cursorsPath}/brush-purple.png" },
+                { ColorsEnum.Pink, $"{_cursorsPath}/brush-pink.png" },
+                { ColorsEnum.Gray, $"{_cursorsPath}/brush-gray.png" }
+            };
+        }
 
         assetLoader = AvaloniaLocator.Current.GetService<IAssetLoader>();
 
@@ -76,6 +79,7 @@ public class BrushSettings
 
             if (string.IsNullOrEmpty(_cursorsPath))
             {
+                // Setting cursor image is unnecessary when running benchmarks
                 return;
             }
 
