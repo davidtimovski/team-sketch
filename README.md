@@ -4,6 +4,14 @@ A cross-platform desktop application for collaborative drawing built with [Avalo
 
 ![Preview](preview.webp)
 
+### Features
+
+Create a room and connect with friends or join a random room and connect with a stranger. Share the canvas and show off your terrible drawing skills.
+
+### Download
+
+You can download it from my website [here](https://www.davidtimovski.com/team-sketch#download).
+
 ## License
 
 This project is licensed under the GNU GPLv3 License - see the [LICENSE](LICENSE) file for details.

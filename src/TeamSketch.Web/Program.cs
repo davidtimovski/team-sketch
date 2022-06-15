@@ -8,24 +8,30 @@ using TeamSketch.Web.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddRazorPages();
 builder.Services.AddSignalR().AddMessagePackProtocol();
 builder.Services.AddOptions<DatabaseSettings>().Bind(builder.Configuration.GetSection("Database"));
+
 builder.Services.AddSingleton<IRandomRoomQueue, RandomRoomQueue>();
-builder.Services.AddSingleton<ILiveLocationsService, LiveLocationsService>();
+builder.Services.AddSingleton<ILiveViewService, LiveViewService>();
 builder.Services.AddTransient<IRepository, Repository>();
 
 builder.WebHost.UseUrls("http://localhost:5150");
 
 var app = builder.Build();
 
-app.UseRouting()
-   .UseEndpoints(endpoints =>
+app.UseStaticFiles();
+
+app.UseRouting();
+app.UseEndpoints(endpoints =>
     {
         endpoints.MapControllers();
     }).UseForwardedHeaders(new ForwardedHeadersOptions
     {
         ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
     });
+
+app.MapRazorPages();
 
 app.MapHub<ActionHub>("/actionHub", options =>
 {

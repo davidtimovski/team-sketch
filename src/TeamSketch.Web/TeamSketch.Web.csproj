@@ -8,12 +8,16 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="6.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="6.0.6" />
     <PackageReference Include="Npgsql" Version="6.0.4" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\TeamSketch.Common\TeamSketch.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
 </Project>

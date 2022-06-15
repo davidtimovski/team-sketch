@@ -1,0 +1,22 @@
+﻿@page
+@model TeamSketch.Web.Pages.IndexModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Team Sketch - Live View</title>
+    <link rel="stylesheet" href="index.css" />
+</head>
+<body>
+    <div id="map"></div>
+    
+    <script>
+        let baseUrl = '@Model.BaseUrl';
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ol3/4.6.5/ol.js" integrity="sha512-O7kHS9ooekX8EveiC94z9xSvD/4xt10Qigl6uEKvspYykdux3Ci5QNu5fwi4ca0ZkZI/oCgx5ja8RklWUEqzxQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="index.js"></script>
+</body>
+</html>

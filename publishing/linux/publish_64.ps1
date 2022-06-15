@@ -7,4 +7,4 @@ Copy-Item -Path "C:\Users\david\source\repos\team-sketch\publishing\linux\templa
 
 Copy-Item "C:\Users\david\source\repos\team-sketch\publishing\linux\template_64\DEBIAN\control" -Destination "C:\Users\david\source\repos\team-sketch\publishing\linux\output\team-sketch_${Version}_amd64\DEBIAN\control"
 
-Copy-Item "C:\Users\david\source\repos\team-sketch\Src\TeamSketch\bin\Release\net6.0\publish\TeamSketch" -Destination "C:\Users\david\source\repos\team-sketch\publishing\linux\output\team-sketch_${Version}_amd64\usr\bin\team-sketch"
+Copy-Item "C:\Users\david\source\repos\team-sketch\src\TeamSketch\bin\Release\net6.0\publish\linux-x64\TeamSketch" -Destination "C:\Users\david\source\repos\team-sketch\publishing\linux\output\team-sketch_${Version}_amd64\usr\bin\team-sketch"

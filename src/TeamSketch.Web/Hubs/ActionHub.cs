@@ -10,13 +10,13 @@ public class ActionHub : Hub
 {
     private readonly IRepository _repository;
     private readonly IRandomRoomQueue _randomRoomQueue;
-    private readonly ILiveLocationsService _liveLocationsService;
+    private readonly ILiveViewService _liveViewService;
 
-    public ActionHub(IRepository repository, IRandomRoomQueue randomRoomQueue, ILiveLocationsService liveLocationsService)
+    public ActionHub(IRepository repository, IRandomRoomQueue randomRoomQueue, ILiveViewService liveViewService)
     {
         _repository = repository;
         _randomRoomQueue = randomRoomQueue;
-        _liveLocationsService = liveLocationsService;
+        _liveViewService = liveViewService;
     }
 
     public async Task CreateRoom(string user)
@@ -88,8 +88,8 @@ public class ActionHub : Hub
 
         await Clients.Group(room).SendAsync("RandomRoomJoined", room);
 
-        await _liveLocationsService.AddAsync(userInQueue.ConnectionId, userInQueue.IpAddress);
-        await _liveLocationsService.AddAsync(Context.ConnectionId, ipAddress);
+        await _liveViewService.AddAsync(userInQueue.ConnectionId, userInQueue.IpAddress);
+        await _liveViewService.AddAsync(Context.ConnectionId, ipAddress);
     }
 
     public async Task DrawPoint(string user, string room, byte[] data)
@@ -117,7 +117,7 @@ public class ActionHub : Hub
             await Clients.OthersInGroup(connectionRoom.Room).SendAsync("LeftRoom", connectionRoom.User);
         }
 
-        _liveLocationsService.Remove(Context.ConnectionId);
+        _liveViewService.Remove(Context.ConnectionId);
 
         await base.OnDisconnectedAsync(exception);
     }

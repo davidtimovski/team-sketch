@@ -4,14 +4,14 @@ using System.Text.Json;
 
 namespace TeamSketch.Web.Services;
 
-public interface ILiveLocationsService
+public interface ILiveViewService
 {
     Task AddAsync(string connectionId, string? ipAddress);
     void Remove(string connectionId);
-    List<Location> GetAll();
+    List<Location> GetLocations();
 }
 
-public class LiveLocationsService : ILiveLocationsService
+public class LiveViewService : ILiveViewService
 {
     private readonly static HttpClient HttpClient = new();
     private readonly static JsonSerializerOptions SerializerSettings = new()
@@ -20,7 +20,7 @@ public class LiveLocationsService : ILiveLocationsService
     };
     private readonly ConcurrentDictionary<string, Location> _locations = new();
 
-    public LiveLocationsService()
+    public LiveViewService()
     {
         HttpClient.DefaultRequestHeaders.Add(HttpRequestHeader.Accept.ToString(), "application/json");
     }
@@ -53,7 +53,7 @@ public class LiveLocationsService : ILiveLocationsService
         _locations.TryRemove(connectionId, out Location? _);
     }
 
-    public List<Location> GetAll()
+    public List<Location> GetLocations()
     {
         return _locations.Values.ToList();
     }
