@@ -17,7 +17,7 @@ namespace TeamSketch.Web.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            var locations = _liveLiveService.GetLocations();
+            var locations = _liveLiveService.GetDistinctLocations();
             return Ok(locations);
         }
     }

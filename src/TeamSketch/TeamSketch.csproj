@@ -40,9 +40,9 @@
     <Compile Update="Views\MainWindow.axaml.cs">
       <DependentUpon>MainWindow.axaml</DependentUpon>
     </Compile>
-	  <Compile Update="Views\EnterWindow.axaml.cs">
-		  <DependentUpon>EnterWindow.axaml</DependentUpon>
-	  </Compile>
+	<Compile Update="Views\LobbyWindow.axaml.cs">
+      <DependentUpon>LobbyWindow.axaml</DependentUpon>
+	</Compile>
   </ItemGroup>
   <ItemGroup>
 	<EmbeddedResource Include="Assets\Fonts\RedHatDisplay-Regular.ttf" />

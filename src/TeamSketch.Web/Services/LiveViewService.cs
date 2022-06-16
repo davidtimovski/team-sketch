@@ -8,7 +8,7 @@ public interface ILiveViewService
 {
     Task AddAsync(string connectionId, string? ipAddress);
     void Remove(string connectionId);
-    List<Location> GetLocations();
+    List<Location> GetDistinctLocations();
 }
 
 public class LiveViewService : ILiveViewService
@@ -53,9 +53,9 @@ public class LiveViewService : ILiveViewService
         _locations.TryRemove(connectionId, out Location? _);
     }
 
-    public List<Location> GetLocations()
+    public List<Location> GetDistinctLocations()
     {
-        return _locations.Values.ToList();
+        return _locations.Values.Distinct().ToList();
     }
 }
 

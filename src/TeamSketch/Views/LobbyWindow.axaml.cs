@@ -10,11 +10,11 @@ using TeamSketch.ViewModels;
 
 namespace TeamSketch.Views;
 
-public partial class EnterWindow : Window
+public partial class LobbyWindow : Window
 {
     private readonly IAppState _appState;
 
-    public EnterWindow()
+    public LobbyWindow()
     {
         InitializeComponent();
 
@@ -32,7 +32,7 @@ public partial class EnterWindow : Window
 
     protected override void OnDataContextChanged(EventArgs e)
     {
-        var vm = (EnterViewModel)DataContext;
+        var vm = (LobbyViewModel)DataContext;
 
         vm.SignalRService.Connection.On<string>("RandomRoomJoined", (room) =>
         {
@@ -45,7 +45,7 @@ public partial class EnterWindow : Window
 
     private async Task CreateButtonClicked()
     {
-        var vm = (EnterViewModel)DataContext;
+        var vm = (LobbyViewModel)DataContext;
 
         var result = await vm.CreateRoomAsync();
         if (result.Success)
@@ -60,7 +60,7 @@ public partial class EnterWindow : Window
 
     private async Task JoinButtonClicked()
     {
-        var vm = (EnterViewModel)DataContext;
+        var vm = (LobbyViewModel)DataContext;
 
         var result = await vm.JoinRoomAsync();
         if (result.Success)
@@ -75,7 +75,7 @@ public partial class EnterWindow : Window
 
     private async Task JoinRandomButtonClicked()
     {
-        var vm = (EnterViewModel)DataContext;
+        var vm = (LobbyViewModel)DataContext;
 
         var result = await vm.JoinRandomRoomAsync();
         if (result.ShowError)

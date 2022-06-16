@@ -1,7 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:TeamSketch.ViewModels"
-        x:Class="TeamSketch.Views.EnterWindow"
+        x:Class="TeamSketch.Views.LobbyWindow"
         Title="Team Sketch">
 
 	<Window.Styles>
@@ -104,7 +104,7 @@
 	</Window.Styles>
 
     <Design.DataContext>
-        <vm:EnterViewModel/>
+		<vm:LobbyViewModel/>
     </Design.DataContext>
 
 	<StackPanel>

@@ -7,11 +7,11 @@ using TeamSketch.Services;
 
 namespace TeamSketch.ViewModels;
 
-public class EnterViewModel : ViewModelBase
+public class LobbyViewModel : ViewModelBase
 {
     private readonly IAppState _appState;
 
-    public EnterViewModel(bool fromMainWindow = false)
+    public LobbyViewModel(bool fromMainWindow = false)
     {
         _appState = Locator.Current.GetRequiredService<IAppState>();
         SignalRService = new SignalRService(_appState);

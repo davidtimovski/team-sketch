@@ -178,9 +178,9 @@ public partial class MainWindow : Window
         }
         _ = vm.SignalRService.Connection.DisposeAsync();
 
-        var window = new EnterWindow
+        var window = new LobbyWindow
         {
-            DataContext = new EnterViewModel(true),
+            DataContext = new LobbyViewModel(true),
             Topmost = true,
             CanResize = false
         };

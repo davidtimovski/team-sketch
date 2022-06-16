@@ -25,17 +25,22 @@ function loadLocationMarkers() {
             'Content-Type': 'application/json'
         }
     })
-        .then(response => response.json())
-        .then(addLocationMarkers);
+    .then(response => response.json())
+    .then(addLocationMarkers);
 }
 
 function addLocationMarkers(locations) {
     const features = [];
+
     for (let location of locations) {
-        features.push(new ol.Feature({
-            geometry: new ol.geom.Point(ol.proj.fromLonLat([location.lon, location.lat])),
-            name: `${location.city}, ${location.country}`
-        }));
+        const feature = new ol.Feature({
+            geometry: new ol.geom.Point(ol.proj.fromLonLat([location.lon, location.lat]))
+        });
+
+        const style = getMarkerStyle(`${location.city}, ${location.country}`);
+        feature.setStyle(style);
+
+        features.push(feature);
     }
 
     if (iconLayer) {
@@ -45,16 +50,35 @@ function addLocationMarkers(locations) {
     iconLayer = new ol.layer.Vector({
         source: new ol.source.Vector({
             features: features
-        }),
-        style: new ol.style.Style({
-            image: new ol.style.Icon({
-                anchor: [0.5, 42],
-                anchorXUnits: 'fraction',
-                anchorYUnits: 'pixels',
-                src: 'images/marker.svg'
-            })
         })
     });
 
     map.addLayer(iconLayer);
+}
+
+function getMarkerStyle(label) {
+    return new ol.style.Style({
+        image: new ol.style.Icon({
+            anchor: [0.5, 42],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'pixels',
+            src: 'images/marker.svg'
+        }),
+        text: new ol.style.Text({
+            font: "12px sans-serif",
+            fill: new ol.style.Fill({ color: '#343434' }),
+            stroke: new ol.style.Stroke({
+                color: '#fff',
+                width: 2
+            }),
+            backgroundFill: new ol.style.Fill({ color: "#fffffa" }),
+            backgroundStroke: new ol.style.Stroke({
+                color: '#2181ff',
+                width: 1
+            }),
+            padding: [3, 7, 1, 7],
+            offsetY: 18,
+            text: label
+        })
+    })
 }

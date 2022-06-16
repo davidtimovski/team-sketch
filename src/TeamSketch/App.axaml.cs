@@ -17,9 +17,9 @@ public class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime)
         {
-            var window = new EnterWindow
+            var window = new LobbyWindow
             {
-                DataContext = new EnterViewModel(),
+                DataContext = new LobbyViewModel(),
                 Topmost = true,
                 CanResize = false
             };
