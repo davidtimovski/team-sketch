@@ -22,9 +22,9 @@ public static class HttpProxy
         HttpClient.DefaultRequestHeaders.Add(HttpRequestHeader.Accept.ToString(), "application/json");
     }
 
-    public static async Task<JoinRoomValidationResult> ValidateJoinRoomAsync(string room, string user)
+    public static async Task<JoinRoomValidationResult> ValidateJoinRoomAsync(string room, string nickname)
     {
-        var response = await HttpClient.GetAsync($"rooms/{room}/validate-join/{user}");
+        var response = await HttpClient.GetAsync($"rooms/{room}/validate-join/{nickname}");
         response.EnsureSuccessStatusCode();
 
         var content = await response.Content.ReadAsStringAsync();
@@ -32,9 +32,9 @@ public static class HttpProxy
         return JsonSerializer.Deserialize<JoinRoomValidationResult>(content, SerializerSettings);
     }
 
-    public static async Task<List<string>> GetUsersInRoomAsync(string room)
+    public static async Task<List<string>> GetParticipantsAsync(string room)
     {
-        var response = await HttpClient.GetAsync($"rooms/{room}/users");
+        var response = await HttpClient.GetAsync($"rooms/{room}/participants");
         response.EnsureSuccessStatusCode();
 
         var content = await response.Content.ReadAsStringAsync();

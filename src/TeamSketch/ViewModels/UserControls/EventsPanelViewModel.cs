@@ -33,14 +33,14 @@ public class EventsPanelViewModel : ViewModelBase
         return Task.CompletedTask;
     }
 
-    private void Connection_JoinedRoom(string user)
+    private void Connection_JoinedRoom(string participant)
     {
-        Events.Add(new EventViewModel(user, " joined."));
+        Events.Add(new EventViewModel(participant, " joined."));
     }
 
-    private void Connection_LeftRoom(string user)
+    private void Connection_LeftRoom(string participant)
     {
-        Events.Add(new EventViewModel(user, " left."));
+        Events.Add(new EventViewModel(participant, " left."));
     }
 }
 
@@ -51,14 +51,14 @@ public class EventViewModel : ViewModelBase
         EventMessage = eventMessage;
     }
 
-    public EventViewModel(string user, string eventMessage)
+    public EventViewModel(string participant, string eventMessage)
     {
-        HasUser = true;
-        User = user;
+        HasParticipant = true;
+        Participant = participant;
         EventMessage = eventMessage;
     }
 
-    public bool HasUser { get; private set; }
-    public string User { get; private set; }
+    public bool HasParticipant { get; private set; }
+    public string Participant { get; private set; }
     public string EventMessage { get; private set; }
 }

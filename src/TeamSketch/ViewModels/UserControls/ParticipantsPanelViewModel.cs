@@ -8,36 +8,36 @@ using TeamSketch.Services;
 
 namespace TeamSketch.ViewModels.UserControls;
 
-public class UsersPanelViewModel : ViewModelBase
+public class ParticipantsPanelViewModel : ViewModelBase
 {
     private readonly ISignalRService _signalRService;
 
-    public UsersPanelViewModel(ISignalRService signalRService)
+    public ParticipantsPanelViewModel(ISignalRService signalRService)
     {
         _signalRService = signalRService;
         _signalRService.Connection.On<string>("JoinedRoom", Connection_JoinedRoom);
         _signalRService.Connection.On<string>("LeftRoom", Connection_LeftRoom);
     }
 
-    public ObservableCollection<UserViewModel> Users { get; } = new();
+    public ObservableCollection<ParticipantViewModel> Participants { get; } = new();
 
-    private void Connection_JoinedRoom(string user)
+    private void Connection_JoinedRoom(string nickname)
     {
-        Users.Add(new UserViewModel(user));
+        Participants.Add(new ParticipantViewModel(nickname));
     }
 
     private void Connection_LeftRoom(string nickname)
     {
-        UserViewModel user = Users.FirstOrDefault(x => x.Nickname == nickname);
-        Users.Remove(user);
+        ParticipantViewModel participant = Participants.FirstOrDefault(x => x.Nickname == nickname);
+        Participants.Remove(participant);
     }
 }
 
-public class UserViewModel : ViewModelBase
+public class ParticipantViewModel : ViewModelBase
 {
     private readonly DispatcherTimer _drawingIndicatorTimer = new();
 
-    public UserViewModel(string nickname)
+    public ParticipantViewModel(string nickname)
     {
         this.nickname = nickname;
 

@@ -41,7 +41,7 @@
 			<Setter Property="Padding" Value="15 15 15 20" />
 		</Style>
 		
-		<Style Selector="Border.usersPanel">
+		<Style Selector="Border.participantsPanel">
 			<Setter Property="Background" Value="#ddd" />
 			<Setter Property="Padding" Value="10" />
 			<Setter Property="VerticalAlignment" Value="Stretch" />
@@ -99,8 +99,8 @@
 						<controls:ToolsPanel DataContext="{Binding ToolsPanel}" />
 					</Border>
 
-					<Border Grid.Row="1" Classes="usersPanel">
-						<controls:UsersPanel DataContext="{Binding UsersPanel}" />
+					<Border Grid.Row="1" Classes="participantsPanel">
+						<controls:ParticipantsPanel DataContext="{Binding ParticipantsPanel}" />
 					</Border>
 
 					<Border Grid.Row="2" Classes="eventsPanel">

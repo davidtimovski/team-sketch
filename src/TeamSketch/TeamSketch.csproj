@@ -34,8 +34,8 @@
 	<PackageReference Include="XamlNameReferenceGenerator" Version="1.3.4" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="UserControls\UsersPanel.axaml.cs">
-      <DependentUpon>UsersPanel.axaml</DependentUpon>
+    <Compile Update="UserControls\ParticipantsPanel.axaml.cs">
+      <DependentUpon>ParticipantsPanel.axaml</DependentUpon>
     </Compile>
     <Compile Update="Views\MainWindow.axaml.cs">
       <DependentUpon>MainWindow.axaml</DependentUpon>

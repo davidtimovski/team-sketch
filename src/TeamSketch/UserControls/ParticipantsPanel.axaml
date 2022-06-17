@@ -1,7 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			 xmlns:vm="using:TeamSketch.ViewModels.UserControls"
-             x:Class="TeamSketch.UserControls.UsersPanel">
+             x:Class="TeamSketch.UserControls.ParticipantsPanel">
 
 	<UserControl.Styles>
 		<Style Selector="Border.label">
@@ -11,36 +11,36 @@
 			<Setter Property="FontSize" Value="16" />
 		</Style>
 		
-		<Style Selector="Border.user">
+		<Style Selector="Border.participant">
 			<Setter Property="Background" Value="#eee" />
 			<Setter Property="CornerRadius" Value="5" />
 			<Setter Property="Padding" Value="15 10" />
 			<Setter Property="Margin" Value="0 0 0 8" />
 		</Style>
-		<Style Selector="Border.user Ellipse.drawingIndicator">
+		<Style Selector="Border.participant Ellipse.drawingIndicator">
 			<Setter Property="Width" Value="10" />
 			<Setter Property="Height" Value="10" />
 			<Setter Property="Fill" Value="#ccc" />
 			<Setter Property="HorizontalAlignment" Value="Right" />
 		</Style>
-		<Style Selector="Border.user Ellipse.drawingIndicator.active">
+		<Style Selector="Border.participant Ellipse.drawingIndicator.active">
 			<Setter Property="Fill" Value="{StaticResource GreenColor}" />
 		</Style>
 	</UserControl.Styles>
 
 	<Design.DataContext>
-		<vm:UsersPanelViewModel />
+		<vm:ParticipantsPanelViewModel />
 	</Design.DataContext>
 
 	<StackPanel>
 		<Border Classes="label">
-			<TextBlock>Users</TextBlock>
+			<TextBlock>Participants</TextBlock>
 		</Border>
 
-		<ItemsControl Items="{Binding Users}">
+		<ItemsControl Items="{Binding Participants}">
 			<ItemsControl.ItemTemplate>
-				<DataTemplate DataType="vm:UserViewModel">
-					<Border Classes="user">
+				<DataTemplate DataType="vm:ParticipantViewModel">
+					<Border Classes="participant">
 						<DockPanel>
 							<TextBlock Text="{Binding Nickname}" />
 							<Ellipse Classes="drawingIndicator" Classes.active="{Binding Drawing}" />

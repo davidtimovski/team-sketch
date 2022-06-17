@@ -9,9 +9,9 @@ namespace TeamSketch.Web.Persistence;
 public interface IRepository
 {
     Task<bool> RoomExistsAsync(string room);
-    Task<List<string>> GetActiveUsersInRoomAsync(string room);
-    Task CreateRoomAsync(string room, bool isPublic, string user, string signalRConnectionId, string? ipAddress);
-    Task JoinRoomAsync(string room, string user, string signalRConnectionId, string? ipAddress);
+    Task<List<string>> GetActiveParticipantsInRoomAsync(string room);
+    Task CreateRoomAsync(string room, bool isPublic, string nickname, string signalRConnectionId, string? ipAddress);
+    Task JoinRoomAsync(string room, string nickname, string signalRConnectionId, string? ipAddress);
     Task<ConnectionRoom?> DisconnectAsync(string signalRConnectionId);
     Task DisconnectAllAsync();
 }
@@ -32,7 +32,7 @@ public class Repository : IRepository
         return await conn.ExecuteScalarAsync<bool>(@"SELECT COUNT(*) FROM rooms WHERE name = @room", new { room });
     }
 
-    public async Task<List<string>> GetActiveUsersInRoomAsync(string room)
+    public async Task<List<string>> GetActiveParticipantsInRoomAsync(string room)
     {
         using IDbConnection conn = OpenConnection();
 
@@ -42,7 +42,7 @@ public class Repository : IRepository
             WHERE r.name = @room", new { room })).ToList();
     }
 
-    public async Task CreateRoomAsync(string room, bool isPublic, string user, string signalRConnectionId, string? ipAddress)
+    public async Task CreateRoomAsync(string room, bool isPublic, string nickname, string signalRConnectionId, string? ipAddress)
     {
         var now = DateTime.UtcNow;
 
@@ -55,8 +55,8 @@ public class Repository : IRepository
             new { name = room, isPublic, created = now }, transaction);
 
         var connectionId = await conn.ExecuteScalarAsync<int>(@"INSERT INTO connections (room_id, signalr_connection_id, ip_address, ""user"", is_connected, created, modified)
-            VALUES (@roomId, @signalRConnectionId, @ipAddress, @user, TRUE, @created, @modified) RETURNING id", 
-            new { roomId, signalRConnectionId, ipAddress, user, created = now, modified = now }, transaction);
+            VALUES (@roomId, @signalRConnectionId, @ipAddress, @nickname, TRUE, @created, @modified) RETURNING id", 
+            new { roomId, signalRConnectionId, ipAddress, nickname, created = now, modified = now }, transaction);
 
         await conn.ExecuteAsync("INSERT INTO events (room_id, connection_id, type, occurred) VALUES (@roomId, @connectionId, @type, @occurred)",
             new { roomId, connectionId, type = EventType.Joined, occurred = now }, transaction);
@@ -64,7 +64,7 @@ public class Repository : IRepository
         transaction.Commit();
     }
 
-    public async Task JoinRoomAsync(string room, string user, string signalRConnectionId, string? ipAddress)
+    public async Task JoinRoomAsync(string room, string nickname, string signalRConnectionId, string? ipAddress)
     {
         var now = DateTime.UtcNow;
 
@@ -83,8 +83,8 @@ public class Repository : IRepository
         else
         {
             connectionId = await conn.ExecuteScalarAsync<int>(@"INSERT INTO connections (room_id, signalr_connection_id, ip_address, ""user"", is_connected, created, modified)
-                VALUES (@roomId, @signalRConnectionId, @ipAddress, @user, TRUE, @created, @modified) RETURNING id",
-                new { roomId, signalRConnectionId, ipAddress, user, created = now, modified = now }, transaction);
+                VALUES (@roomId, @signalRConnectionId, @ipAddress, @nickname, TRUE, @created, @modified) RETURNING id",
+                new { roomId, signalRConnectionId, ipAddress, nickname, created = now, modified = now }, transaction);
         }
 
         await conn.ExecuteAsync("INSERT INTO events (room_id, connection_id, type, occurred) VALUES (@roomId, @connectionId, @type, @occurred)",
