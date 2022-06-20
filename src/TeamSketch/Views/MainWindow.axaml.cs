@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -57,14 +58,14 @@ public partial class MainWindow : Window
     {
         Dispatcher.UIThread.InvokeAsync(() =>
         {
-            var segments = _renderer.RenderLine();
-            if (segments.Length == 0)
+            var points = _renderer.RenderLine();
+            if (!points.Any())
             {
                 return;
             }
 
             var vm = DataContext as MainWindowViewModel;
-            _ = vm.SignalRService.DrawLineAsync(segments);
+            _ = vm.SignalRService.DrawLineAsync(points);
         });
     }
 
@@ -87,11 +88,11 @@ public partial class MainWindow : Window
 
     private void Connection_ParticipantDrewLine(string participant, byte[] data)
     {
-        var (segments, thickness, colorBrush) = PayloadConverter.ToLine(data);
+        var (points, thickness, colorBrush) = PayloadConverter.ToLine(data);
 
         Dispatcher.UIThread.InvokeAsync(() =>
         {
-            _renderer.RenderLine(segments, thickness, colorBrush);
+            _renderer.RenderLine(points, thickness, colorBrush);
         });
 
         IndicateDrawing(participant);
@@ -107,11 +108,11 @@ public partial class MainWindow : Window
     {
         pressed = false;
 
-        var (x, y) = _renderer.RestrictPointToCanvas(currentPoint.X, currentPoint.Y);
-        _renderer.DrawPoint(x, y);
+        var newPoint = _renderer.RestrictPointToCanvas(currentPoint.X, currentPoint.Y);
+        _renderer.DrawPoint(newPoint.X, newPoint.Y);
 
         var vm = DataContext as MainWindowViewModel;
-        _ = vm.SignalRService.DrawPointAsync(x, y);
+        _ = vm.SignalRService.DrawPointAsync(newPoint.X, newPoint.Y);
 
         IndicateDrawing(_appState.Nickname);
     }
@@ -124,11 +125,11 @@ public partial class MainWindow : Window
         }
 
         Point newPosition = e.GetPosition(canvas);
-        var (x, y) = _renderer.RestrictPointToCanvas(newPosition.X, newPosition.Y);
+        var newPoint = _renderer.RestrictPointToCanvas(newPosition.X, newPosition.Y);
 
-        _renderer.EnqueueLineSegment(new LineDrawSegment(currentPoint.X, currentPoint.Y, x, y));
+        _renderer.EnqueueLineSegment(currentPoint, newPoint);
 
-        currentPoint = new Point(x, y);
+        currentPoint = newPoint;
 
         IndicateDrawing(_appState.Nickname);
     }

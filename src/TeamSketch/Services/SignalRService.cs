@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Avalonia;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using TeamSketch.Utils;
@@ -12,7 +14,7 @@ public interface ISignalRService
     Task JoinRoomAsync();
     Task JoinRandomRoomAsync();
     Task DrawPointAsync(double x, double y);
-    Task DrawLineAsync(LineDrawSegment[] segments);
+    Task DrawLineAsync(List<Point> points);
 }
 
 public class SignalRService : ISignalRService
@@ -60,9 +62,9 @@ public class SignalRService : ISignalRService
         await Connection.InvokeAsync("DrawPoint", _appState.Nickname, _appState.Room, data);
     }
 
-    public async Task DrawLineAsync(LineDrawSegment[] segments)
+    public async Task DrawLineAsync(List<Point> points)
     {
-        var data = PayloadConverter.ToBytes(segments, _appState.BrushSettings.BrushThickness, _appState.BrushSettings.BrushColor);
+        var data = PayloadConverter.ToBytes(points, _appState.BrushSettings.BrushThickness, _appState.BrushSettings.BrushColor);
         await Connection.InvokeAsync("DrawLine", _appState.Nickname, _appState.Room, data);
     }
 }
