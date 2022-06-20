@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
@@ -11,30 +11,30 @@ namespace TeamSketch.Services;
 public interface IRenderer
 {
     void DrawPoint(double x, double y);
-    void EnqueueLineSegment(LineDrawSegment segment);
+    void EnqueueLineSegment(Point point1, Point point2);
 
     /// <summary>
-    /// Render line from locally batched segments.
+    /// Render line from locally batched points.
     /// </summary>
-    /// <returns>A list of the rendered segments.</returns>
-    LineDrawSegment[] RenderLine();
+    /// <returns>The points making up the line that was rendered.</returns>
+    List<Point> RenderLine();
 
     /// <summary>
-    /// Render line from remotely batched segments.
+    /// Render line from the input points.
     /// </summary>
-    /// <param name="lineSegmentsQueue"></param>
+    /// <param name="linePointsQueue"></param>
     /// <param name="thickness"></param>
     /// <param name="colorBrush"></param>
-    void RenderLine(Queue<LineDrawSegment> lineSegmentsQueue, double thickness, SolidColorBrush colorBrush);
+    void RenderLine(Queue<Point> linePointsQueue, double thickness, SolidColorBrush colorBrush);
 
-    (double x, double y) RestrictPointToCanvas(double x, double y);
+    Point RestrictPointToCanvas(double x, double y);
 }
 
 public class Renderer : IRenderer
 {
     private readonly BrushSettings _brushSettings;
     private readonly Canvas _canvas;
-    private readonly Queue<LineDrawSegment> _lineSegmentsQueue = new();
+    private readonly Queue<Point> _linePointsQueue = new();
 
     public Renderer(BrushSettings brushSettings, Canvas canvas)
     {
@@ -54,29 +54,28 @@ public class Renderer : IRenderer
         _canvas.Children.Add(ellipse);
     }
 
-    public void EnqueueLineSegment(LineDrawSegment segment)
+    public void EnqueueLineSegment(Point point1, Point point2)
     {
-        _lineSegmentsQueue.Enqueue(segment);
+        _linePointsQueue.Enqueue(point1);
+        _linePointsQueue.Enqueue(point2);
     }
     
-    public LineDrawSegment[] RenderLine()
+    public List<Point> RenderLine()
     {
-        if (_lineSegmentsQueue.Count == 0)
+        if (_linePointsQueue.Count == 0)
         {
-            return Array.Empty<LineDrawSegment>();
+            return new List<Point>();
         }
 
         var myPointCollection = new Points();
 
-        var result = _lineSegmentsQueue.ToArray();
-        var firstLine = _lineSegmentsQueue.Dequeue();
+        var result = _linePointsQueue.ToList();
+        var firstPoint = _linePointsQueue.Dequeue();
 
-        while (_lineSegmentsQueue.Count > 0)
+        while (_linePointsQueue.Count > 0)
         {
-            var line = _lineSegmentsQueue.Dequeue();
-
-            myPointCollection.Add(new Point(line.X1, line.Y1));
-            myPointCollection.Add(new Point(line.X2, line.Y2));
+            var point = _linePointsQueue.Dequeue();
+            myPointCollection.Add(point);
         }
 
         var pathGeometry = new PathGeometry();
@@ -89,7 +88,7 @@ public class Renderer : IRenderer
                     Points = myPointCollection
                 }
             },
-            StartPoint = new Point(firstLine.X1, firstLine.Y1),
+            StartPoint = firstPoint,
             IsClosed = false
         };
         pathGeometry.Figures.Add(pathFigure);
@@ -100,12 +99,11 @@ public class Renderer : IRenderer
             StrokeThickness = _brushSettings.Thickness,
             Data = pathGeometry
         };
-
         _canvas.Children.Add(path);
 
         var ellipse = new Ellipse
         {
-            Margin = new Thickness(firstLine.X1 - _brushSettings.HalfThickness, firstLine.Y1 - _brushSettings.HalfThickness, 0, 0),
+            Margin = new Thickness(firstPoint.X - _brushSettings.HalfThickness, firstPoint.Y - _brushSettings.HalfThickness, 0, 0),
             Fill = _brushSettings.ColorBrush,
             Width = _brushSettings.Thickness,
             Height = _brushSettings.Thickness
@@ -115,23 +113,21 @@ public class Renderer : IRenderer
         return result;
     }
 
-    public void RenderLine(Queue<LineDrawSegment> lineSegmentsQueue, double thickness, SolidColorBrush colorBrush)
+    public void RenderLine(Queue<Point> linePointsQueue, double thickness, SolidColorBrush colorBrush)
     {
-        if (lineSegmentsQueue.Count == 0)
+        if (linePointsQueue.Count == 0)
         {
             return;
         }
 
         var myPointCollection = new Points();
 
-        var firstLine = lineSegmentsQueue.Dequeue();
+        var firstPoint = linePointsQueue.Dequeue();
 
-        while (lineSegmentsQueue.Count > 0)
+        while (linePointsQueue.Count > 0)
         {
-            var line = lineSegmentsQueue.Dequeue();
-
-            myPointCollection.Add(new Point(line.X1, line.Y1));
-            myPointCollection.Add(new Point(line.X2, line.Y2));
+            var point = linePointsQueue.Dequeue();
+            myPointCollection.Add(point);
         }
 
         var pathGeometry = new PathGeometry();
@@ -144,7 +140,7 @@ public class Renderer : IRenderer
                     Points = myPointCollection
                 }
             },
-            StartPoint = new Point(firstLine.X1, firstLine.Y1),
+            StartPoint = firstPoint,
             IsClosed = false
         };
         pathGeometry.Figures.Add(pathFigure);
@@ -155,12 +151,11 @@ public class Renderer : IRenderer
             StrokeThickness = thickness,
             Data = pathGeometry
         };
-
         _canvas.Children.Add(path);
 
         var ellipse = new Ellipse
         {
-            Margin = new Thickness(firstLine.X1 - thickness / 2, firstLine.Y1 - thickness / 2, 0, 0),
+            Margin = new Thickness(firstPoint.X - thickness / 2, firstPoint.Y - thickness / 2, 0, 0),
             Fill = colorBrush,
             Width = thickness,
             Height = thickness
@@ -168,7 +163,7 @@ public class Renderer : IRenderer
         _canvas.Children.Add(ellipse);
     }
 
-    public (double x, double y) RestrictPointToCanvas(double x, double y)
+    public Point RestrictPointToCanvas(double x, double y)
     {
         if (x > _brushSettings.MaxBrushPointX)
         {
@@ -188,8 +183,6 @@ public class Renderer : IRenderer
             y = _brushSettings.MinBrushPoint;
         }
 
-        return (x, y);
+        return new Point(x, y);
     }
 }
-
-public record LineDrawSegment(double X1, double Y1, double X2, double Y2);

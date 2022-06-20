@@ -19,9 +19,9 @@ public class ActionHub : Hub
         _liveViewService = liveViewService;
     }
 
-    public async Task CreateRoom(string user)
+    public async Task CreateRoom(string nickname)
     {
-        var nicknameError = Validations.ValidateNickname(user);
+        var nicknameError = Validations.ValidateNickname(nickname);
         if (nicknameError != null)
         {
             throw new InvalidOperationException(nicknameError);
@@ -30,14 +30,14 @@ public class ActionHub : Hub
         string room = RoomNameGenerator.Generate();
 
         await Groups.AddToGroupAsync(Context.ConnectionId, room);
-        await _repository.CreateRoomAsync(room, false, user, Context.ConnectionId, GetIPAddress());
+        await _repository.CreateRoomAsync(room, false, nickname, Context.ConnectionId, GetIPAddress());
 
         await Clients.Caller.SendAsync("RoomCreated", room);
     }
 
-    public async Task JoinRoom(string user, string room)
+    public async Task JoinRoom(string nickname, string room)
     {
-        var nicknameError = Validations.ValidateNickname(user);
+        var nicknameError = Validations.ValidateNickname(nickname);
         if (nicknameError != null)
         {
             throw new InvalidOperationException(nicknameError);
@@ -49,29 +49,29 @@ public class ActionHub : Hub
             throw new InvalidOperationException($"Room '{room}' does not exist.");
         }
 
-        var usersInRoom = await _repository.GetActiveUsersInRoomAsync(room);
-        if (usersInRoom.Count > 4)
+        var participantsInRoom = await _repository.GetActiveParticipantsInRoomAsync(room);
+        if (participantsInRoom.Count > 4)
         {
             throw new InvalidOperationException($"Room '{room}' is currently full.");
         }
 
-        if (usersInRoom.Contains(user))
+        if (participantsInRoom.Contains(nickname))
         {
-            throw new InvalidOperationException($"Nickname '{user}' is taken in room '{room}'.");
+            throw new InvalidOperationException($"Nickname '{nickname}' is taken in room '{room}'.");
         }
 
         await Groups.AddToGroupAsync(Context.ConnectionId, room);
-        await _repository.JoinRoomAsync(room, user, Context.ConnectionId, GetIPAddress());
+        await _repository.JoinRoomAsync(room, nickname, Context.ConnectionId, GetIPAddress());
 
-        await Clients.OthersInGroup(room).SendAsync("JoinedRoom", user);
+        await Clients.OthersInGroup(room).SendAsync("JoinedRoom", nickname);
     }
 
-    public async Task JoinRandomRoom(string user)
+    public async Task JoinRandomRoom(string nickname)
     {
         UserInQueue? userInQueue = _randomRoomQueue.Dequeue();
         if (userInQueue == null)
         {
-            _randomRoomQueue.Enqueue(Context.ConnectionId, user, GetIPAddress());
+            _randomRoomQueue.Enqueue(Context.ConnectionId, nickname, GetIPAddress());
             return;
         }
 
@@ -84,7 +84,7 @@ public class ActionHub : Hub
 
         await _repository.JoinRoomAsync(room, userInQueue.Nickname, userInQueue.ConnectionId, userInQueue.IpAddress);
         var ipAddress = GetIPAddress();
-        await _repository.JoinRoomAsync(room, user, Context.ConnectionId, ipAddress);
+        await _repository.JoinRoomAsync(room, nickname, Context.ConnectionId, ipAddress);
 
         await Clients.Group(room).SendAsync("RandomRoomJoined", room);
 
@@ -92,14 +92,14 @@ public class ActionHub : Hub
         await _liveViewService.AddAsync(Context.ConnectionId, ipAddress);
     }
 
-    public async Task DrawPoint(string user, string room, byte[] data)
+    public async Task DrawPoint(string nickname, string room, byte[] data)
     {
-        await Clients.OthersInGroup(room).SendAsync("DrewPoint", user, data);
+        await Clients.OthersInGroup(room).SendAsync("DrewPoint", nickname, data);
     }
 
-    public async Task DrawLine(string user, string room, byte[] data)
+    public async Task DrawLine(string nickname, string room, byte[] data)
     {
-        await Clients.OthersInGroup(room).SendAsync("DrewLine", user, data);
+        await Clients.OthersInGroup(room).SendAsync("DrewLine", nickname, data);
     }
 
     public Task Ping()
@@ -114,7 +114,7 @@ public class ActionHub : Hub
         var connectionRoom = await _repository.DisconnectAsync(Context.ConnectionId);
         if (connectionRoom != null)
         {
-            await Clients.OthersInGroup(connectionRoom.Room).SendAsync("LeftRoom", connectionRoom.User);
+            await Clients.OthersInGroup(connectionRoom.Room).SendAsync("LeftRoom", connectionRoom.Nickname);
         }
 
         _liveViewService.Remove(Context.ConnectionId);

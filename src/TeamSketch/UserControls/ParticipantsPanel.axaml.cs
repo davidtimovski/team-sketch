@@ -3,9 +3,9 @@ using Avalonia.Markup.Xaml;
 
 namespace TeamSketch.UserControls;
 
-public partial class UsersPanel : UserControl
+public partial class ParticipantsPanel : UserControl
 {
-    public UsersPanel()
+    public ParticipantsPanel()
     {
         InitializeComponent();
     }

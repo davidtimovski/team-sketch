@@ -3,7 +3,6 @@ using Avalonia;
 using Avalonia.Controls.Shapes;
 using Avalonia.Media;
 using TeamSketch.Models;
-using TeamSketch.Services;
 
 namespace TeamSketch.Utils;
 
@@ -43,26 +42,20 @@ public static class PayloadConverter
         return ellipse;
     }
 
-    public static byte[] ToBytes(LineDrawSegment[] segments, ThicknessEnum thickness, ColorsEnum color)
+    public static byte[] ToBytes(List<Point> points, ThicknessEnum thickness, ColorsEnum color)
     {
-        var bytes = new byte[1 + segments.Length * 8 + 2];
+        var bytes = new byte[1 + points.Count * 4 + 2];
         int currentIndex = 0;
 
-        bytes[currentIndex++] = (byte)segments.Length;
+        bytes[currentIndex++] = (byte)points.Count;
 
-        foreach (var segment in segments)
+        foreach (var point in points)
         {
-            bytes[currentIndex++] = (byte)segment.X1;
-            bytes[currentIndex++] = (byte)((short)segment.X1 >> 8);
+            bytes[currentIndex++] = (byte)point.X;
+            bytes[currentIndex++] = (byte)((short)point.X >> 8);
 
-            bytes[currentIndex++] = (byte)segment.Y1;
-            bytes[currentIndex++] = (byte)((short)segment.Y1 >> 8);
-
-            bytes[currentIndex++] = (byte)segment.X2;
-            bytes[currentIndex++] = (byte)((short)segment.X2 >> 8);
-
-            bytes[currentIndex++] = (byte)segment.Y2;
-            bytes[currentIndex++] = (byte)((short)segment.Y2 >> 8);
+            bytes[currentIndex++] = (byte)point.Y;
+            bytes[currentIndex++] = (byte)((short)point.Y >> 8);
         }
 
         bytes[currentIndex++] = (byte)thickness;
@@ -71,23 +64,20 @@ public static class PayloadConverter
         return bytes;
     }
 
-    public static (Queue<LineDrawSegment> segments, double thickness, SolidColorBrush colorBrush) ToLine(byte[] bytes)
+    public static (Queue<Point> points, double thickness, SolidColorBrush colorBrush) ToLine(byte[] bytes)
     {
         int currentIndex = 0;
         var count = (int)bytes[currentIndex++];
 
-        var result = new Queue<LineDrawSegment>(count);
+        var result = new Queue<Point>(count);
 
         for (var i = 0; i < count; i++)
         {
-            var buffer = i * 8;
+            var buffer = i * 4;
 
-            var x1 = (bytes[buffer + 2] << 8) + bytes[buffer + 1];
-            var y1 = (bytes[buffer + 4] << 8) + bytes[buffer + 3];
-            var x2 = (bytes[buffer + 6] << 8) + bytes[buffer + 5];
-            var y2 = (bytes[buffer + 8] << 8) + bytes[buffer + 7];
-            
-            result.Enqueue(new LineDrawSegment(x1, y1, x2, y2));
+            var x = (bytes[buffer + 2] << 8) + bytes[buffer + 1];
+            var y = (bytes[buffer + 4] << 8) + bytes[buffer + 3];
+            result.Enqueue(new Point(x, y));
         }
 
         var size = BrushSettings.FindThickness(bytes[^2]);

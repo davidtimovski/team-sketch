@@ -21,35 +21,35 @@ public class MainWindowViewModel : ViewModelBase
         Room = _appState.Room;
 
         toolsPanel = new ToolsPanelViewModel(_appState.BrushSettings);
-        usersPanel = new UsersPanelViewModel(signalRService);
+        participantsPanel = new ParticipantsPanelViewModel(signalRService);
         eventsPanel = new EventsPanelViewModel(signalRService);
         connectionStatus = new ConnectionStatusViewModel(signalRService);
 
-        _ = GetUsersInRoomAsync();
+        _ = GetParticipantsInRoomAsync();
     }
 
     public ISignalRService SignalRService { get; }
     public string Room { get; }
 
-    public void IndicateUserDrawing(string nickname)
+    public void IndicateDrawing(string nickname)
     {
-        UserViewModel user = UsersPanel.Users.FirstOrDefault(x => x.Nickname == nickname);
-        if (user != null)
+        ParticipantViewModel participant = ParticipantsPanel.Participants.FirstOrDefault(x => x.Nickname == nickname);
+        if (participant != null)
         {
-            user.Drawing = true;
+            participant.Drawing = true;
         }
     }
 
-    private async Task GetUsersInRoomAsync()
+    private async Task GetParticipantsInRoomAsync()
     {
-        var usersInRoom = await HttpProxy.GetUsersInRoomAsync(Room);
+        var participants = await HttpProxy.GetParticipantsAsync(Room);
 
-        foreach (var user in usersInRoom)
+        foreach (var participantNickname in participants)
         {
-            UsersPanel.Users.Add(new UserViewModel(user));
+            ParticipantsPanel.Participants.Add(new ParticipantViewModel(participantNickname));
         }
 
-        var initialEventMessage = usersInRoom.Count == 1 ? "Room created." : "Joined room.";
+        var initialEventMessage = participants.Count == 1 ? "Room created." : "Joined room.";
         EventsPanel.Events.Add(new EventViewModel(initialEventMessage));
     }
 
@@ -65,11 +65,11 @@ public class MainWindowViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref toolsPanel, value);
     }
 
-    private UsersPanelViewModel usersPanel;
-    private UsersPanelViewModel UsersPanel
+    private ParticipantsPanelViewModel participantsPanel;
+    private ParticipantsPanelViewModel ParticipantsPanel
     {
-        get => usersPanel;
-        set => this.RaiseAndSetIfChanged(ref usersPanel, value);
+        get => participantsPanel;
+        set => this.RaiseAndSetIfChanged(ref participantsPanel, value);
     }
 
     private EventsPanelViewModel eventsPanel;

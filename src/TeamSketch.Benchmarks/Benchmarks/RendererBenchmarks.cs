@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using BenchmarkDotNet.Attributes;
 using TeamSketch.Models;
 using TeamSketch.Services;
@@ -11,7 +12,7 @@ namespace TeamSketch.Benchmarks
     {
         private readonly Random _random = new();
         private readonly IRenderer _renderer;
-        private const int LineSegmentCount = 20;
+        private const int LineSegmentsCount = 20;
 
         public RendererBenchmarks()
         {
@@ -22,13 +23,13 @@ namespace TeamSketch.Benchmarks
             };
             _renderer = new Renderer(new BrushSettings(""), canvas);
 
-            for (int i = 0; i < LineSegmentCount; i++)
+            for (int i = 0; i < LineSegmentsCount; i++)
             {
                 var x1 = _random.Next(0, Globals.CanvasWidth);
                 var y1 = _random.Next(0, Globals.CanvasHeight);
                 var x2 = _random.Next(0, Globals.CanvasWidth);
                 var y2 = _random.Next(0, Globals.CanvasHeight);
-                _renderer.EnqueueLineSegment(new LineDrawSegment(x1, y1, x2, y2));
+                _renderer.EnqueueLineSegment(new Point(x1, y1), new Point(x2, y2));
             }
         }
 

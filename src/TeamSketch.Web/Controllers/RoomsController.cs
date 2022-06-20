@@ -15,10 +15,10 @@ namespace TeamSketch.Web.Controllers
             _repository = repository;
         }
 
-        [HttpGet("{room}/validate-join/{user}")]
-        public async Task<IActionResult> ValidateJoin(string room, string user)
+        [HttpGet("{room}/validate-join/{nickname}")]
+        public async Task<IActionResult> ValidateJoin(string room, string nickname)
         {
-            if (string.IsNullOrEmpty(room) || string.IsNullOrEmpty(user))
+            if (string.IsNullOrEmpty(room) || string.IsNullOrEmpty(nickname))
             {
                 return BadRequest();
             }
@@ -29,13 +29,13 @@ namespace TeamSketch.Web.Controllers
                 return Ok(new JoinRoomValidationResult { RoomExists = false });
             }
 
-            var usersInRoom = await _repository.GetActiveUsersInRoomAsync(room);
-            if (usersInRoom.Count > 4)
+            var participantsInRoom = await _repository.GetActiveParticipantsInRoomAsync(room);
+            if (participantsInRoom.Count > 4)
             {
                 return Ok(new JoinRoomValidationResult { RoomExists = true, RoomIsFull = true });
             }
 
-            if (usersInRoom.Contains(user))
+            if (participantsInRoom.Contains(nickname))
             {
                 return Ok(new JoinRoomValidationResult { RoomExists = true, RoomIsFull = false, NicknameIsTaken = true });
             }
@@ -43,16 +43,16 @@ namespace TeamSketch.Web.Controllers
             return Ok(new JoinRoomValidationResult { RoomExists = true });
         }
 
-        [HttpGet("{room}/users")]
-        public async Task<IActionResult> GetUsersInRoom(string room)
+        [HttpGet("{room}/participants")]
+        public async Task<IActionResult> GetParticipantsInRoom(string room)
         {
             if (string.IsNullOrEmpty(room))
             {
                 return BadRequest();
             }
 
-            var usersInRoom = await _repository.GetActiveUsersInRoomAsync(room);
-            return Ok(usersInRoom);
+            var participantsInRoom = await _repository.GetActiveParticipantsInRoomAsync(room);
+            return Ok(participantsInRoom);
         }
     }
 }

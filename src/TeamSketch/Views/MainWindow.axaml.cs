@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -24,7 +25,7 @@ public partial class MainWindow : Window
     private bool pressed;
     private Action closeAdditionalAction = () => { };
     private bool isClosing;
-    
+
 
     public MainWindow()
     {
@@ -34,7 +35,7 @@ public partial class MainWindow : Window
         _renderer = new Renderer(_appState.BrushSettings, canvas);
 
         _lineRenderingTimer.Tick += LineRenderingTimer_Tick;
-        _lineRenderingTimer.Interval = TimeSpan.FromMilliseconds(10);
+        _lineRenderingTimer.Interval = TimeSpan.FromMilliseconds(Globals.RenderingIntervalMs);
         _lineRenderingTimer.Start();
 
         canvas.Cursor = _appState.BrushSettings.Cursor;
@@ -46,8 +47,8 @@ public partial class MainWindow : Window
     protected override void OnDataContextChanged(EventArgs e)
     {
         var vm = DataContext as MainWindowViewModel;
-        vm.SignalRService.Connection.On<string, byte[]>("DrewPoint", Connection_UserDrewPoint);
-        vm.SignalRService.Connection.On<string, byte[]>("DrewLine", Connection_UserDrewLine);
+        vm.SignalRService.Connection.On<string, byte[]>("DrewPoint", Connection_ParticipantDrewPoint);
+        vm.SignalRService.Connection.On<string, byte[]>("DrewLine", Connection_ParticipantDrewLine);
         vm.SignalRService.Connection.Closed += Connection_Closed;
 
         base.OnDataContextChanged(e);
@@ -57,14 +58,14 @@ public partial class MainWindow : Window
     {
         Dispatcher.UIThread.InvokeAsync(() =>
         {
-            var segments = _renderer.RenderLine();
-            if (segments.Length == 0)
+            var points = _renderer.RenderLine();
+            if (!points.Any())
             {
                 return;
             }
 
             var vm = DataContext as MainWindowViewModel;
-            _ = vm.SignalRService.DrawLineAsync(segments);
+            _ = vm.SignalRService.DrawLineAsync(points);
         });
     }
 
@@ -73,7 +74,7 @@ public partial class MainWindow : Window
         canvas.Cursor = e.Cursor;
     }
 
-    private void Connection_UserDrewPoint(string user, byte[] data)
+    private void Connection_ParticipantDrewPoint(string participant, byte[] data)
     {
         var point = PayloadConverter.ToPoint(data);
 
@@ -82,19 +83,19 @@ public partial class MainWindow : Window
             canvas.Children.Add(point);
         });
 
-        IndicateUserDrawing(user);
+        IndicateDrawing(participant);
     }
 
-    private void Connection_UserDrewLine(string user, byte[] data)
+    private void Connection_ParticipantDrewLine(string participant, byte[] data)
     {
-        var (segments, thickness, colorBrush) = PayloadConverter.ToLine(data);
+        var (points, thickness, colorBrush) = PayloadConverter.ToLine(data);
 
         Dispatcher.UIThread.InvokeAsync(() =>
         {
-            _renderer.RenderLine(segments, thickness, colorBrush);
+            _renderer.RenderLine(points, thickness, colorBrush);
         });
 
-        IndicateUserDrawing(user);
+        IndicateDrawing(participant);
     }
 
     private void Canvas_PointerPressed(object sender, PointerPressedEventArgs e)
@@ -107,13 +108,13 @@ public partial class MainWindow : Window
     {
         pressed = false;
 
-        var (x, y) = _renderer.RestrictPointToCanvas(currentPoint.X, currentPoint.Y);
-        _renderer.DrawPoint(x, y);
+        var newPoint = _renderer.RestrictPointToCanvas(currentPoint.X, currentPoint.Y);
+        _renderer.DrawPoint(newPoint.X, newPoint.Y);
 
         var vm = DataContext as MainWindowViewModel;
-        _ = vm.SignalRService.DrawPointAsync(x, y);
+        _ = vm.SignalRService.DrawPointAsync(newPoint.X, newPoint.Y);
 
-        IndicateUserDrawing(_appState.Nickname);
+        IndicateDrawing(_appState.Nickname);
     }
 
     private void Canvas_PointerMoved(object sender, PointerEventArgs e)
@@ -124,19 +125,19 @@ public partial class MainWindow : Window
         }
 
         Point newPosition = e.GetPosition(canvas);
-        var (x, y) = _renderer.RestrictPointToCanvas(newPosition.X, newPosition.Y);
+        var newPoint = _renderer.RestrictPointToCanvas(newPosition.X, newPosition.Y);
 
-        _renderer.EnqueueLineSegment(new LineDrawSegment(currentPoint.X, currentPoint.Y, x, y));
+        _renderer.EnqueueLineSegment(currentPoint, newPoint);
 
-        currentPoint = new Point(x, y);
+        currentPoint = newPoint;
 
-        IndicateUserDrawing(_appState.Nickname);
+        IndicateDrawing(_appState.Nickname);
     }
 
-    private void IndicateUserDrawing(string nickname)
+    private void IndicateDrawing(string nickname)
     {
         var vm = DataContext as MainWindowViewModel;
-        vm.IndicateUserDrawing(nickname);
+        vm.IndicateDrawing(nickname);
     }
 
     private Task Connection_Closed(Exception arg)

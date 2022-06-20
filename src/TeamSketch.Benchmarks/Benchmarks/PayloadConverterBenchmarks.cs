@@ -1,6 +1,6 @@
-﻿using BenchmarkDotNet.Attributes;
+﻿using Avalonia;
+using BenchmarkDotNet.Attributes;
 using TeamSketch.Models;
-using TeamSketch.Services;
 using TeamSketch.Utils;
 
 namespace TeamSketch.Benchmarks
@@ -28,21 +28,19 @@ namespace TeamSketch.Benchmarks
     public class PayloadConverterLineBenchmarks
     {
         private readonly Random _random = new();
-        private readonly LineDrawSegment[] _lineSegments = new LineDrawSegment[20];
+        private readonly List<Point> _linePoints = new(40);
 
         public PayloadConverterLineBenchmarks()
         {
-            for (int i = 0; i < _lineSegments.Length; i++)
+            for (int i = 0; i < _linePoints.Count; i++)
             {
-                var lineX1 = _random.Next(0, Globals.CanvasWidth);
-                var lineY1 = _random.Next(0, Globals.CanvasHeight);
-                var lineX2 = _random.Next(0, Globals.CanvasWidth);
-                var lineY2 = _random.Next(0, Globals.CanvasHeight);
-                _lineSegments[i] = new LineDrawSegment(lineX1, lineY1, lineX2, lineY2);
+                var x = _random.Next(0, Globals.CanvasWidth);
+                var y = _random.Next(0, Globals.CanvasHeight);
+                _linePoints[i] = new Point(x, y);
             }
         }
 
         [Benchmark]
-        public void LineToBytes() => PayloadConverter.ToBytes(_lineSegments, ThicknessEnum.SemiThin, ColorsEnum.Blue);
+        public void LineToBytes() => PayloadConverter.ToBytes(_linePoints, ThicknessEnum.SemiThin, ColorsEnum.Blue);
     }
 }

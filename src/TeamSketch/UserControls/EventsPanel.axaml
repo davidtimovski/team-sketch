@@ -45,12 +45,12 @@
 					<DataTemplate DataType="vm:EventViewModel">
 						<Border Classes="event">
 							<Panel>
-								<DockPanel IsVisible="{Binding HasUser}">
-									<TextBlock Text="{Binding User}" Classes="nickname" />
+								<DockPanel IsVisible="{Binding HasParticipant}">
+									<TextBlock Text="{Binding Participant}" Classes="nickname" />
 									<TextBlock Text="{Binding EventMessage}" />
 								</DockPanel>
 
-								<TextBlock IsVisible="{Binding !HasUser}" Text="{Binding EventMessage}" />
+								<TextBlock IsVisible="{Binding !HasParticipant}" Text="{Binding EventMessage}" />
 							</Panel>
 						</Border>
 					</DataTemplate>

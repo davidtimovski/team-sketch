@@ -15,8 +15,10 @@ public class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime)
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
         {
+            desktopLifetime.Startup += Startup;
+
             var window = new LobbyWindow
             {
                 DataContext = new LobbyViewModel(),
@@ -28,5 +30,13 @@ public class App : Application
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private void Startup(object sender, ControlledApplicationLifetimeStartupEventArgs e)
+    {
+        if (e.Args.Length > 0)
+        {
+            Globals.RenderingIntervalMs = short.Parse(e.Args[0]);
+        }
     }
 }
