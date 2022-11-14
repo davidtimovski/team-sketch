@@ -3,7 +3,7 @@ Description=Team Sketch running on Ubuntu
 
 [Service]
 WorkingDirectory=/home/davidtimovski/team-sketch
-ExecStart=/usr/bin/dotnet /home/davidtimovski/team-sketch/TeamSketch.Web.dll
+ExecStart=/snap/bin/dotnet /home/davidtimovski/team-sketch/TeamSketch.Web.dll
 Restart=always
 # Restart service after 10 seconds if dotnet service crashes
 RestartSec=10
