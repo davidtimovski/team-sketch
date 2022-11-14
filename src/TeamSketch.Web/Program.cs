@@ -23,13 +23,11 @@ var app = builder.Build();
 app.UseStaticFiles();
 
 app.UseRouting();
-app.UseEndpoints(endpoints =>
-    {
-        endpoints.MapControllers();
-    }).UseForwardedHeaders(new ForwardedHeadersOptions
-    {
-        ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-    });
+app.MapControllers();
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 app.MapRazorPages();
 
@@ -38,7 +36,8 @@ app.MapHub<ActionHub>("/actionHub", options =>
     options.Transports = HttpTransportType.WebSockets;
 });
 
-app.Lifetime.ApplicationStarted.Register(async () => {
+app.Lifetime.ApplicationStarted.Register(async () =>
+{
     var repository = app.Services.GetService<IRepository>();
     await repository.DisconnectAllAsync();
 });
