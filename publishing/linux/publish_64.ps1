@@ -1,4 +1,4 @@
-$Version = "0.8.1"
+$Version = "0.8.2"
 
 cd "C:\Users\david\source\repos\team-sketch\publishing\linux"
 
