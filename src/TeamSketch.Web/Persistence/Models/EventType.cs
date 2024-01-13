@@ -1,8 +1,7 @@
-﻿namespace TeamSketch.Web.Persistence
+﻿namespace TeamSketch.Web.Persistence;
+
+public enum EventType
 {
-    public enum EventType
-    {
-        Joined,
-        Disconnected
-    }
+    Joined,
+    Disconnected
 }

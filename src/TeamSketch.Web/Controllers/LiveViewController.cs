@@ -1,24 +1,23 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TeamSketch.Web.Services;
 
-namespace TeamSketch.Web.Controllers
+namespace TeamSketch.Web.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class LiveViewController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class LiveViewController : ControllerBase
+    private readonly ILiveViewService _liveLiveService;
+
+    public LiveViewController(ILiveViewService liveViewService)
     {
-        private readonly ILiveViewService _liveLiveService;
+        _liveLiveService = liveViewService;
+    }
 
-        public LiveViewController(ILiveViewService liveViewService)
-        {
-            _liveLiveService = liveViewService;
-        }
-
-        [HttpGet]
-        public IActionResult Get()
-        {
-            var locations = _liveLiveService.GetDistinctLocations();
-            return Ok(locations);
-        }
+    [HttpGet]
+    public IActionResult Get()
+    {
+        var locations = _liveLiveService.GetDistinctLocations();
+        return Ok(locations);
     }
 }

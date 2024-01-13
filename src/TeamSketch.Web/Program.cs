@@ -38,7 +38,7 @@ app.MapHub<ActionHub>("/actionHub", options =>
 
 app.Lifetime.ApplicationStarted.Register(async () =>
 {
-    var repository = app.Services.GetService<IRepository>();
+    var repository = app.Services.GetRequiredService<IRepository>();
     await repository.DisconnectAllAsync();
 });
 

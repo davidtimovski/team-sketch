@@ -5,7 +5,7 @@ using TeamSketch.Utils;
 
 namespace TeamSketch.Benchmarks
 {
-    [SimpleJob(launchCount: 5, warmupCount: 5, targetCount: 5)]
+    [SimpleJob(launchCount: 5, warmupCount: 5)]
     [MemoryDiagnoser]
     public class PayloadConverterPointBenchmarks
     {
@@ -23,7 +23,7 @@ namespace TeamSketch.Benchmarks
         public void PointToBytes() => PayloadConverter.ToBytes(x1, y1, ThicknessEnum.SemiThin, ColorsEnum.Blue);
     }
 
-    [SimpleJob(launchCount: 5, warmupCount: 5, targetCount: 5)]
+    [SimpleJob(launchCount: 5, warmupCount: 5)]
     [MemoryDiagnoser]
     public class PayloadConverterLineBenchmarks
     {
