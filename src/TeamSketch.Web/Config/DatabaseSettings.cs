@@ -2,5 +2,5 @@
 
 public class DatabaseSettings
 {
-    public string? ConnectionString { get; set; }
+    public required string ConnectionString { get; init; }
 }

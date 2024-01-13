@@ -6,7 +6,7 @@ using TeamSketch.Services;
 
 namespace TeamSketch.Benchmarks
 {
-    [SimpleJob(launchCount: 5, warmupCount: 5, targetCount: 5)]
+    [SimpleJob(launchCount: 5, warmupCount: 5)]
     [MemoryDiagnoser]
     public class RendererBenchmarks
     {

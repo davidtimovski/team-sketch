@@ -16,14 +16,9 @@ public interface IRepository
     Task DisconnectAllAsync();
 }
 
-public class Repository : IRepository
+public class Repository(IOptions<DatabaseSettings> databaseSettings) : IRepository
 {
-    private readonly string? _connectionString;
-
-    public Repository(IOptions<DatabaseSettings> databaseSettings)
-    {
-        _connectionString = databaseSettings.Value.ConnectionString;
-    }
+    private readonly string _connectionString = databaseSettings.Value.ConnectionString;
 
     public async Task<bool> RoomExistsAsync(string room)
     {
@@ -126,7 +121,7 @@ public class Repository : IRepository
         await conn.ExecuteScalarAsync<int>(@"UPDATE connections SET is_connected = FALSE, modified = @modified", new { modified = DateTime.UtcNow });
     }
 
-    private IDbConnection OpenConnection()
+    private NpgsqlConnection OpenConnection()
     {
         var conn = new NpgsqlConnection(_connectionString);
         conn.Open();
