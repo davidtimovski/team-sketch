@@ -5,7 +5,7 @@ namespace TeamSketch.Web.Utils;
 
 public static class RoomNameGenerator
 {
-    private static readonly char[] chars = "abcdefghkmnprstuvwxyz123456789".ToCharArray();
+    private static readonly char[] Chars = "abcdefghkmnprstuvwxyz123456789".ToCharArray();
     private const int Length = 7;
 
     public static string Generate()
@@ -20,9 +20,9 @@ public static class RoomNameGenerator
         for (int i = 0; i < Length; i++)
         {
             var random = BitConverter.ToUInt32(data, i * 4);
-            var index = random % chars.Length;
+            var index = random % Chars.Length;
 
-            result.Append(chars[index]);
+            result.Append(Chars[index]);
         }
 
         return result.ToString();

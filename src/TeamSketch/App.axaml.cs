@@ -32,7 +32,7 @@ public class App : Application
         base.OnFrameworkInitializationCompleted();
     }
 
-    private void Startup(object sender, ControlledApplicationLifetimeStartupEventArgs e)
+    private static void Startup(object _, ControlledApplicationLifetimeStartupEventArgs e)
     {
         if (e.Args.Length > 0)
         {

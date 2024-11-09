@@ -11,7 +11,3 @@ Create a room and connect with friends or join a random room and connect with a 
 ### Download
 
 You can download it from my website [here](https://www.davidtimovski.com/team-sketch#download).
-
-## License
-
-This project is licensed under the GNU GPLv3 License - see the [LICENSE](LICENSE) file for details.

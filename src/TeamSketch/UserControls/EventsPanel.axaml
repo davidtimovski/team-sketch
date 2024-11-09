@@ -1,7 +1,8 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			 xmlns:vm="using:TeamSketch.ViewModels.UserControls"
-             x:Class="TeamSketch.UserControls.EventsPanel">
+             x:Class="TeamSketch.UserControls.EventsPanel"
+             x:DataType="vm:EventsPanelViewModel">
 
 	<UserControl.Styles>
 		<Style Selector="Border.label">
@@ -40,7 +41,7 @@
 		</Border>
 
 		<ScrollViewer>
-			<ItemsControl Items="{Binding Events}">
+			<ItemsControl ItemsSource="{Binding Events}">
 				<ItemsControl.ItemTemplate>
 					<DataTemplate DataType="vm:EventViewModel">
 						<Border Classes="event">

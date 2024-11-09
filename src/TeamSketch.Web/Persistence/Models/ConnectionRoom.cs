@@ -1,6 +1,6 @@
-﻿namespace TeamSketch.Web.Persistence;
+﻿namespace TeamSketch.Web.Persistence.Models;
 
-public class ConnectionRoom
+public sealed class ConnectionRoom
 {
     public required int ConnectionId { get; init; }
     public required string Nickname { get; init; }

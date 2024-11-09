@@ -2,24 +2,22 @@
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
+using ReactiveUI;
 using TeamSketch.Services;
 
 namespace TeamSketch.ViewModels.UserControls;
 
-public class EventsPanelViewModel : ViewModelBase
+public sealed class EventsPanelViewModel : ReactiveObject
 {
-    private readonly ISignalRService _signalRService;
-
     public EventsPanelViewModel(ISignalRService signalRService)
     {
-        _signalRService = signalRService;
-        _signalRService.Connection.Reconnecting += Connection_Reconnecting;
-        _signalRService.Connection.Reconnected += Connection_Reconnected;
-        _signalRService.Connection.On<string>("JoinedRoom", Connection_JoinedRoom);
-        _signalRService.Connection.On<string>("LeftRoom", Connection_LeftRoom);
+        signalRService.Connection.Reconnecting += Connection_Reconnecting;
+        signalRService.Connection.Reconnected += Connection_Reconnected;
+        signalRService.Connection.On<string>("JoinedRoom", Connection_JoinedRoom);
+        signalRService.Connection.On<string>("LeftRoom", Connection_LeftRoom);
     }
 
-    public ObservableCollection<EventViewModel> Events { get; } = new();
+    public ObservableCollection<EventViewModel> Events { get; } = [];
 
     private Task Connection_Reconnecting(Exception arg)
     {
@@ -44,7 +42,7 @@ public class EventsPanelViewModel : ViewModelBase
     }
 }
 
-public class EventViewModel : ViewModelBase
+public class EventViewModel : ReactiveObject
 {
     public EventViewModel(string eventMessage)
     {

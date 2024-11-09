@@ -14,10 +14,7 @@ public static class Globals
     private static short renderingIntervalMs = 10;
     public static short RenderingIntervalMs
     {
-        get
-        {
-            return renderingIntervalMs;
-        }
+        get => renderingIntervalMs;
         set
         {
             if (value > 1000)

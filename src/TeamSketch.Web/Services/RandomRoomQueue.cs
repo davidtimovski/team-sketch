@@ -9,7 +9,7 @@ public interface IRandomRoomQueue
     void Remove(string connectionId);
 }
 
-public class RandomRoomQueue : IRandomRoomQueue
+public sealed class RandomRoomQueue : IRandomRoomQueue
 {
     private readonly ConcurrentDictionary<string, UserInQueue> _queue = new();
 

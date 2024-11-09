@@ -1,2 +1,0 @@
-dpkg-deb --build team-sketch_*_amd64
-dpkg-deb --build team-sketch_*_armhf

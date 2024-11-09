@@ -6,7 +6,7 @@ using TeamSketch.Web.Utils;
 
 namespace TeamSketch.Web.Hubs;
 
-public class ActionHub : Hub
+public sealed class ActionHub : Hub
 {
     private readonly IRepository _repository;
     private readonly IRandomRoomQueue _randomRoomQueue;
@@ -30,7 +30,7 @@ public class ActionHub : Hub
         string room = RoomNameGenerator.Generate();
 
         await Groups.AddToGroupAsync(Context.ConnectionId, room);
-        await _repository.CreateRoomAsync(room, false, nickname, Context.ConnectionId, GetIPAddress());
+        await _repository.CreateRoomAsync(room, false, nickname, Context.ConnectionId, GetIpAddress());
 
         await Clients.Caller.SendAsync("RoomCreated", room);
     }
@@ -61,7 +61,7 @@ public class ActionHub : Hub
         }
 
         await Groups.AddToGroupAsync(Context.ConnectionId, room);
-        await _repository.JoinRoomAsync(room, nickname, Context.ConnectionId, GetIPAddress());
+        await _repository.JoinRoomAsync(room, nickname, Context.ConnectionId, GetIpAddress());
 
         await Clients.OthersInGroup(room).SendAsync("JoinedRoom", nickname);
     }
@@ -71,7 +71,7 @@ public class ActionHub : Hub
         UserInQueue? userInQueue = _randomRoomQueue.Dequeue();
         if (userInQueue == null)
         {
-            _randomRoomQueue.Enqueue(Context.ConnectionId, nickname, GetIPAddress());
+            _randomRoomQueue.Enqueue(Context.ConnectionId, nickname, GetIpAddress());
             return;
         }
 
@@ -83,7 +83,7 @@ public class ActionHub : Hub
         await _repository.CreateRoomAsync(room, true, userInQueue.Nickname, userInQueue.ConnectionId, userInQueue.IpAddress);
 
         await _repository.JoinRoomAsync(room, userInQueue.Nickname, userInQueue.ConnectionId, userInQueue.IpAddress);
-        var ipAddress = GetIPAddress();
+        var ipAddress = GetIpAddress();
         await _repository.JoinRoomAsync(room, nickname, Context.ConnectionId, ipAddress);
 
         await Clients.Group(room).SendAsync("RandomRoomJoined", room);
@@ -122,14 +122,10 @@ public class ActionHub : Hub
         await base.OnDisconnectedAsync(exception);
     }
 
-    private string? GetIPAddress()
+    private string? GetIpAddress()
     {
         var httpContext = Context.GetHttpContext();
-        if (httpContext == null)
-        {
-            return null;
-        }
 
-        return httpContext.Request.Headers["X-Forwarded-For"];
+        return httpContext?.Request.Headers["X-Forwarded-For"];
     }
 }

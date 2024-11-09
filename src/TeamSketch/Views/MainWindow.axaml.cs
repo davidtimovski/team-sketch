@@ -1,10 +1,10 @@
 using System;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Microsoft.AspNetCore.SignalR.Client;
 using Splat;
@@ -21,25 +21,25 @@ public partial class MainWindow : Window
     private readonly IAppState _appState;
     private readonly IRenderer _renderer;
     private readonly DispatcherTimer _lineRenderingTimer = new();
+    
     private Point currentPoint = new();
     private bool pressed;
     private Action closeAdditionalAction = () => { };
     private bool isClosing;
-
-
+    
     public MainWindow()
     {
         InitializeComponent();
 
         _appState = Locator.Current.GetRequiredService<IAppState>();
-        _renderer = new Renderer(_appState.BrushSettings, canvas);
+        _renderer = new Renderer(_appState.BrushSettings, Canvas);
 
         _lineRenderingTimer.Tick += LineRenderingTimer_Tick;
         _lineRenderingTimer.Interval = TimeSpan.FromMilliseconds(Globals.RenderingIntervalMs);
         _lineRenderingTimer.Start();
 
-        canvas.Cursor = _appState.BrushSettings.Cursor;
-        canvas.PointerMoved += Canvas_PointerMoved;
+        Canvas.Cursor = _appState.BrushSettings.Cursor;
+        Canvas.PointerMoved += Canvas_PointerMoved;
 
         _appState.BrushSettings.BrushChanged += BrushSettings_BrushChanged;
     }
@@ -71,7 +71,7 @@ public partial class MainWindow : Window
 
     private void BrushSettings_BrushChanged(object sender, BrushChangedEventArgs e)
     {
-        canvas.Cursor = e.Cursor;
+        Canvas.Cursor = e.Cursor;
     }
 
     private void Connection_ParticipantDrewPoint(string participant, byte[] data)
@@ -80,7 +80,7 @@ public partial class MainWindow : Window
 
         Dispatcher.UIThread.InvokeAsync(() =>
         {
-            canvas.Children.Add(point);
+            Canvas.Children.Add(point);
         });
 
         IndicateDrawing(participant);
@@ -100,7 +100,7 @@ public partial class MainWindow : Window
 
     private void Canvas_PointerPressed(object sender, PointerPressedEventArgs e)
     {
-        currentPoint = e.GetPosition(canvas);
+        currentPoint = e.GetPosition(Canvas);
         pressed = true;
     }
 
@@ -124,7 +124,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        Point newPosition = e.GetPosition(canvas);
+        Point newPosition = e.GetPosition(Canvas);
         var newPoint = _renderer.RestrictPointToCanvas(newPosition.X, newPosition.Y);
 
         _renderer.EnqueueLineSegment(currentPoint, newPoint);
@@ -132,6 +132,11 @@ public partial class MainWindow : Window
         currentPoint = newPoint;
 
         IndicateDrawing(_appState.Nickname);
+    }
+    
+    private async void OnCopyRoomNameClick(object _, RoutedEventArgs e)
+    {
+        await Clipboard!.SetTextAsync(_appState.Room);
     }
 
     private void IndicateDrawing(string nickname)
@@ -168,7 +173,7 @@ public partial class MainWindow : Window
         return Task.CompletedTask;
     }
 
-    protected override void OnClosing(CancelEventArgs e)
+    protected override void OnClosing(WindowClosingEventArgs e)
     {
         isClosing = true;
 
@@ -177,6 +182,7 @@ public partial class MainWindow : Window
         {
             _ = vm.SignalRService.Connection.StopAsync();
         }
+
         _ = vm.SignalRService.Connection.DisposeAsync();
 
         var window = new LobbyWindow

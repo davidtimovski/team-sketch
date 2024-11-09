@@ -4,13 +4,14 @@ using Splat;
 using TeamSketch.Common;
 using TeamSketch.DependencyInjection;
 using TeamSketch.Services;
+using TeamSketch.Utils;
 
 namespace TeamSketch.ViewModels;
 
-public class LobbyViewModel : ViewModelBase
+public sealed class LobbyViewModel : ReactiveObject
 {
     private readonly IAppState _appState;
-
+    
     public LobbyViewModel(bool fromMainWindow = false)
     {
         _appState = Locator.Current.GetRequiredService<IAppState>();
@@ -27,7 +28,7 @@ public class LobbyViewModel : ViewModelBase
             createTabSelected = true;
         }
     }
-
+    
     public ISignalRService SignalRService { get; }
 
     public async Task<EnterValidationResult> CreateRoomAsync()
@@ -165,23 +166,21 @@ public class LobbyViewModel : ViewModelBase
         }
     }
 
-    private async Task<EnterValidationResult> ExitRandomRoomQueueAsync()
+    public async Task ExitRandomRoomQueueAsync()
     {
         Entering = false;
 
         try
         {
             await SignalRService.Connection.StopAsync();
-            return new EnterValidationResult(true, null, false, false);
         }
         catch
         {
             Entering = false;
-            return new EnterValidationResult(false, "Could not talk to the server. Please check your internet connection or try again later.", true, true);
         }
     }
 
-    private void SelectTab(int tab)
+    public void SelectTab(object tab)
     {
         if (Entering)
         {
@@ -190,94 +189,93 @@ public class LobbyViewModel : ViewModelBase
 
         switch (tab)
         {
-            case 0:
+            case "create":
                 JoinTabSelected = JoinRandomTabSelected = false;
                 CreateTabSelected = true;
                 break;
-            case 1:
+            case "join":
                 CreateTabSelected = JoinRandomTabSelected = false;
                 JoinTabSelected = true;
                 break;
-            case 2:
+            case "random":
                 CreateTabSelected = JoinTabSelected = false;
                 JoinRandomTabSelected = true;
                 break;
         }
     }
 
-
     private bool createTabSelected;
-    private bool CreateTabSelected
+    public bool CreateTabSelected
     {
         get => createTabSelected;
         set => this.RaiseAndSetIfChanged(ref createTabSelected, value);
     }
 
     private bool joinTabSelected;
-    private bool JoinTabSelected
+    public bool JoinTabSelected
     {
         get => joinTabSelected;
         set => this.RaiseAndSetIfChanged(ref joinTabSelected, value);
     }
 
     private bool joinRandomTabSelected;
-    private bool JoinRandomTabSelected
+    public bool JoinRandomTabSelected
     {
         get => joinRandomTabSelected;
         set => this.RaiseAndSetIfChanged(ref joinRandomTabSelected, value);
     }
 
     private string nickname = string.Empty;
-    private string Nickname
+    public string Nickname
     {
         get => nickname;
         set => this.RaiseAndSetIfChanged(ref nickname, value);
     }
 
     private bool nicknameIsInvalid;
-    private bool NicknameIsInvalid
+    public bool NicknameIsInvalid
     {
         get => nicknameIsInvalid;
         set => this.RaiseAndSetIfChanged(ref nicknameIsInvalid, value);
     }
 
     private string room = string.Empty;
-    private string Room
+    public string Room
     {
         get => room;
         set => this.RaiseAndSetIfChanged(ref room, value);
     }
 
     private bool roomIsInvalid;
-    private bool RoomIsInvalid
+    public bool RoomIsInvalid
     {
         get => roomIsInvalid;
         set => this.RaiseAndSetIfChanged(ref roomIsInvalid, value);
     }
 
     private string createButtonLabel = "Create";
-    private string CreateButtonLabel
+    public string CreateButtonLabel
     {
         get => createButtonLabel;
         set => this.RaiseAndSetIfChanged(ref createButtonLabel, value);
     }
 
     private string joinButtonLabel = "Join";
-    private string JoinButtonLabel
+    public string JoinButtonLabel
     {
         get => joinButtonLabel;
         set => this.RaiseAndSetIfChanged(ref joinButtonLabel, value);
     }
 
     private string joinRandomButtonLabel = "Join random";
-    private string JoinRandomButtonLabel
+    public string JoinRandomButtonLabel
     {
         get => joinRandomButtonLabel;
         set => this.RaiseAndSetIfChanged(ref joinRandomButtonLabel, value);
     }
 
     private bool entering;
-    private bool Entering
+    public bool Entering
     {
         get => entering;
         set

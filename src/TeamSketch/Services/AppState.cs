@@ -9,7 +9,7 @@ public interface IAppState
     public BrushSettings BrushSettings { get; }
 }
 
-public class AppState : IAppState
+public sealed class AppState : IAppState
 {
     public string Nickname { get; set; }
     public string Room { get; set; }

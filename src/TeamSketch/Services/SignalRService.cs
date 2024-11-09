@@ -17,13 +17,14 @@ public interface ISignalRService
     Task DrawLineAsync(List<Point> points);
 }
 
-public class SignalRService : ISignalRService
+public sealed class SignalRService : ISignalRService
 {
     private readonly IAppState _appState;
 
     public SignalRService(IAppState appState)
     {
         _appState = appState;
+        
         Connection = new HubConnectionBuilder()
            .WithUrl(Globals.ServerUri + "/actionHub")
            .WithAutomaticReconnect()
@@ -35,7 +36,7 @@ public class SignalRService : ISignalRService
 
     public async Task CreateRoomAsync()
     {
-        Connection.On<string>("RoomCreated", (room) =>
+        Connection.On<string>("RoomCreated", room =>
         {
             _appState.Room = room;
         });

@@ -7,7 +7,7 @@ using TeamSketch.Services;
 
 namespace TeamSketch.ViewModels.UserControls;
 
-public class ConnectionStatusViewModel : ViewModelBase
+public sealed class ConnectionStatusViewModel : ReactiveObject
 {
     private readonly ISignalRService _signalRService;
     private readonly DispatcherTimer _pingTimer = new();
@@ -61,21 +61,21 @@ public class ConnectionStatusViewModel : ViewModelBase
     }
 
     private bool connected = true;
-    private bool Connected
+    public bool Connected
     {
         get => connected;
         set => this.RaiseAndSetIfChanged(ref connected, value);
     }
 
     private int latency;
-    private int Latency
+    public int Latency
     {
         get => latency;
         set => this.RaiseAndSetIfChanged(ref latency, value);
     }
 
     private string reconnectingLabel = "Reconnecting";
-    private string ReconnectingLabel
+    public string ReconnectingLabel
     {
         get => reconnectingLabel;
         set => this.RaiseAndSetIfChanged(ref reconnectingLabel, value);

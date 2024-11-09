@@ -3,7 +3,8 @@
 			 xmlns:vm="using:TeamSketch.ViewModels.UserControls"
 			 xmlns:conv="using:TeamSketch.Converters"
 			 xmlns:models="using:TeamSketch.Models"
-             x:Class="TeamSketch.UserControls.ToolsPanel">
+             x:Class="TeamSketch.UserControls.ToolsPanel"
+             x:DataType="vm:ToolsPanelViewModel">
 
 	<UserControl.Styles>
 		<Style Selector="Border.label">

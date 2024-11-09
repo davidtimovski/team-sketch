@@ -1,7 +1,8 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			 xmlns:vm="using:TeamSketch.ViewModels.UserControls"
-             x:Class="TeamSketch.UserControls.ConnectionStatus">
+             x:Class="TeamSketch.UserControls.ConnectionStatus"
+             x:DataType="vm:ConnectionStatusViewModel">
 
 	<UserControl.Styles>
 		<Style Selector="Border.connectionStatus">

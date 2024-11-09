@@ -3,6 +3,7 @@ using Dapper;
 using Microsoft.Extensions.Options;
 using Npgsql;
 using TeamSketch.Web.Config;
+using TeamSketch.Web.Persistence.Models;
 
 namespace TeamSketch.Web.Persistence;
 
@@ -16,7 +17,7 @@ public interface IRepository
     Task DisconnectAllAsync();
 }
 
-public class Repository(IOptions<DatabaseSettings> databaseSettings) : IRepository
+public sealed class Repository(IOptions<DatabaseSettings> databaseSettings) : IRepository
 {
     private readonly string _connectionString = databaseSettings.Value.ConnectionString;
 

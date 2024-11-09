@@ -1,13 +1,10 @@
 Package: team-sketch
-Architecture: amd64
-Section: base
-Standards-Version: 4.0.0
+Version: 0.9.0
+Section: devel
 Priority: optional
-Name: Team Sketch
-Description: Sketch with your friends.
-Author: David Timovski <david.timovski@gmail.com>
-Maintainer: David Timovski <david.timovski@gmail.com>
-Version: 0.8.2
-Essential: no
-Icon: /usr/share/icons/hicolor/scalable/apps/team-sketch.svg
+Architecture: amd64
+Depends: libc6, libc6, libgcc-s1, libicu74, libssl3, libstdc++6, zlib1g
+Maintainer: David Timovski
 Homepage: https://www.davidtimovski.com/team-sketch
+Description: Sketch with your friends.
+Copyright: 2021-2024 David Timovski

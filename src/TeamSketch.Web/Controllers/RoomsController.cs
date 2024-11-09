@@ -6,7 +6,7 @@ namespace TeamSketch.Web.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class RoomsController : ControllerBase
+public sealed class RoomsController : ControllerBase
 {
     private readonly IRepository _repository;
 

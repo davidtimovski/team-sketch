@@ -19,15 +19,10 @@ public partial class LobbyWindow : Window
         InitializeComponent();
 
         _appState = Locator.Current.GetRequiredService<IAppState>();
-
-        var createButton = this.FindControl<Button>("createButton");
-        createButton.Command = ReactiveCommand.Create(CreateButtonClicked);
-
-        var joinButton = this.FindControl<Button>("joinButton");
-        joinButton.Command = ReactiveCommand.Create(JoinButtonClicked);
-
-        var joinRandomButton = this.FindControl<Button>("joinRandomButton");
-        joinRandomButton.Command = ReactiveCommand.Create(JoinRandomButtonClicked);
+        
+        CreateButton.Command = ReactiveCommand.Create(CreateButtonClicked);
+        JoinButton.Command = ReactiveCommand.Create(JoinButtonClicked);
+        JoinRandomButton.Command = ReactiveCommand.Create(JoinRandomButtonClicked);
     }
 
     protected override void OnDataContextChanged(EventArgs e)

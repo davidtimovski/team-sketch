@@ -6,12 +6,12 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using TeamSketch.Common.ApiModels;
 
-namespace TeamSketch.Services;
+namespace TeamSketch.Utils;
 
 public static class HttpProxy
 {
-    private readonly static HttpClient HttpClient = new();
-    private readonly static JsonSerializerOptions SerializerSettings = new()
+    private static readonly HttpClient HttpClient = new();
+    private static readonly JsonSerializerOptions SerializerSettings = new()
     {
         PropertyNameCaseInsensitive = true
     };

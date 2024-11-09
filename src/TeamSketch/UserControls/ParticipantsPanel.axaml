@@ -1,7 +1,8 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			 xmlns:vm="using:TeamSketch.ViewModels.UserControls"
-             x:Class="TeamSketch.UserControls.ParticipantsPanel">
+             x:Class="TeamSketch.UserControls.ParticipantsPanel"
+             x:DataType="vm:ParticipantsPanelViewModel">
 
 	<UserControl.Styles>
 		<Style Selector="Border.label">
@@ -37,7 +38,7 @@
 			<TextBlock>Participants</TextBlock>
 		</Border>
 
-		<ItemsControl Items="{Binding Participants}">
+		<ItemsControl ItemsSource="{Binding Participants}">
 			<ItemsControl.ItemTemplate>
 				<DataTemplate DataType="vm:ParticipantViewModel">
 					<Border Classes="participant">
