@@ -1,26 +1,24 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Avalonia;
 using ReactiveUI;
 using Splat;
 using TeamSketch.DependencyInjection;
 using TeamSketch.Services;
+using TeamSketch.Utils;
 using TeamSketch.ViewModels.UserControls;
 
 namespace TeamSketch.ViewModels;
 
-public class MainWindowViewModel : ViewModelBase
+public sealed class MainWindowViewModel : ReactiveObject
 {
-    private readonly IAppState _appState;
-
     public MainWindowViewModel(ISignalRService signalRService)
     {
-        _appState = Locator.Current.GetRequiredService<IAppState>();
+        var appState = Locator.Current.GetRequiredService<IAppState>();
         SignalRService = signalRService;
 
-        Room = _appState.Room;
+        Room = appState.Room;
 
-        toolsPanel = new ToolsPanelViewModel(_appState.BrushSettings);
+        toolsPanel = new ToolsPanelViewModel(appState.BrushSettings);
         participantsPanel = new ParticipantsPanelViewModel(signalRService);
         eventsPanel = new EventsPanelViewModel(signalRService);
         connectionStatus = new ConnectionStatusViewModel(signalRService);
@@ -53,34 +51,29 @@ public class MainWindowViewModel : ViewModelBase
         EventsPanel.Events.Add(new EventViewModel(initialEventMessage));
     }
 
-    private async void CopyRoom()
-    {
-        await Application.Current.Clipboard.SetTextAsync(Room);
-    }
-
     private ToolsPanelViewModel toolsPanel;
-    private ToolsPanelViewModel ToolsPanel
+    public ToolsPanelViewModel ToolsPanel
     {
         get => toolsPanel;
         set => this.RaiseAndSetIfChanged(ref toolsPanel, value);
     }
 
     private ParticipantsPanelViewModel participantsPanel;
-    private ParticipantsPanelViewModel ParticipantsPanel
+    public ParticipantsPanelViewModel ParticipantsPanel
     {
         get => participantsPanel;
         set => this.RaiseAndSetIfChanged(ref participantsPanel, value);
     }
 
     private EventsPanelViewModel eventsPanel;
-    private EventsPanelViewModel EventsPanel
+    public EventsPanelViewModel EventsPanel
     {
         get => eventsPanel;
         set => this.RaiseAndSetIfChanged(ref eventsPanel, value);
     }
 
     private ConnectionStatusViewModel connectionStatus;
-    private ConnectionStatusViewModel ConnectionStatus
+    public ConnectionStatusViewModel ConnectionStatus
     {
         get => connectionStatus;
         set => this.RaiseAndSetIfChanged(ref connectionStatus, value);

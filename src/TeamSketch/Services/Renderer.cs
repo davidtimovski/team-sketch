@@ -30,7 +30,7 @@ public interface IRenderer
     Point RestrictPointToCanvas(double x, double y);
 }
 
-public class Renderer : IRenderer
+public sealed class Renderer : IRenderer
 {
     private readonly BrushSettings _brushSettings;
     private readonly Canvas _canvas;
@@ -64,7 +64,7 @@ public class Renderer : IRenderer
     {
         if (_linePointsQueue.Count == 0)
         {
-            return new List<Point>();
+            return [];
         }
 
         var myPointCollection = new Points();
@@ -78,16 +78,16 @@ public class Renderer : IRenderer
             myPointCollection.Add(point);
         }
 
-        var pathGeometry = new PathGeometry();
+        var pathGeometry = new PathGeometry { Figures = [] };
         var pathFigure = new PathFigure
         {
-            Segments = new PathSegments
-            {
+            Segments =
+            [
                 new PolyLineSegment
                 {
                     Points = myPointCollection
                 }
-            },
+            ],
             StartPoint = firstPoint,
             IsClosed = false
         };
@@ -130,16 +130,16 @@ public class Renderer : IRenderer
             myPointCollection.Add(point);
         }
 
-        var pathGeometry = new PathGeometry();
+        var pathGeometry = new PathGeometry { Figures = [] };
         var pathFigure = new PathFigure
         {
-            Segments = new PathSegments
-            {
+            Segments =
+            [
                 new PolyLineSegment
                 {
                     Points = myPointCollection
                 }
-            },
+            ],
             StartPoint = firstPoint,
             IsClosed = false
         };

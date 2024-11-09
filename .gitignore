@@ -40,3 +40,4 @@ msbuild.wrn
 publishing/*/*.lnk
 publishing/*/installers/
 publishing/linux/output/
+!publishing/linux/template_*/usr/bin

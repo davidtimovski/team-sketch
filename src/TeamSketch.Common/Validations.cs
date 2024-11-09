@@ -2,7 +2,7 @@
 
 namespace TeamSketch.Common;
 
-public static class Validations
+public static partial class Validations
 {
     public static string? ValidateNickname(string nickname)
     {
@@ -43,6 +43,9 @@ public static class Validations
 
         text = text.Trim();
 
-        return Regex.IsMatch(text, @"^[a-zA-Z0-9\s]*$");
+        return AlphanumericRegex().IsMatch(text);
     }
+
+    [GeneratedRegex(@"^[a-zA-Z0-9\s]*$")]
+    private static partial Regex AlphanumericRegex();
 }

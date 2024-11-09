@@ -11,10 +11,10 @@ public interface ILiveViewService
     List<Location> GetDistinctLocations();
 }
 
-public class LiveViewService : ILiveViewService
+public sealed class LiveViewService : ILiveViewService
 {
-    private readonly static HttpClient HttpClient = new();
-    private readonly static JsonSerializerOptions SerializerSettings = new()
+    private static readonly HttpClient HttpClient = new();
+    private static readonly JsonSerializerOptions SerializerSettings = new()
     {
         PropertyNameCaseInsensitive = true
     };
@@ -27,7 +27,7 @@ public class LiveViewService : ILiveViewService
 
     public async Task AddAsync(string connectionId, string? ipAddress)
     {
-        if (ipAddress == null)
+        if (ipAddress is null)
         {
             return;
         }
@@ -40,7 +40,7 @@ public class LiveViewService : ILiveViewService
 
         var content = await response.Content.ReadAsStringAsync();
         var data = JsonSerializer.Deserialize<Location>(content, SerializerSettings);
-        if (data == null)
+        if (data is null)
         {
             return;
         }

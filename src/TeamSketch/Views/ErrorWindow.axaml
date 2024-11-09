@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:TeamSketch.ViewModels"
         x:Class="TeamSketch.Views.ErrorWindow"
+        x:DataType="vm:ErrorViewModel"
         Title="Error"
 		ExtendClientAreaToDecorationsHint="True"
 		ExtendClientAreaChromeHints="NoChrome"

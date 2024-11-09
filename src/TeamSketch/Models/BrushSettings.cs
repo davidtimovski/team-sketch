@@ -34,7 +34,6 @@ public class BrushSettings
     };
     private readonly string _cursorsPath;
     private readonly Dictionary<ColorsEnum, string> _cursorBrushPathLookup;
-    private readonly IAssetLoader assetLoader;
 
     /// <param name="cursorsPath">Required parameter. Use empty string for unit testing.</param>
     /// <exception cref="ArgumentException"></exception>
@@ -57,8 +56,6 @@ public class BrushSettings
                 { ColorsEnum.Gray, $"{_cursorsPath}/brush-gray.png" }
             };
         }
-
-        assetLoader = AvaloniaLocator.Current.GetService<IAssetLoader>();
 
         BrushColor = ColorsEnum.Default;
         BrushThickness = ThicknessEnum.SemiThin;
@@ -86,15 +83,15 @@ public class BrushSettings
             if (value == ColorsEnum.Eraser)
             {
                 var path = $"{_cursorsPath}/eraser-{Thickness}.png";
-                Cursor = new(new Bitmap(assetLoader.Open(new Uri(path))), new PixelPoint((int)HalfThickness, (int)HalfThickness));
+                Cursor = new(new Bitmap(AssetLoader.Open(new Uri(path))), new PixelPoint((int)HalfThickness, (int)HalfThickness));
             }
             else
             {
                 var path = _cursorBrushPathLookup[value];
-                Cursor = new(new Bitmap(assetLoader.Open(new Uri(path))), new PixelPoint(0, 0));
+                Cursor = new(new Bitmap(AssetLoader.Open(new Uri(path))), new PixelPoint(0, 0));
             }
 
-            BrushChanged?.Invoke(null, new BrushChangedEventArgs(Cursor));
+            BrushChanged?.Invoke(null, new BrushChangedEventArgs { Cursor = Cursor });
         }
     }
 
@@ -117,10 +114,10 @@ public class BrushSettings
             if (brushColor == ColorsEnum.Eraser)
             {
                 var path = $"{_cursorsPath}/eraser-{Thickness}.png";
-                Cursor = new(new Bitmap(assetLoader.Open(new Uri(path))), new PixelPoint((int)HalfThickness, (int)HalfThickness));
+                Cursor = new(new Bitmap(AssetLoader.Open(new Uri(path))), new PixelPoint((int)HalfThickness, (int)HalfThickness));
             }
 
-            BrushChanged?.Invoke(null, new BrushChangedEventArgs(Cursor));
+            BrushChanged?.Invoke(null, new BrushChangedEventArgs { Cursor = Cursor });
         }
     }
 
@@ -142,12 +139,7 @@ public class BrushSettings
     }
 }
 
-public class BrushChangedEventArgs : EventArgs
+public sealed class BrushChangedEventArgs : EventArgs
 {
-    public BrushChangedEventArgs(Cursor cursor)
-    {
-        Cursor = cursor;
-    }
-
-    public Cursor Cursor { get; private set; }
+    public required Cursor Cursor { get; init; }
 }

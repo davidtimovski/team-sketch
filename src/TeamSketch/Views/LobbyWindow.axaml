@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:TeamSketch.ViewModels"
         x:Class="TeamSketch.Views.LobbyWindow"
+        x:DataType="vm:LobbyViewModel"
         Title="Team Sketch">
 
 	<Window.Styles>
@@ -56,7 +57,7 @@
 		<Style Selector="TextBox.invalid">
 			<Setter Property="BorderBrush" Value="#eb3324" />
 		</Style>
-		<Style Selector="TextBox#roomTextBox">
+		<Style Selector="TextBox#RoomTextBox">
 			<Setter Property="Margin" Value="0 10 0 0" />
 		</Style>
 
@@ -110,9 +111,9 @@
 	<StackPanel>
 		<Border Classes="tabs">
 			<Grid ColumnDefinitions="*,14,*,14,*">
-				<Button Grid.Column="0" Command="{Binding SelectTab}" CommandParameter="0" IsEnabled="{Binding !CreateTabSelected}">Create</Button>
-				<Button Grid.Column="2" Command="{Binding SelectTab}" CommandParameter="1" IsEnabled="{Binding !JoinTabSelected}">Join</Button>
-				<Button Grid.Column="4" Command="{Binding SelectTab}" CommandParameter="2" IsEnabled="{Binding !JoinRandomTabSelected}">Random</Button>
+				<Button Grid.Column="0" Command="{Binding SelectTab}" CommandParameter="create" IsEnabled="{Binding !CreateTabSelected}">Create</Button>
+				<Button Grid.Column="2" Command="{Binding SelectTab}" CommandParameter="join" IsEnabled="{Binding !JoinTabSelected}">Join</Button>
+				<Button Grid.Column="4" Command="{Binding SelectTab}" CommandParameter="random" IsEnabled="{Binding !JoinRandomTabSelected}">Random</Button>
 			</Grid>
 		</Border>
 
@@ -121,14 +122,14 @@
 				<StackPanel IsVisible="{Binding CreateTabSelected}">
 					<TextBox Text="{Binding Nickname}" IsEnabled="{Binding !Entering}" MaxLength="30" Watermark="Nickname" Classes.invalid="{Binding NicknameIsInvalid}" />
 
-					<Button Name="createButton" Content="{Binding CreateButtonLabel}" IsEnabled="{Binding !Entering}" />
+					<Button Name="CreateButton" Content="{Binding CreateButtonLabel}" IsEnabled="{Binding !Entering}" />
 				</StackPanel>
 
 				<StackPanel IsVisible="{Binding JoinTabSelected}">
 					<TextBox Text="{Binding Nickname}" IsEnabled="{Binding !Entering}" MaxLength="30" Watermark="Nickname" Classes.invalid="{Binding NicknameIsInvalid}" />
-					<TextBox Name="roomTextBox" IsEnabled="{Binding !Entering}" Text="{Binding Room}" MaxLength="7" Watermark="Room" Classes.invalid="{Binding RoomIsInvalid}" />
+					<TextBox Name="RoomTextBox" IsEnabled="{Binding !Entering}" Text="{Binding Room}" MaxLength="7" Watermark="Room" Classes.invalid="{Binding RoomIsInvalid}" />
 
-					<Button Name="joinButton" Content="{Binding JoinButtonLabel}" IsEnabled="{Binding !Entering}" />
+					<Button Name="JoinButton" Content="{Binding JoinButtonLabel}" IsEnabled="{Binding !Entering}" />
 				</StackPanel>
 
 				<StackPanel IsVisible="{Binding JoinRandomTabSelected}">
@@ -136,7 +137,7 @@
 
 					<DockPanel>
 						<Button Command="{Binding ExitRandomRoomQueueAsync}" IsVisible="{Binding Entering}" Classes="cancel">Cancel</Button>
-						<Button Name="joinRandomButton" Content="{Binding JoinRandomButtonLabel}" IsEnabled="{Binding !Entering}" />
+						<Button Name="JoinRandomButton" Content="{Binding JoinRandomButtonLabel}" IsEnabled="{Binding !Entering}" />
 					</DockPanel>
 				</StackPanel>
 			</Panel>

@@ -8,18 +8,15 @@ using TeamSketch.Services;
 
 namespace TeamSketch.ViewModels.UserControls;
 
-public class ParticipantsPanelViewModel : ViewModelBase
+public sealed class ParticipantsPanelViewModel : ReactiveObject
 {
-    private readonly ISignalRService _signalRService;
-
     public ParticipantsPanelViewModel(ISignalRService signalRService)
     {
-        _signalRService = signalRService;
-        _signalRService.Connection.On<string>("JoinedRoom", Connection_JoinedRoom);
-        _signalRService.Connection.On<string>("LeftRoom", Connection_LeftRoom);
+        signalRService.Connection.On<string>("JoinedRoom", Connection_JoinedRoom);
+        signalRService.Connection.On<string>("LeftRoom", Connection_LeftRoom);
     }
 
-    public ObservableCollection<ParticipantViewModel> Participants { get; } = new();
+    public ObservableCollection<ParticipantViewModel> Participants { get; } = [];
 
     private void Connection_JoinedRoom(string nickname)
     {
@@ -33,7 +30,7 @@ public class ParticipantsPanelViewModel : ViewModelBase
     }
 }
 
-public class ParticipantViewModel : ViewModelBase
+public sealed class ParticipantViewModel : ReactiveObject
 {
     private readonly DispatcherTimer _drawingIndicatorTimer = new();
 

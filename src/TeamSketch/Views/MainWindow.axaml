@@ -3,6 +3,7 @@
         xmlns:vm="using:TeamSketch.ViewModels"
 		xmlns:controls="using:TeamSketch.UserControls"
         x:Class="TeamSketch.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
         Title="Team Sketch">
 
     <Design.DataContext>
@@ -90,7 +91,7 @@
 		<Grid Grid.Row="0" ColumnDefinitions="*,Auto">
 
 			<Border Grid.Column="0" Classes="canvasContainer">
-				<Canvas Name="canvas" DataContext="{Binding Path=ConnectionStatus}" IsEnabled="{Binding Connected}" PointerPressed="Canvas_PointerPressed" PointerReleased="Canvas_PointerReleased" />
+				<Canvas Name="Canvas" DataContext="{Binding Path=ConnectionStatus}" IsEnabled="{Binding Connected}" PointerPressed="Canvas_PointerPressed" PointerReleased="Canvas_PointerReleased" />
 			</Border>
 
 			<Border Grid.Column="1">
@@ -118,7 +119,7 @@
 					<DockPanel>
 						<TextBlock Text="Room: " />
 						<TextBlock Text="{Binding Room}" Classes="roomName" />
-						<Button Command="{Binding CopyRoom}">Copy</Button>
+						<Button Click="OnCopyRoomNameClick">Copy</Button>
 					</DockPanel>
 				</Border>
 

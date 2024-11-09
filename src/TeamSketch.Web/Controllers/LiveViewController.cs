@@ -5,7 +5,7 @@ namespace TeamSketch.Web.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class LiveViewController : ControllerBase
+public sealed class LiveViewController : ControllerBase
 {
     private readonly ILiveViewService _liveLiveService;
 

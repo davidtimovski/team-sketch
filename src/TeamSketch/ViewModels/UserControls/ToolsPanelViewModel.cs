@@ -3,7 +3,7 @@ using TeamSketch.Models;
 
 namespace TeamSketch.ViewModels.UserControls;
 
-public class ToolsPanelViewModel : ViewModelBase
+public sealed class ToolsPanelViewModel : ReactiveObject
 {
     private readonly BrushSettings _brushSettings;
 
@@ -17,7 +17,7 @@ public class ToolsPanelViewModel : ViewModelBase
     }
 
     private ColorsEnum brushColor;
-    private ColorsEnum BrushColor
+    public ColorsEnum BrushColor
     {
         get => brushColor;
         set
@@ -38,7 +38,7 @@ public class ToolsPanelViewModel : ViewModelBase
 
     private ThicknessEnum previousBrushThickness;
     private ThicknessEnum brushThickness;
-    private ThicknessEnum BrushThickness
+    public ThicknessEnum BrushThickness
     {
         get => brushThickness;
         set

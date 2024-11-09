@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Team Sketch"
-#define MyAppVersion "0.8.2"
+#define MyAppVersion "0.9.0"
 #define MyAppPublisher "David Timovski"
 #define MyAppURL "https://www.davidtimovski.com/team-sketch"
 #define MyAppExeName "TeamSketch.exe"
@@ -22,9 +22,9 @@ DefaultDirName={autopf}\{#MyAppName}
 DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
-OutputDir=C:\Users\david\source\repos\team-sketch\publishing\windows\installers
+OutputDir=R:\repos\team-sketch\publishing\windows\installers
 OutputBaseFilename="team-sketch_{#MyAppVersion}_win64_setup"
-SetupIconFile=C:\Users\david\source\repos\team-sketch\src\TeamSketch\Assets\logo.ico
+SetupIconFile=R:\repos\team-sketch\src\TeamSketch\Assets\logo.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -36,7 +36,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\david\source\repos\team-sketch\src\TeamSketch\bin\Release\net6.0\publish\win-x64\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "R:\repos\team-sketch\src\TeamSketch\bin\Release\net8.0\publish\win-x64\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

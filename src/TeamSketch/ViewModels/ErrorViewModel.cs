@@ -1,6 +1,8 @@
-﻿namespace TeamSketch.ViewModels;
+﻿using ReactiveUI;
 
-public class ErrorViewModel : ViewModelBase
+namespace TeamSketch.ViewModels;
+
+public sealed class ErrorViewModel : ReactiveObject
 {
     public ErrorViewModel(string message, bool isSystemError)
     {
