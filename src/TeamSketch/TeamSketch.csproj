@@ -1,47 +1,58 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
-	<BuiltInComInteropSupport>true</BuiltInComInteropSupport>
-    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-	<ApplicationIcon>logo.ico</ApplicationIcon>
-	<Product>Team Sketch</Product>
-	<Copyright>Copyright © David Timovski 2024</Copyright>
-	<Company>David Timovski</Company>
-	<AssemblyVersion>0.9.0</AssemblyVersion>
-	<FileVersion>0.9.0</FileVersion>
-	<Version>0.9.0</Version>
-  </PropertyGroup>
-  <ItemGroup>
-    <AvaloniaResource Include="Assets\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.2.0" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.2.0" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.0" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="11.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.10" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="8.0.10" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="UserControls\ParticipantsPanel.axaml.cs">
-      <DependentUpon>ParticipantsPanel.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\MainWindow.axaml.cs">
-      <DependentUpon>MainWindow.axaml</DependentUpon>
-    </Compile>
-	<Compile Update="Views\LobbyWindow.axaml.cs">
-      <DependentUpon>LobbyWindow.axaml</DependentUpon>
-	</Compile>
-  </ItemGroup>
-  <ItemGroup>
-	<EmbeddedResource Include="Assets\Fonts\RedHatDisplay-Regular.ttf" />
-	<EmbeddedResource Include="Assets\Fonts\RedHatDisplay-Medium.ttf" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\TeamSketch.Common\TeamSketch.Common.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <AvaloniaResource Update="Assets\Icons.axaml" />
-  </ItemGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
+		<AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+		<PublishAot>true</PublishAot>
+		<!-- Recommended Avalonia trimming settings for Native AOT -->
+		<BuiltInComInteropSupport>false</BuiltInComInteropSupport>
+		<TrimMode>link</TrimMode>
+		<ApplicationIcon>logo.ico</ApplicationIcon>
+		<Product>Team Sketch</Product>
+		<Copyright>Copyright © David Timovski 2025</Copyright>
+		<Company>David Timovski</Company>
+		<AssemblyVersion>0.10.0</AssemblyVersion>
+		<FileVersion>0.10.0</FileVersion>
+		<Version>0.10.0</Version>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<AvaloniaResource Include="Assets\**" />
+		<AvaloniaResource Update="Assets\Icons.axaml" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<PackageReference Include="Avalonia" Version="11.2.3" />
+		<PackageReference Include="Avalonia.Desktop" Version="11.2.3" />
+		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.3" />
+		<PackageReference Include="Avalonia.ReactiveUI" Version="11.2.3" />
+		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.11" />
+		<PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="8.0.11" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Preserve Avalonia types for reflection -->
+		<TrimmerRootAssembly Include="Avalonia.Themes.Fluent" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="UserControls\ParticipantsPanel.axaml.cs">
+			<DependentUpon>ParticipantsPanel.axaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\MainWindow.axaml.cs">
+			<DependentUpon>MainWindow.axaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\LobbyWindow.axaml.cs">
+			<DependentUpon>LobbyWindow.axaml</DependentUpon>
+		</Compile>
+	</ItemGroup>
+	
+	<ItemGroup>
+		<EmbeddedResource Include="Assets\Fonts\RedHatDisplay-Regular.ttf" />
+		<EmbeddedResource Include="Assets\Fonts\RedHatDisplay-Medium.ttf" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<ProjectReference Include="..\TeamSketch.Common\TeamSketch.Common.csproj" />
+	</ItemGroup>
 </Project>

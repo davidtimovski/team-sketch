@@ -1,4 +1,4 @@
-$Version = "0.9.0"
+$Version = "0.10.0"
 $RepoDir = "R:\repos\team-sketch"
 $TargetFramework = "net8.0"
 

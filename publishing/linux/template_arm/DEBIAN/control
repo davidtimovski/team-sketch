@@ -1,5 +1,5 @@
 Package: team-sketch
-Version: 0.9.0
+Version: 0.10.0
 Section: devel
 Priority: optional
 Architecture: armhf
@@ -7,4 +7,4 @@ Depends: libc6, libc6, libgcc-s1, libicu74, libssl3, libstdc++6, zlib1g
 Maintainer: David Timovski
 Homepage: https://www.davidtimovski.com/team-sketch
 Description: Sketch with your friends.
-Copyright: 2021-2024 David Timovski
+Copyright: 2021-2025 David Timovski
