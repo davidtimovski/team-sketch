@@ -5,16 +5,13 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TeamSketch.Common.ApiModels;
+using TeamSketch.Serialization;
 
 namespace TeamSketch.Utils;
 
 public static class HttpProxy
 {
     private static readonly HttpClient HttpClient = new();
-    private static readonly JsonSerializerOptions SerializerSettings = new()
-    {
-        PropertyNameCaseInsensitive = true
-    };
 
     static HttpProxy()
     {
@@ -29,7 +26,7 @@ public static class HttpProxy
 
         var content = await response.Content.ReadAsStringAsync();
 
-        return JsonSerializer.Deserialize<JoinRoomValidationResult>(content, SerializerSettings);
+        return JsonSerializer.Deserialize(content, SourceGenerationContext.Default.JoinRoomValidationResult);
     }
 
     public static async Task<List<string>> GetParticipantsAsync(string room)
@@ -39,6 +36,6 @@ public static class HttpProxy
 
         var content = await response.Content.ReadAsStringAsync();
 
-        return JsonSerializer.Deserialize<List<string>>(content, SerializerSettings);
+        return JsonSerializer.Deserialize(content, SourceGenerationContext.Default.ListString);
     }
 }
